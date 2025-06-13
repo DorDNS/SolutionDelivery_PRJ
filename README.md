@@ -10,8 +10,6 @@ Face à l’absence de données précises sur les déchets abandonnés et l’in
 
 Ce projet s’inscrit dans une logique **AI for Good** et de **Green IT**, visant un impact environnemental et sociétal positif.
 
----
-
 ## 🎯 Objectifs
 
 - Développement d’une **plateforme web** pour la détection automatique d’ordures via des images.
@@ -19,8 +17,6 @@ Ce projet s’inscrit dans une logique **AI for Good** et de **Green IT**, visan
 - Visualisation des données via un **tableau de bord interactif**.
 - Suivi de l’état des poubelles sur le territoire (cartographie dynamique).
 - Intégration de bonnes pratiques en **éco-conception** et **gestion des risques**.
-
----
 
 ## 🧩 Fonctionnalités principales
 
@@ -51,8 +47,6 @@ Ce projet s’inscrit dans une logique **AI for Good** et de **Green IT**, visan
 - Analyse des risques liés à la qualité des images, l’annotation manuelle, la variabilité technique des utilisateurs, etc.
 - Mesures d’atténuation prévues (prévisualisation, contrôle qualité, documentation).
 
----
-
 ## 🧑‍💻 Technologies utilisées
 
 | Côté | Technologies |
@@ -63,8 +57,6 @@ Ce projet s’inscrit dans une logique **AI for Good** et de **Green IT**, visan
 | Visualisation | matplotlib, Chart.js |
 | Hébergement | local / cloud écoresponsable recommandé |
 | Conformité Green IT | RGESN, grille d’impact, pratiques écoresponsables |
-
----
 
 ## 🧱 Structure du projet
 
@@ -84,8 +76,6 @@ Ce projet s’inscrit dans une logique **AI for Good** et de **Green IT**, visan
 
 ````
 
----
-
 ## ✅ Exécution locale
 
 ```bash
@@ -100,8 +90,6 @@ pip install -r requirements.txt
 python app/main.py
 ````
 
----
-
 ## 📚 Livrables attendus
 
 * Plateforme fonctionnelle (back + front),
@@ -114,8 +102,6 @@ python app/main.py
   * Justification Green IT,
   * Captures du tableau de bord.
 
----
-
 ## 👥 Équipe
 
 * Doryan Denis
@@ -125,13 +111,9 @@ python app/main.py
 * Louise Monciero
 * Camille Tura-Durand
 
----
-
 ## 📝 Licence
 
 Projet académique réalisé dans le cadre du MasterCamp Data EFREI 2025 – **non destiné à une exploitation commerciale**.
-
----
 
 ## 🌿 Démarche écoresponsable
 
@@ -142,8 +124,6 @@ Ce projet intègre une **démarche Green IT** selon les référentiels du [RGESN
 * Compression des images,
 * Hébergement durable privilégié,
 * Documentation des impacts via grille et questionnaire d’écoconception.
-
----
 
 ## 📎 Liens utiles
 
