@@ -61,19 +61,45 @@ Ce projet s’inscrit dans une logique **AI for Good** et de **Green IT**, visan
 ## 🧱 Structure du projet
 
 ```
-
-├── app/                  # Code principal (routes, gestion des images)
-│   ├── routes/
-│   ├── static/
-│   └── templates/
-├── data/                 # Images, base SQLite
-├── scripts/              # Extraction de features, règles de classification
-├── dashboard/            # Scripts Chart.js ou matplotlib
-├── tests/                # Tests unitaires (si implémentés)
-├── docs/                 # Rapport, documentation, grille d’impact
-├── requirements.txt      # Dépendances
-└── README.md             # Ce fichier
-
+📦 SolutionDelivery_PRJ/
+│
+├── app/                    # 📌 Application principale (code Flask/Django)
+│   ├── routes/             # Endpoints (upload, annotation, dashboard…)
+│   ├── templates/          # Fichiers HTML (Jinja)
+│   ├── static/             # Fichiers statiques (CSS, JS, images du front)
+│   ├── logic/              # Fonctions métier : classification, feature extraction
+│   └── main.py             # Lancement du serveur web
+│
+├── data/                   # 📁 Données locales
+│   ├── raw/                # Images originales (uploadées)
+│   ├── processed/          # Images annotées / traitées
+│   ├── features.csv        # Données extraites par image
+│   └── db.sqlite3          # Base SQLite
+│
+├── scripts/                # 🛠️ Scripts indépendants
+│   ├── extract_features.py # Extraction de caractéristiques visuelles
+│   ├── classify_rules.py   # Règles de classification automatique
+│   ├── clean_db.py         # Nettoyage, réinitialisation de la base
+│   └── ...
+│
+├── dashboard/              # 📊 Visualisations et graphes
+│   ├── stats.py            # Stats matplotlib
+│   └── dashboard.html      # Tableau de bord (front)
+│
+├── tests/                  # ✅ Tests unitaires (si implémentés)
+│   ├── test_upload.py
+│   └── test_classification.py
+│
+├── docs/                   # 📚 Documentation du projet
+│   ├── README.md           # Présentation du projet
+│   ├── Rapport_final.pdf   # Rapport technique (rendu)
+│   ├── Evaluation_des_risques_final.pdf
+│   ├── Questionnaire_ecoconception.pdf
+│   └── Grille_impacts_projets.pdf
+│
+├── requirements.txt        # 📦 Dépendances Python
+├── .gitignore              # 🧼 Fichiers à ignorer (base, images…)
+└── README.md               # 📝 Présentation principale du dépôt
 ````
 
 ## ✅ Exécution locale
