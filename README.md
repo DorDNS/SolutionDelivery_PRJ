@@ -131,7 +131,7 @@ python app/main.py
 ## 👥 Équipe
 
 * Doryan Denis
-* Adria Djafri
+* Nour Mezzi
 * Thomas Fischer
 * Eva Marot
 * Louise Monciero
