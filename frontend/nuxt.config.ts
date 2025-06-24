@@ -9,7 +9,7 @@ export default defineNuxtConfig({
       ]
     }
   },
-  
+
   devtools: { enabled: true },
 
   modules: [
@@ -18,8 +18,10 @@ export default defineNuxtConfig({
     '@nuxt/icon',
     '@nuxt/image',
     '@nuxt/fonts',
-    '@vueuse/motion/nuxt'
+    '@vueuse/motion/nuxt',
   ],
+
+  ui: {},
 
   css: ['~/assets/css/main.css'],
 
