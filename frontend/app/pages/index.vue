@@ -2,7 +2,7 @@
   <div class="flex flex-col min-h-screen bg-white">
     <!-- Hero Section -->
     <section
-      class="relative bg-cover bg-center h-[600px] text-center text-gray-800"
+      class="relative bg-cover bg-center h-[420px] text-center text-gray-800"
       style="
         background-image:
           linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)),
@@ -47,7 +47,7 @@
     </section>
 
     <!-- Dashboard Preview Section -->
-    <section class="py-20 bg-[#e0e1dd] text-center text-[#1b263b]">
+    <section class="flex-1 py-20 bg-[#e0e1dd] text-center text-[#1b263b]">
       <UContainer class="space-y-6">
         <h2 class="text-3xl font-bold">Aperçu du Dashboard</h2>
         <p class="max-w-2xl mx-auto text-[#415a77]">

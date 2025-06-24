@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="63.234 167.543 104.198 157.356">
+  <defs>
+    <linearGradient id="gradBlue" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#00BFFF"/>
+      <stop offset="1" stop-color="#1E3FA0"/>
+    </linearGradient>
+  </defs>
+  <path d="M 115.358 168.683 C 143.241 168.683 166.055 192.228 166.055 221.005 C 166.055 253.707 115.358 324.014 115.358 324.014 C 115.358 324.014 64.66 253.707 64.66 221.005 C 64.66 192.228 87.474 168.683 115.358 168.683 Z" fill="url(#gradBlue)" style="stroke-width: 1.61;"/>
+  <circle cx="40" cy="32" r="18" fill="white" transform="matrix(1.584293, 0, 0, 1.635063, 51.985828, 168.682861)"/>
+  <rect x="99.459" y="204.584" width="31.686" height="4.905" rx="1.5" style="stroke-width: 1.61; fill: rgb(75, 105, 167);"/>
+  <rect x="110.549" y="199.601" width="9.506" height="3.27" rx="1" style="stroke-width: 1.61; fill: rgb(75, 105, 167);"/>
+  <rect x="102.628" y="209.412" width="25.349" height="29.431" rx="2" style="stroke-width: 1.61; fill: rgb(75, 105, 167);"/>
+  <rect x="107.381" y="212.317" width="3.169" height="22.891" fill="white" style="stroke-width: 1.61;"/>
+  <rect x="113.718" y="212.317" width="3.169" height="22.891" fill="white" style="stroke-width: 1.61;"/>
+  <rect x="120.055" y="212.317" width="3.169" height="22.891" fill="white" style="stroke-width: 1.61;"/>
+</svg>
