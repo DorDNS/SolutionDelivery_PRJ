@@ -47,87 +47,6 @@ Ce projet s’inscrit dans une logique **AI for Good** et de **Green IT**, visan
 - Analyse des risques liés à la qualité des images, l’annotation manuelle, la variabilité technique des utilisateurs, etc.
 - Mesures d’atténuation prévues (prévisualisation, contrôle qualité, documentation).
 
-## 🧑‍💻 Technologies utilisées
-
-| Côté | Technologies |
-|------|--------------|
-| Back-end | Python, Flask/Django, SQLite ou PostgreSQL |
-| Traitement image | Pillow, OpenCV, os, shutil |
-| Front-end | HTML, CSS, Bootstrap, JavaScript, Chart.js |
-| Visualisation | matplotlib, Chart.js |
-| Hébergement | local / cloud écoresponsable recommandé |
-| Conformité Green IT | RGESN, grille d’impact, pratiques écoresponsables |
-
-## 🧱 Structure du projet
-
-```
-📦 SolutionDelivery_PRJ/
-│
-├── app/                    # 📌 Application principale (code Flask/Django)
-│   ├── routes/             # Endpoints (upload, annotation, dashboard…)
-│   ├── templates/          # Fichiers HTML (Jinja)
-│   ├── static/             # Fichiers statiques (CSS, JS, images du front)
-│   ├── logic/              # Fonctions métier : classification, feature extraction
-│   └── main.py             # Lancement du serveur web
-│
-├── data/                   # 📁 Données locales
-│   ├── raw/                # Images originales (uploadées)
-│   ├── processed/          # Images annotées / traitées
-│   ├── features.csv        # Données extraites par image
-│   └── db.sqlite3          # Base SQLite
-│
-├── scripts/                # 🛠️ Scripts indépendants
-│   ├── extract_features.py # Extraction de caractéristiques visuelles
-│   ├── classify_rules.py   # Règles de classification automatique
-│   ├── clean_db.py         # Nettoyage, réinitialisation de la base
-│   └── ...
-│
-├── dashboard/              # 📊 Visualisations et graphes
-│   ├── stats.py            # Stats matplotlib
-│   └── dashboard.html      # Tableau de bord (front)
-│
-├── tests/                  # ✅ Tests unitaires (si implémentés)
-│   ├── test_upload.py
-│   └── test_classification.py
-│
-├── docs/                   # 📚 Documentation du projet
-│   ├── README.md           # Présentation du projet
-│   ├── Rapport_final.pdf   # Rapport technique (rendu)
-│   ├── Evaluation_des_risques_final.pdf
-│   ├── Questionnaire_ecoconception.pdf
-│   └── Grille_impacts_projets.pdf
-│
-├── requirements.txt        # 📦 Dépendances Python
-├── .gitignore              # 🧼 Fichiers à ignorer (base, images…)
-└── README.md               # 📝 Présentation principale du dépôt
-````
-
-## ✅ Exécution locale
-
-```bash
-# 1. Cloner le repo
-git clone https://github.com/DorDNS/SolutionDelivery_PRJ
-cd wdp-platform
-
-# 2. Installer les dépendances
-pip install -r requirements.txt
-
-# 3. Lancer l'application (ex: Flask)
-python app/main.py
-````
-
-## 📚 Livrables attendus
-
-* Plateforme fonctionnelle (back + front),
-* Base de données d’images et annotations,
-* Rapport technique :
-
-  * Architecture de la solution,
-  * Fonctionnement des extractions et règles,
-  * Évaluation des risques,
-  * Justification Green IT,
-  * Captures du tableau de bord.
-
 ## 👥 Équipe
 
 * Doryan Denis
@@ -137,23 +56,78 @@ python app/main.py
 * Louise Monciero
 * Camille Tura-Durand
 
+## 🚀 Lancer le projet TrashMap en local
+
+Voici les étapes à suivre pour exécuter le projet TrashMap sur votre machine après avoir cloné ce dépôt GitHub.
+
+### ✅ Prérequis (à faire une seule fois)
+
+Avant de commencer, vérifiez que vous avez :
+
+* **Node.js v18 ou supérieur** installé
+  (Vous pouvez vérifier avec `node -v` dans le terminal)
+* **npm** installé (inclus avec Node.js)
+* Un terminal : Terminal macOS, Git Bash / PowerShell sur Windows, ou tout terminal Unix/Linux
+* (Optionnel mais recommandé) **Visual Studio Code**
+
+### 📦 Étapes après le clonage du projet
+
+Une fois que vous avez cloné ce dépôt GitHub sur votre machine, voici ce qu’il faut faire :
+
+**1. Ouvrir un terminal et se placer dans le dossier `frontend` :**
+
+```bash
+cd [nom-du-projet-cloné]
+cd frontend
+```
+
+**2. Installer les dépendances du projet :**
+
+```bash
+npm install
+```
+
+> Cela va créer automatiquement le dossier `node_modules/` (qui est ignoré par Git).
+
+**3. (Facultatif) Copier le fichier `.env.example` si présent :**
+
+```bash
+cp .env.example .env
+```
+
+> Sinon, vous pouvez créer un fichier `.env` vide ou le configurer selon les besoins ultérieurs (actuellement pas requis pour ce projet).
+
+**4. Lancer le serveur de développement Nuxt :**
+
+```bash
+npm run dev
+```
+
+**5. Accéder au site dans le navigateur :**
+
+Ouvrez votre navigateur à l'adresse suivante :
+
+```
+http://localhost:3000
+```
+
+Vous verrez la page d’accueil avec l’image de fond, le titre animé, les boutons, et la section dashboard.
+
+### ⚠️ Ce que vous n’avez pas besoin de faire :
+
+* **Pas besoin de créer le dossier `.nuxt/` ou `.output/`** → ils sont générés automatiquement par Nuxt
+* **Pas besoin de toucher à `node_modules/`** → il est généré par `npm install`
+* **Pas besoin de créer des pages ou composants supplémentaires** → tout est déjà prêt
+
+## 🧠 Que contient le projet ?
+
+* `frontend/app/pages/` : les pages Vue/Nuxt (`index.vue`, `upload.vue`)
+* `frontend/app/components/` : les composants comme `Header` et `Footer`
+* `frontend/app/layouts/default.vue` : le layout principal avec structure page complète
+* `frontend/public/images/` : image de fond (`hero-fond.png`)
+* `frontend/nuxt.config.ts` : configuration globale de Nuxt
+
+
 ## 📝 Licence
 
 Projet académique réalisé dans le cadre du MasterCamp Data EFREI 2025 – **non destiné à une exploitation commerciale**.
-
-## 🌿 Démarche écoresponsable
-
-Ce projet intègre une **démarche Green IT** selon les référentiels du [RGESN](https://ecoresponsable.numerique.gouv.fr/) :
-
-* Architecture logicielle légère,
-* Limitation des requêtes, pagination,
-* Compression des images,
-* Hébergement durable privilégié,
-* Documentation des impacts via grille et questionnaire d’écoconception.
-
-## 📎 Liens utiles
-
-* Rapport complet : `docs/Master_camp-Data_Final.pdf`
-* Évaluation des risques : `docs/Evaluation_des_risques_final.pdf`
-* Questionnaire RGESN : `docs/Questionnaire_d_ecoconception.pdf`
-* Grille d’impact : `docs/Grille_des_impacts_projets.pdf`
