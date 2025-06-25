@@ -88,10 +88,10 @@ const pieAnnotations = {
     label: 'Annotations',
     data: [10, 20, 30, 12],
     backgroundColor: [
-      'hsl(217, 91%, 60%)',
-      'hsl(190, 85%, 65%)',
-      'hsl(160, 80%, 55%)',
-      'hsl(40, 90%, 65%)'
+      '#4CAF50', // Vide
+      '#FFCA28', // Moitié pleine
+      '#FB8C00', // Pleine
+      '#E53935'  // Débordée
     ],
     borderColor: '#fff',
     borderWidth: 2
