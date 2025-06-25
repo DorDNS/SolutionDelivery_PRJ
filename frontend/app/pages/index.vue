@@ -53,11 +53,7 @@
         <p class="max-w-2xl mx-auto text-[#415a77]">
           Ici s’afficheront bientôt les graphiques, les cartes interactives et les statistiques de collecte.
         </p>
-        <div class="flex justify-center">
-          <UCard class="w-full max-w-md opacity-60 pointer-events-none">
-            <div class="text-center py-8 italic">Dashboard en construction…</div>
-          </UCard>
-        </div>
+        <DashboardPreview />
       </UContainer>
     </section>
   </div>
@@ -65,6 +61,7 @@
 
 <script setup>
 import { ref } from 'vue'
+import DashboardPreview from '@/components/dashboard/DashboardPreview.vue'
 
 const gradientStyle = ref('color: transparent; background-image: linear-gradient(90deg, #415a77, #778da9); background-clip: text;')
 
