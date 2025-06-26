@@ -132,9 +132,7 @@ const dragCounter = ref(0);
 
 const annotationOptions = [
     { label: "Vide", value: "vide", icon: "i-lucide-brush-cleaning" },
-    { label: "Moitié pleine", value: "moitie", icon: "i-lucide-beaker" },
     { label: "Pleine", value: "pleine", icon: "i-lucide-trash-2" },
-    { label: "Débordée", value: "debordee", icon: "i-lucide-alert-triangle" },
 ];
 
 const annotationIcon = computed(
@@ -206,20 +204,17 @@ async function saveAnnotation() {
     annotationSaved.value = true;
 
     const formData = new FormData();
-
-    // Ajoute le fichier image
     formData.append("image", selectedFile.value);
-
-    // Ajoute les métadonnées associées
     formData.append("File_name", selectedFile.value.name);
     formData.append("Height", selectedFile.value.height);
     formData.append("Width", selectedFile.value.width);
     formData.append("Size", selectedFile.value.size);
     formData.append("Date_taken", new Date().toISOString().split("T")[0]);
-    formData.append("Status", true);
-    formData.append("Annotation", annotation.value);
 
-    // Coordonnées factices ou réelles si disponibles
+    // Annotation binaire : 1 = pleine, 0 = vide
+    const annotationValue = annotation.value === "pleine" ? 1 : 0;
+    formData.append("Annotation", annotationValue);
+
     formData.append("Latitude", 48.8566);
     formData.append("Longitude", 2.3522);
     formData.append("City", "Paris");
@@ -227,14 +222,14 @@ async function saveAnnotation() {
     try {
         const response = await fetch("http://localhost:8000/img/upload/", {
             method: "POST",
-            body: formData, // Pas de headers ici, sinon bug avec boundary
+            body: formData,
         });
 
         if (!response.ok) {
             throw new Error(`Erreur HTTP ${response.status}`);
         }
 
-        console.log(`✅ Annotation enregistrée : ${annotation.value}`);
+        console.log(`✅ Annotation envoyée : ${annotationValue}`);
     } catch (err) {
         console.error(`❌ Erreur : ${err.message}`);
     }

@@ -3,10 +3,14 @@ import TrashMapServer.model_classification as models
 from django.http import FileResponse
 from django.http import HttpResponse, JsonResponse, HttpResponseNotFound, FileResponse, HttpResponseBadRequest
 import sqlite3
+import datetime
 import os
 import json
 import cv2
 import numpy as np
+from django.views.decorators.csrf import csrf_exempt
+import uuid
+
 
 def dashboard(request):
     db_path = os.path.join(s.BASE_DIR, 'db.sqlite3')
@@ -68,6 +72,7 @@ def locations_img(request):
         conn.close()
     return JsonResponse(data, safe=False)
 
+@csrf_exempt
 def upload_img(request):
     def compute_color_histogram(image):
         hist_data = {}
@@ -91,32 +96,34 @@ def upload_img(request):
         # A FAIRE !!!
         return (0)
 
-    print(request.content_type)
-    print(request.FILES)
-    print(request.POST)
-    #return 
 
     if (request.method != 'POST'):
         return HttpResponse("Method not autorized", status=405)
 
-    image = request.FILES.get('image')
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    file_name = request.POST.get('File_name')
-    file_path = os.path.join("Data/uploads", file_name)
+    image = request.FILES.get('image')  
+
+    file_name = str(uuid.uuid4())+'.png'
+    file_path = os.path.join("Data", "uploads", file_name)  # Pour l'enregistrement logique
+
+    image_bytes = image.read()
+    image_np = np.frombuffer(image_bytes, np.uint8)
+    image_cv2 = cv2.imdecode(image_np, cv2.IMREAD_COLOR)
+    gray = cv2.cvtColor(image_cv2, cv2.COLOR_BGR2GRAY)
+
     size = request.POST.get('Size')
     height = request.POST.get('Height')
     width = request.POST.get('Width')
     date_taken = request.POST.get('Date_taken') or datetime.now().strftime("%Y-%m-%d")
-    avg_rgb = mean_color(image)
-    avg_r, avg_g, avg_b = avg_rgb['red'], avg_rgb['green'], avg_rgb['blue']
+    avg_rgb = mean_color(image_cv2)
     contrast_level = give_contrast_level(gray)
-    rgb_histogram = compute_color_histogram(image)
+    rgb_histogram = compute_color_histogram(image_cv2)
     luminance_histogram = compute_brightness_histogram(gray)
-    edges = compute_edges(image)
+    edges = compute_edges(image_cv2)
     status = request.POST.get('Annotation')
     latitude = request.POST.get('Latitude')
     longitude = request.POST.get('Longitude')
     city = request.POST.get('City')
+
     if not image:
         return HttpResponse("No file found", status=400)
 
@@ -161,10 +168,12 @@ def upload_img(request):
                 id_location, float(latitude), float(longitude), city, id_image
             ))
 
+        cv2.imwrite(os.path.join(s.BASE_DIR, file_path), image_cv2)
+
         conn.commit()
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
-    
+
     finally:
         conn.close()
 
@@ -175,7 +184,7 @@ def upload_img(request):
 def predict_img(request):
     return HttpResponse(models.predict())
 
-
+@csrf_exempt
 def modify_img(request, id):
     if request.method not in ['POST', 'PUT']:
         return HttpResponseBadRequest("Seules les requêtes POST ou PUT sont autorisées.")
