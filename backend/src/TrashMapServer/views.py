@@ -169,7 +169,6 @@ def upload_img(request):
             cursor.execute(query_loc, (
                 id_location, float(latitude), float(longitude), city, id_image
             ))
-        print(": ",os.path.join(s.MEDIA_ROOT, file_path))
         cv2.imwrite(os.path.join(s.MEDIA_ROOT, file_path), image_cv2)
 
         conn.commit()
