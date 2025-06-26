@@ -179,7 +179,23 @@ def upload_img(request):
         conn.close()
 
     #A faire : Extraire Location depuis métadonnées ou corps de requête
-    return HttpResponse("Upload ok ?")
+    return JsonResponse({
+        "file_name": file_name,
+        "file_path": file_path,
+        "size": size,
+        "height": height,
+        "width": width,
+        "date_taken": date_taken,
+        "avg_rgb": avg_rgb,
+        "contrast_level": contrast_level,
+        "rgb_histogram": rgb_histogram,
+        "luminance_histogram": luminance_histogram,
+        "edges": edges,
+        "status": status,
+        "latitude": latitude,
+        "longitude": longitude,
+        "city": city
+    })
 
 
 def predict_img(request):
