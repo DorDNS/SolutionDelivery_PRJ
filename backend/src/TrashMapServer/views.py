@@ -100,9 +100,11 @@ def upload_img(request):
     if (request.method != 'POST'):
         return HttpResponse("Method not autorized", status=405)
 
-    image = request.FILES.get('image')  
+    image = request.FILES.get('image')
+    __, file_ext = os.path.splitext(request.POST.get('File_name'))
 
-    file_name = str(uuid.uuid4())+'.png'
+    file_name = str(uuid.uuid4())+file_ext
+
     file_path = os.path.join("Data", "uploads", file_name)  # Pour l'enregistrement logique
 
     image_bytes = image.read()
@@ -167,8 +169,8 @@ def upload_img(request):
             cursor.execute(query_loc, (
                 id_location, float(latitude), float(longitude), city, id_image
             ))
-
-        cv2.imwrite(os.path.join(s.BASE_DIR, file_path), image_cv2)
+        print(": ",os.path.join(s.MEDIA_ROOT, file_path))
+        cv2.imwrite(os.path.join(s.MEDIA_ROOT, file_path), image_cv2)
 
         conn.commit()
     except Exception as e:
