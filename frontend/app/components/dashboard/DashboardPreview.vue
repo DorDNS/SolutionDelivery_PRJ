@@ -42,8 +42,8 @@
         </div>
       </ChartCard>
 
-      <ChartCard title="Histogramme des tailles (px)">
-        <Bar :data="barTailles" :options="chartOptions" />
+      <ChartCard title="Histogramme global des tailles (px)">
+        <Bar :data="globalSizeHistogram" :options="chartOptions" />
       </ChartCard>
 
       <ChartCard title="Histogramme des couleurs (tons dominants)">
@@ -96,6 +96,22 @@ const periodes = [
 const selectedEtat = ref(etats[0].value)
 const selectedPeriod = ref(periodes[0].value)
 
+const { data: histoData, pending: histoPending, error: histoError } = await useFetch('http://127.0.0.1:8000/img/global_histograms/')
+const globalSizeHistogram = computed(() => ({
+  labels: ['<500px', '500-800px', '800-1200px', '>1200px'],
+  datasets: [{
+    label: 'Nombre d’images',
+    data: [
+      histoData.value?.Size_Histogram?.['<500px'] ?? 0,
+      histoData.value?.Size_Histogram?.['500-800px'] ?? 0,
+      histoData.value?.Size_Histogram?.['800-1200px'] ?? 0,
+      histoData.value?.Size_Histogram?.['>1200px'] ?? 0
+    ],
+    backgroundColor: ['#4CAF50', '#FFCA28', '#FB8C00', '#E53935'],
+    borderRadius: 8
+  }]
+}))
+
 // 🔗 API call
 const { data, pending, error } = await useFetch('http://127.0.0.1:8000/dashboard/')
 
@@ -111,33 +127,17 @@ const barImages = computed(() => ({
 }))
 
 const pieAnnotations = computed(() => ({
-  labels: ['Vide', 'Moitié pleine', 'Pleine', 'Sans label'],
+  labels: ['Vide', 'Pleine', 'Sans label'],
   datasets: [{
     label: 'Annotations',
     data: [
       data.value?.anotations_balance.empty_count ?? 0,
-      data.value?.anotations_balance.half_full_count ?? 0, // Assure que ce champ existe côté back
       data.value?.anotations_balance.full_count ?? 0,
       data.value?.anotations_balance.no_labeled_count ?? 0
     ],
-    backgroundColor: ['#4CAF50', '#FFCA28', '#FB8C00', '#9E9E9E'],
+    backgroundColor: ['#4CAF50', '#FB8C00', '#9E9E9E'],
     borderColor: '#fff',
     borderWidth: 2
-  }]
-}))
-
-const barTailles = computed(() => ({
-  labels: ['<500px', '500-800px', '800-1200px', '>1200px'],
-  datasets: [{
-    label: 'Nombre',
-    data: [
-      data.value?.histogram_tailles?.['<500px'] ?? 0,
-      data.value?.histogram_tailles?.['500-800px'] ?? 0,
-      data.value?.histogram_tailles?.['800-1200px'] ?? 0,
-      data.value?.histogram_tailles?.['>1200px'] ?? 0
-    ],
-    backgroundColor: 'hsl(160, 80%, 55%)',
-    borderRadius: 8
   }]
 }))
 

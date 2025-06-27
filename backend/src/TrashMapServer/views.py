@@ -323,3 +323,61 @@ def get_img(request, id):
         return HttpResponse(f"Error: {e}", status=500)
     finally:
         conn.close()
+
+def global_histograms(request):
+    db_path = os.path.join(s.BASE_DIR, 'db.sqlite3')
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute("SELECT Width, Height, RGB_Histogram, Luminance_Histogram, Contrast_level FROM Image")
+        rows = cursor.fetchall()
+
+        total_hist_r = [0]*256
+        total_hist_g = [0]*256
+        total_hist_b = [0]*256
+        total_luminance = [0]*256
+        contrast_list = []
+
+        # 🆕 Histogramme des tailles
+        size_classes = {'<500px': 0, '500-800px': 0, '800-1200px': 0, '>1200px': 0}
+
+        for width, height, rgb_json, lum_json, contrast in rows:
+            max_dim = max(width, height)
+            if max_dim < 500:
+                size_classes['<500px'] += 1
+            elif 500 <= max_dim < 800:
+                size_classes['500-800px'] += 1
+            elif 800 <= max_dim < 1200:
+                size_classes['800-1200px'] += 1
+            else:
+                size_classes['>1200px'] += 1
+
+            rgb_hist = json.loads(rgb_json)
+            lum_hist = json.loads(lum_json)
+
+            # Sum RGB
+            total_hist_r = [x + y for x, y in zip(total_hist_r, rgb_hist['red'])]
+            total_hist_g = [x + y for x, y in zip(total_hist_g, rgb_hist['green'])]
+            total_hist_b = [x + y for x, y in zip(total_hist_b, rgb_hist['blue'])]
+
+            # Sum luminance
+            total_luminance = [x + y for x, y in zip(total_luminance, lum_hist)]
+
+            # Contraste
+            if contrast is not None:
+                contrast_list.append(contrast)
+
+        avg_contrast = sum(contrast_list) / len(contrast_list) if contrast_list else None
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+    finally:
+        conn.close()
+
+    return JsonResponse({
+        "Size_Histogram": size_classes,
+        "RGB_Histogram": {"red": total_hist_r, "green": total_hist_g, "blue": total_hist_b},
+        "Luminance_Histogram": total_luminance,
+        "Average_Contrast": avg_contrast
+    })
