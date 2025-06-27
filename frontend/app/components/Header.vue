@@ -11,9 +11,17 @@
           TrashMap
         </span>
       </NuxtLink>
+
       <nav class="flex gap-4">
-        <UButton to="/" variant="ghost" class="text-white hover:text-[#e0e1dd]">Accueil</UButton>
-        <UButton to="/upload" color="primary">Uploader</UButton>
+        <UButton to="/" variant="ghost" class="text-white hover:text-[#e0e1dd]">
+          Accueil
+        </UButton>
+        <UButton to="/upload" color="primary">
+          Uploader
+        </UButton>
+        <UButton to="/navigation" variant="ghost" class="text-white hover:text-[#e0e1dd]">
+          Navigation
+        </UButton>
       </nav>
     </UContainer>
   </header>
