@@ -1,179 +1,242 @@
 <template>
-  <div
-    class="min-h-[calc(100vh-64px-80px)] py-16 px-4 bg-white relative"
-    @dragenter.prevent="handleDragEnter"
-    @dragleave.prevent="handleDragLeave"
-    @dragover.prevent
-    @drop.prevent="handleDrop"
-  >
-
-    <!-- Zone Drag & Drop -->
     <div
-      v-if="dragging"
-      class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50"
+        class="min-h-[calc(100vh-64px-80px)] py-16 px-4 bg-white relative"
+        @dragenter.prevent="handleDragEnter"
+        @dragleave.prevent="handleDragLeave"
+        @dragover.prevent
+        @drop.prevent="handleDrop"
     >
-      <div class="bg-white px-6 py-10 rounded-xl shadow-xl border-2 border-dashed border-[#778da9] text-center space-y-4">
-        <UIcon name="i-heroicons-arrow-down-tray" class="text-[#415a77] w-12 h-12 mx-auto" />
-        <p class="text-lg text-[#1b263b] font-semibold">Déposez votre image ici</p>
-        <p class="text-sm text-[#778da9]">JPG ou PNG — 5 Mo max — min. 500×500 px</p>
-      </div>
-    </div>
-
-    <UContainer class="max-w-xl mx-auto space-y-8">
-      <!-- Titre -->
-      <div class="text-center">
-        <h1 class="text-3xl font-bold text-[#1b263b]">Uploader une image</h1>
-        <div class="mt-2 text-[#415a77] text-sm flex items-center justify-center gap-2">
-          <UIcon name="i-heroicons-information-circle" class="w-4 h-4 text-[#778da9]" />
-          <span>
-            Formats : <strong>JPG</strong>, <strong>PNG</strong> — max <strong>5 Mo</strong> — min <strong>500×500 px</strong>
-          </span>
-        </div>
-      </div>
-
-      <!-- Upload -->
-      <UCard>
-        <div class="space-y-4">
-          <label class="block font-medium text-[#1b263b]">Image</label>
-          <UInput
-            type="file"
-            accept=".jpg,.jpeg,.png"
-            icon="i-heroicons-photo"
-            @change="handleFileChange"
-          />
-          <p v-if="error" class="text-red-600 text-sm">{{ error }}</p>
-        </div>
-      </UCard>
-
-      <!-- Aperçu & annotation -->
-      <div v-if="preview" class="text-center mt-8 space-y-6">
-        <img :src="preview" alt="Aperçu" class="max-h-[32rem] mx-auto rounded-xl shadow-lg border" />
-
-        <div class="flex flex-col items-center space-y-6">
-          <p class="text-sm font-medium text-[#415a77]">Sélectionnez l’état de la poubelle :</p>
-
-          <!-- Sélecteur élégant -->
-          <USelect
-            v-model="annotation"
-            :items="annotationOptions"
-            value-key="value"
-            :icon="annotationIcon"
-            placeholder="Choisissez un état"
-            class="w-full max-w-xs"
-            size="lg"
-            color="primary"
-          />
-
-          <!-- Enregistrement -->
-          <UButton
-            color="primary"
-            :disabled="!annotation || annotationSaved"
-            @click="saveAnnotation"
-          >
-            Enregistrer l’annotation
-          </UButton>
-
-          <div v-if="annotationSaved" class="text-sm text-[#415a77] font-semibold text-center">
-            ✅ Annotation enregistrée
-            <div class="mt-2">
-              <UButton color="primary" variant="ghost" @click="resetAnnotation">
-                Modifier l'annotation
-              </UButton>
+        <!-- Zone Drag & Drop -->
+        <div
+            v-if="dragging"
+            class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50"
+        >
+            <div
+                class="bg-white px-6 py-10 rounded-xl shadow-xl border-2 border-dashed border-[#778da9] text-center space-y-4"
+            >
+                <UIcon
+                    name="i-heroicons-arrow-down-tray"
+                    class="text-[#415a77] w-12 h-12 mx-auto"
+                />
+                <p class="text-lg text-[#1b263b] font-semibold">
+                    Déposez votre image ici
+                </p>
+                <p class="text-sm text-[#778da9]">
+                    JPG ou PNG — 5 Mo max — min. 500×500 px
+                </p>
             </div>
-          </div>
         </div>
-      </div>
-    </UContainer>
-  </div>
+
+        <UContainer class="max-w-xl mx-auto space-y-8">
+            <!-- Titre -->
+            <div class="text-center">
+                <h1 class="text-3xl font-bold text-[#1b263b]">
+                    Uploader une image
+                </h1>
+                <div
+                    class="mt-2 text-[#415a77] text-sm flex items-center justify-center gap-2"
+                >
+                    <UIcon
+                        name="i-heroicons-information-circle"
+                        class="w-4 h-4 text-[#778da9]"
+                    />
+                    <span>
+                        Formats : <strong>JPG</strong>, <strong>PNG</strong> —
+                        max <strong>5 Mo</strong> — min
+                        <strong>500×500 px</strong>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Upload -->
+            <UCard>
+                <div class="space-y-4">
+                    <label class="block font-medium text-[#1b263b]"
+                        >Image</label
+                    >
+                    <UInput
+                        type="file"
+                        accept=".jpg,.jpeg,.png"
+                        icon="i-heroicons-photo"
+                        @change="handleFileChange"
+                    />
+                    <p v-if="error" class="text-red-600 text-sm">{{ error }}</p>
+                </div>
+            </UCard>
+
+            <!-- Aperçu & annotation -->
+            <div v-if="preview" class="text-center mt-8 space-y-6">
+                <img
+                    :src="preview"
+                    alt="Aperçu"
+                    class="max-h-[32rem] mx-auto rounded-xl shadow-lg border"
+                />
+
+                <div class="flex flex-col items-center space-y-6">
+                    <p class="text-sm font-medium text-[#415a77]">
+                        Sélectionnez l’état de la poubelle :
+                    </p>
+
+                    <!-- Sélecteur élégant -->
+                    <USelect
+                        v-model="annotation"
+                        :items="annotationOptions"
+                        value-key="value"
+                        :icon="annotationIcon"
+                        placeholder="Choisissez un état"
+                        class="w-full max-w-xs"
+                        size="lg"
+                        color="primary"
+                    />
+
+                    <!-- Enregistrement -->
+                    <UButton
+                        color="primary"
+                        :disabled="!annotation || annotationSaved"
+                        @click="saveAnnotation"
+                    >
+                        Envoyer
+                    </UButton>
+
+                    <div
+                        v-if="annotationSaved"
+                        class="text-sm text-[#415a77] font-semibold text-center"
+                    >
+                        ✅ Annotation enregistrée
+                        <div class="mt-2">
+                            <UButton
+                                color="primary"
+                                variant="ghost"
+                                @click="resetAnnotation"
+                            >
+                                Modifier l'annotation
+                            </UButton>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </UContainer>
+    </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed } from "vue";
 
-const preview = ref(null)
-const error = ref('')
-const annotation = ref('')
-const annotationSaved = ref(false)
-const dragging = ref(false)
-const dragCounter = ref(0)
+const selectedFile = ref(null);
+const preview = ref(null);
+const error = ref("");
+const annotation = ref("");
+const annotationSaved = ref(false);
+const dragging = ref(false);
+const dragCounter = ref(0);
 
 const annotationOptions = [
-  { label: 'Vide', value: 'vide', icon: 'i-lucide-brush-cleaning' },
-  { label: 'Moitié pleine', value: 'moitie', icon: 'i-lucide-beaker' },
-  { label: 'Pleine', value: 'pleine', icon: 'i-lucide-trash-2' },
-  { label: 'Débordée', value: 'debordee', icon: 'i-lucide-alert-triangle' }
-]
+    { label: "Vide", value: "vide", icon: "i-lucide-brush-cleaning" },
+    { label: "Pleine", value: "pleine", icon: "i-lucide-trash-2" },
+];
 
-const annotationIcon = computed(() =>
-  annotationOptions.find(opt => opt.value === annotation.value)?.icon
-)
+const annotationIcon = computed(
+    () => annotationOptions.find((opt) => opt.value === annotation.value)?.icon
+);
 
 function handleFileChange(event) {
-  const file = event.target.files[0]
-  processFile(file)
+    const file = event.target.files[0];
+    processFile(file);
 }
 
 function handleDrop(event) {
-  dragCounter.value = 0
-  dragging.value = false
-  const file = event.dataTransfer.files[0]
-  processFile(file)
+    dragCounter.value = 0;
+    dragging.value = false;
+    const file = event.dataTransfer.files[0];
+    processFile(file);
 }
 
 function handleDragEnter() {
-  dragCounter.value++
-  dragging.value = true
+    dragCounter.value++;
+    dragging.value = true;
 }
 
 function handleDragLeave() {
-  dragCounter.value--
-  if (dragCounter.value <= 0) {
-    dragging.value = false
-  }
+    dragCounter.value--;
+    if (dragCounter.value <= 0) {
+        dragging.value = false;
+    }
 }
 
 function processFile(file) {
-  error.value = ''
-  preview.value = null
-  annotation.value = ''
-  annotationSaved.value = false
+    error.value = "";
+    preview.value = null;
+    annotation.value = "";
+    annotationSaved.value = false;
+    selectedFile.value = file;
 
-  if (!file) return
+    if (!file) return;
 
-  const validTypes = ['image/jpeg', 'image/png']
-  if (!validTypes.includes(file.type)) {
-    error.value = 'Format non supporté. JPG ou PNG requis.'
-    return
-  }
-
-  if (file.size > 5 * 1024 * 1024) {
-    error.value = 'Fichier trop volumineux. 5 Mo max.'
-    return
-  }
-
-  const reader = new FileReader()
-  reader.onload = (e) => {
-    const img = new Image()
-    img.onload = () => {
-      if (img.width < 500 || img.height < 500) {
-        error.value = 'Image trop petite. Minimum 500×500 px.'
-      } else {
-        preview.value = e.target.result
-      }
+    const validTypes = ["image/jpeg", "image/png"];
+    if (!validTypes.includes(file.type)) {
+        error.value = "Format non supporté. JPG ou PNG requis.";
+        return;
     }
-    img.src = e.target.result
-  }
-  reader.readAsDataURL(file)
+
+    if (file.size > 5 * 1024 * 1024) {
+        error.value = "Fichier trop volumineux. 5 Mo max.";
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+            if (img.width < 500 || img.height < 500) {
+                error.value = "Image trop petite. Minimum 500×500 px.";
+            } else {
+                preview.value = e.target.result;
+            }
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
 }
 
-function saveAnnotation() {
-  if (!annotation.value) return
-  annotationSaved.value = true
-  console.log(`✅ Annotation enregistrée : ${annotation.value}`)
+async function saveAnnotation() {
+    if (!annotation.value || !selectedFile.value) return;
+
+    annotationSaved.value = true;
+
+    const formData = new FormData();
+    formData.append("image", selectedFile.value);
+    formData.append("File_name", selectedFile.value.name);
+    formData.append("Height", selectedFile.value.height);
+    formData.append("Width", selectedFile.value.width);
+    formData.append("Size", selectedFile.value.size);
+    formData.append("Date_taken", new Date().toISOString().split("T")[0]);
+
+    // Annotation binaire : 1 = pleine, 0 = vide
+    const annotationValue = annotation.value === "pleine" ? 1 : 0;
+    formData.append("Annotation", annotationValue);
+
+    formData.append("Latitude", 48.8566);
+    formData.append("Longitude", 2.3522);
+    formData.append("City", "Paris");
+
+    try {
+        const response = await fetch("http://localhost:8000/img/upload/", {
+            method: "POST",
+            body: formData,
+        });
+
+        if (!response.ok) {
+            throw new Error(`Erreur HTTP ${response.status}`);
+        }
+
+        console.log(`✅ Annotation envoyée : ${annotationValue}`);
+    } catch (err) {
+        console.error(`❌ Erreur : ${err.message}`);
+    }
 }
 
 function resetAnnotation() {
-  annotation.value = ''
-  annotationSaved.value = false
+    annotation.value = "";
+    annotationSaved.value = false;
 }
 </script>
