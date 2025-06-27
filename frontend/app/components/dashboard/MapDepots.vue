@@ -9,10 +9,12 @@
 
 <script setup>
 import { onMounted } from 'vue'
-import L from 'leaflet'
+import 'leaflet/dist/leaflet.css'
 
-onMounted(() => {
-  const map = L.map('map').setView([48.8566, 2.3522], 12) // Paris par défaut
+onMounted(async () => {
+  const L = await import('leaflet')
+
+  const map = L.map('map').setView([48.8566, 2.3522], 12)
 
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors'
