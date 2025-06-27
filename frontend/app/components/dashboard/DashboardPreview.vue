@@ -33,6 +33,8 @@
         <Bar :data="barContrastes" :options="chartOptions" />
       </ChartCard>
     </div>
+
+    <MapDepots />
   </div>
 </template>
 
@@ -48,7 +50,8 @@ import {
   LinearScale
 } from 'chart.js'
 import { Bar, Pie } from 'vue-chartjs'
-import ChartCard from './ChartCard.vue' // Carte modulaire avec centrement
+import ChartCard from './ChartCard.vue' 
+import MapDepots from './MapDepots.vue'
 
 ChartJS.register(Title, Tooltip, Legend, ArcElement, BarElement, CategoryScale, LinearScale)
 
