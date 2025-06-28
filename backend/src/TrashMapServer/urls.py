@@ -32,6 +32,7 @@ urlpatterns = [
     path('img/<int:id>/modify/', v.modify_img),  # POST/PUT: Annotate/modify image
     path('img/metadatas/<int:id>/', v.img_detail),          # GET: Get all info of this image
     path('img/img/<int:id>', v.get_img),                ## GET: Get the image
+    path('img/global_histograms/', v.global_histograms),
     path('api/image/<str:filename>/', v.img_by_filename),  # GET : infos via nom de fichier
 
     # Map-related
