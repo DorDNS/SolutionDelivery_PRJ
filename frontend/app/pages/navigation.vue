@@ -97,7 +97,7 @@
                                                 label: 'Moyenne RGB',
                                                 data: [
                                                     meta.Avg_R,
-                                                    meta.Avg_V,
+                                                    meta.Avg_G,
                                                     meta.Avg_B,
                                                 ],
                                                 backgroundColor: [
@@ -186,7 +186,7 @@ const meta = ref({
     Date_taken: "2024-05-01",
     Contrast_level: 1.2,
     Avg_R: 0.2,
-    Avg_V: 0.3,
+    Avg_G: 0.3,
     Avg_B: 0.5,
     Edges: 157,
     Status: true,
