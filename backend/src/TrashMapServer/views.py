@@ -33,6 +33,12 @@ def dashboard(request):
         cursor.execute("SELECT AVG(Avg_R), AVG(Avg_G), AVG(Avg_B) FROM Image")
         Avg_R, Avg_G, Avg_B = cursor.fetchone()
 
+        cursor.execute("SELECT (Height*Width) AS Size FROM Image")
+        sizes = cursor.fetchall()
+
+        cursor.execute("SELECT Contrast_level FROM Image")
+        constrasts = cursor.fetchall()
+
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
     finally:
@@ -41,7 +47,9 @@ def dashboard(request):
     return JsonResponse({
         "total_images": count,
         "anotations_balance": {"empty_count": empty_count, "full_count" : full_count, "no_labeled_count": no_labeled_count,
-        "Avg_RGB": {"Avg_R": Avg_R, "Avg_G": Avg_G, "Avg_B": Avg_B}
+        "Avg_RGB": {"Avg_R": Avg_R, "Avg_G": Avg_G, "Avg_B": Avg_B},
+        "Sizes": sizes,
+        "Contrasts": constrasts
         }
     })
 
