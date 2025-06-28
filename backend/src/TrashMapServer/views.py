@@ -323,3 +323,37 @@ def get_img(request, id):
         return HttpResponse(f"Error: {e}", status=500)
     finally:
         conn.close()
+
+def img_by_filename(request, filename):
+    db_path = os.path.join(s.BASE_DIR, 'db.sqlite3')
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+
+    try:
+        query = """
+        SELECT
+            Id_Image, File_name, File_path, Size, Height, Width,
+            Date_taken, Avg_R, Avg_G, Avg_B, Contrast_level,
+            RGB_Histogram, Luminance_Histogram, Edges, Status
+        FROM Image
+        WHERE File_name = ?
+        """
+        cursor.execute(query, (filename,))
+        row = cursor.fetchone()
+
+        if not row:
+            return JsonResponse({"error": "Image not found"}, status=404)
+
+        keys = [
+            "Id_Image","File_name","File_path","Size","Height","Width","Date_taken",
+            "Avg_R","Avg_G","Avg_B","Contrast_level","RGB_Histogram","Luminance_Histogram",
+            "Edges","Status"
+        ]
+
+        data = dict(zip(keys, row))
+        return JsonResponse(data)
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+    finally:
+        conn.close()
