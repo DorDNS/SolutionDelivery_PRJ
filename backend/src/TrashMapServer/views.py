@@ -59,7 +59,7 @@ def locations_img(request):
     cursor = conn.cursor()
     try :
         query = """
-        SELECT Location.Id_Location , Location.Latitude, Location.Longitude, Location.city, Location.id_image
+        SELECT Location.Id_Location , Location.latitude, Location.Longitude, Location.city, Location.id_image
         FROM Location
         """
         cursor.execute(query)
@@ -130,7 +130,7 @@ def upload_img(request):
     luminance_histogram = compute_brightness_histogram(gray)
     edges = compute_edges(image_cv2)
     status = request.POST.get('Annotation')
-    latitude = request.POST.get('Latitude')
+    latitude = request.POST.get('latitude')
     longitude = request.POST.get('Longitude')
     city = request.POST.get('City')
 
@@ -171,7 +171,7 @@ def upload_img(request):
             id_location = 1 if loc_id is None else loc_id + 1
 
             query_loc = """
-            INSERT INTO Location (Id_Location, Latitude, Longitude, City, Id_Image)
+            INSERT INTO Location (Id_Location, latitude, Longitude, City, Id_Image)
             VALUES (?, ?, ?, ?, ?)
             """
             cursor.execute(query_loc, (
@@ -224,6 +224,7 @@ def modify_img(request, id):
     cursor = conn.cursor()
 
     try:
+        print(data)
         # Vérifier que l'image existe
         cursor.execute("SELECT Id_Image FROM Image WHERE Id_Image = ?", (id,))
         if cursor.fetchone() is None:
@@ -244,15 +245,11 @@ def modify_img(request, id):
             image_updates.append("Status = ?")
             image_params.append(int(data['Status']))  # booléen 0/1
 
-        if image_updates:
-            query_img = f"UPDATE Image SET {', '.join(image_updates)} WHERE Id_Image = ?"
-            image_params.append(id)
-            cursor.execute(query_img, image_params)
 
         # Préparer mise à jour de la localisation
         location_updates = []
         location_params = []
-        if 'Latitude' in data:
+        if 'Latitude' in data :
             location_updates.append("Latitude = ?")
             location_params.append(data['Latitude'])
 
@@ -264,7 +261,13 @@ def modify_img(request, id):
             location_updates.append("City = ?")
             location_params.append(data['City'])
 
-        if location_updates:
+
+        if len(image_updates) > 0:
+            query_img = f"UPDATE Image SET {', '.join(image_updates)} WHERE Id_Image = ?"
+            image_params.append(id)
+            cursor.execute(query_img, image_params)
+
+        if len(location_updates) > 0:
             query_loc = f"UPDATE Location SET {', '.join(location_updates)} WHERE Id_Image = ?"
             location_params.append(id)
             cursor.execute(query_loc, location_params)
@@ -275,6 +278,8 @@ def modify_img(request, id):
         return JsonResponse({"error": str(e)}, status=500)
     finally:
         conn.close()
+    if len(image_updates) == 0 and len(location_updates) == 0:
+        return JsonResponse({"message": f"Aucune mise à jour pour l'image"})
 
     return JsonResponse({"message": f"Image {id} mise à jour avec succès."})
 
