@@ -55,7 +55,7 @@
                                         label: 'Moyenne RGB',
                                         data: [
                                             meta.Avg_R,
-                                            meta.Avg_V,
+                                            meta.Avg_G,
                                             meta.Avg_B,
                                         ],
                                         backgroundColor: [
