@@ -13,6 +13,14 @@
 img.huechange {
     filter: hue-rotate(120deg);
 }
+
+.leaflet-popup-button {
+    cursor: pointer;
+}
+
+.leaflet-popup-button:hover {
+    color: blue;
+}
 </style>
 
 <script setup>
@@ -48,8 +56,25 @@ onMounted(async () => {
                 const marker = L.marker([latitude, longitude]).addTo(map);
 
                 marker.bindPopup(
-                    `<strong>${id_image}</strong><br>Dépôt sauvage détecté`
+                    `<strong>Image n°${id_image}</strong><br>
+                    <button class="leaflet-popup-button" data-id="${id_image}">
+                      Voir cette image
+                    </button>`
                 );
+
+                map.on("popupopen", (e) => {
+                    const button = e.popup._contentNode.querySelector(
+                        ".leaflet-popup-button"
+                    );
+                    if (button) {
+                        button.addEventListener("click", () => {
+                            const id = button.dataset.id;
+                            localStorage.setItem("currentId", id);
+                            window.location.href = "/navigation";
+                            // ou router.push("/navigation") si tu as injecté `const router = useRouter()`
+                        });
+                    }
+                });
 
                 // Ajoute la classe si c'est le point sélectionné
                 if (props.highlightId === id_image) {
