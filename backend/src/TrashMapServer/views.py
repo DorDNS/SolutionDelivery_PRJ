@@ -423,6 +423,12 @@ def global_histograms(request):
         # 🆕 Histogramme des tailles
         size_classes = {'<500px': 0, '500-800px': 0, '800-1200px': 0, '>1200px': 0}
 
+        # 🆕 Couleurs dominantes globales
+        dominant_colors = {'Rouge': 0, 'Vert': 0, 'Bleu': 0}
+
+        # 🆕 Histogramme contrastes global
+        contrast_classes = {'Faible': 0, 'Moyen': 0, 'Élevé': 0}
+
         for width, height, rgb_json, lum_json, contrast in rows:
             max_dim = max(width, height)
             if max_dim < 500:
@@ -437,17 +443,35 @@ def global_histograms(request):
             rgb_hist = json.loads(rgb_json)
             lum_hist = json.loads(lum_json)
 
-            # Sum RGB
+            # Sum RGB histograms (non utilisé ici mais conservé)
             total_hist_r = [x + y for x, y in zip(total_hist_r, rgb_hist['red'])]
             total_hist_g = [x + y for x, y in zip(total_hist_g, rgb_hist['green'])]
             total_hist_b = [x + y for x, y in zip(total_hist_b, rgb_hist['blue'])]
 
+            # ✅ **Déterminer la couleur dominante pour cette image**
+            sum_r = sum(rgb_hist['red'])
+            sum_g = sum(rgb_hist['green'])
+            sum_b = sum(rgb_hist['blue'])
+            max_color = max(sum_r, sum_g, sum_b)
+            if max_color == sum_r:
+                dominant_colors['Rouge'] += 1
+            elif max_color == sum_g:
+                dominant_colors['Vert'] += 1
+            else:
+                dominant_colors['Bleu'] += 1
+
             # Sum luminance
             total_luminance = [x + y for x, y in zip(total_luminance, lum_hist)]
 
-            # Contraste
+            # ✅ **Classer contraste en faible/moyen/élevé**
             if contrast is not None:
                 contrast_list.append(contrast)
+                if contrast < 30:
+                    contrast_classes['Faible'] += 1
+                elif 30 <= contrast < 60:
+                    contrast_classes['Moyen'] += 1
+                else:
+                    contrast_classes['Élevé'] += 1
 
         avg_contrast = sum(contrast_list) / len(contrast_list) if contrast_list else None
 
@@ -458,7 +482,7 @@ def global_histograms(request):
 
     return JsonResponse({
         "Size_Histogram": size_classes,
-        "RGB_Histogram": {"red": total_hist_r, "green": total_hist_g, "blue": total_hist_b},
-        "Luminance_Histogram": total_luminance,
+        "Dominant_Colors": dominant_colors,    # ✅ ajouté
+        "Contrast_Histogram": contrast_classes, # ✅ ajouté
         "Average_Contrast": avg_contrast
     })
