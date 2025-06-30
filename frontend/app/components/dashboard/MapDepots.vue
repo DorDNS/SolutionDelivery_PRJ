@@ -1,12 +1,5 @@
 <template>
-  <UCard class="w-full">
-    <template #header>
-      <h3 class="text-lg font-semibold text-[#1b263b]">
-        Carte des dépôts sauvages
-      </h3>
-    </template>
     <div id="map" class="h-[500px] rounded-lg" />
-  </UCard>
 </template>
 
 <script setup>

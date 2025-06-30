@@ -52,7 +52,12 @@
       </ChartCard>
     </div>
 
-    <MapDepots />
+    <UCard class="mt-12">
+      <template #header>
+        <h3 class="text-lg font-semibold text-[#1b263b]">Carte des dépôts sauvages</h3>
+      </template>
+      <MapDepots />
+    </UCard>
   </div>
 </template>
 
