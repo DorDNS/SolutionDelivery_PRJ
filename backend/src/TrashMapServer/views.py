@@ -101,8 +101,9 @@ def upload_img(request):
         return float(np.std(gray_image))
     
     def compute_edges(gray_image):
-        # A FAIRE !!!
-        return (0)
+        edges = cv2.Canny(gray_image, 100, 200)
+        contour_count = int(np.sum(edges > 0))
+        return (contour_count)
 
 
     if (request.method != 'POST'):
