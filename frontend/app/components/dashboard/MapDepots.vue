@@ -1,89 +1,96 @@
 <template>
-    <UCard class="w-full">
-        <template #header>
-            <h3 class="text-lg font-semibold text-[#1b263b]">
-                Carte des dépôts sauvages
-            </h3>
-        </template>
-        <div id="map" class="h-[500px] rounded-lg" />
-    </UCard>
+  <UCard class="w-full">
+    <template #header>
+      <h3 class="text-lg font-semibold text-[#1b263b]">
+        Carte des dépôts sauvages
+      </h3>
+    </template>
+    <div id="map" class="h-[500px] rounded-lg" />
+  </UCard>
 </template>
 
-<style>
-img.huechange {
-    filter: hue-rotate(120deg);
-}
-
-.leaflet-popup-button {
-    cursor: pointer;
-}
-
-.leaflet-popup-button:hover {
-    color: blue;
-}
-</style>
-
 <script setup>
-import { watch, onMounted } from "vue";
+import { watch, onMounted, ref } from "vue";
 import "leaflet/dist/leaflet.css";
 
 const props = defineProps({
-    highlightId: {
-        type: Number,
-        default: null,
-    },
+  highlightId: Number,
 });
 
-const { data, pending, error } = await useFetch(
-    "http://127.0.0.1:8000/img/locations/"
-);
+const map = ref(null);
+const markers = ref([]);
+const highlightMarker = ref(null);
+
+const { data } = await useFetch("http://127.0.0.1:8000/img/locations/");
 
 onMounted(async () => {
-    const L = await import("leaflet");
+  const L = await import("leaflet");
+  map.value = L.map("map").setView([48.8566, 2.3522], 14);
 
-    const map = L.map("map").setView([48.8566, 2.3522], 14);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: "&copy; OpenStreetMap contributors",
+  }).addTo(map.value);
 
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: "&copy; OpenStreetMap contributors",
-    }).addTo(map);
+  // Ajouter tous les markers
+  data.value.forEach(({ latitude, longitude, id_image }) => {
+    const marker = L.marker([latitude, longitude]).addTo(map.value);
 
-    watch(
-        data,
-        (locations) => {
-            if (!locations) return;
-
-            locations.forEach(({ latitude, longitude, id_image }) => {
-                const marker = L.marker([latitude, longitude]).addTo(map);
-
-                marker.bindPopup(
-                    `<strong>Image n°${id_image}</strong><br>
-                    <button class="leaflet-popup-button" data-id="${id_image}">
-                      Voir cette image
-                    </button>`
-                );
-
-                map.on("popupopen", (e) => {
-                    const button = e.popup._contentNode.querySelector(
-                        ".leaflet-popup-button"
-                    );
-                    if (button) {
-                        button.addEventListener("click", () => {
-                            const id = button.dataset.id;
-                            localStorage.setItem("currentId", id);
-                            window.location.href = "/navigation";
-                            // ou router.push("/navigation") si tu as injecté `const router = useRouter()`
-                        });
-                    }
-                });
-
-                // Ajoute la classe si c'est le point sélectionné
-                if (props.highlightId === id_image) {
-                    marker._icon.classList.add("huechange");
-                    map.setView([latitude, longitude], 20);
-                }
-            });
-        },
-        { immediate: true }
+    marker.bindPopup(
+      `<strong>Image n°${id_image}</strong><br>
+      <button class="leaflet-popup-button" data-id="${id_image}">
+        Voir cette image
+      </button>`
     );
+
+    marker.on("popupopen", (e) => {
+      const button = e.target.getPopup().getContent().match(/data-id="(\d+)"/);
+      if (button) {
+        const id = button[1];
+        document
+          .querySelector(".leaflet-popup-button")
+          .addEventListener("click", () => {
+            localStorage.setItem("currentId", id);
+            window.location.href = "/navigation";
+          });
+      }
+    });
+
+    markers.value.push({ id: id_image, marker, latitude, longitude });
+  });
+
+  updateHighlight(); // premier affichage
 });
+
+// 🔄 Watch highlightId pour déplacer le marker de highlight
+watch(
+  () => props.highlightId,
+  () => {
+    updateHighlight();
+  }
+);
+
+function updateHighlight() {
+  if (!map.value || !props.highlightId) return;
+
+  // Supprimer la classe highlight de tous les markers
+  markers.value.forEach(({ marker }) => {
+    marker._icon?.classList.remove("huechange");
+  });
+
+  // Trouver le marker correspondant et ajouter la classe highlight
+  const highlightData = markers.value.find(
+    (m) => m.id === props.highlightId
+  );
+  if (highlightData) {
+    highlightData.marker._icon?.classList.add("huechange");
+    map.value.setView(
+      [highlightData.latitude, highlightData.longitude],
+      20
+    );
+  }
+}
 </script>
+
+<style>
+#map { min-height: 500px; }
+</style>
