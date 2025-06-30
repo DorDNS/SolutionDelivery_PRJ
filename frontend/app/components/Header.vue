@@ -20,7 +20,7 @@
           {{ translations[currentLanguage].headernav }}
         </UButton>
         <!-- Menu déroulant pour changer la langue -->
-        <USelect v-model="value" :items="items" value-key="value" :avatar="avatar" class="w-48" @update:model-value="changeLanguage" />
+        <USelect v-model="value" :items="items" value-key="value" :avatar="avatar" class="custom-select" @update:model-value="changeLanguage" />
       </nav>
     </UContainer>
   </header>
@@ -66,34 +66,7 @@ provide('translations', translations)
 </script>
 
 <style scoped>
-.lang-switch {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.lang-button {
-  background-color: transparent;
-  border: none;
-  cursor: pointer;
-}
-
-.lang-button img {
-  display: block;
-  border-radius: 50%;
-}
-
-.lang-dropdown {
-  padding: 8px 16px;
-  background-color: #415a77;
-  color: #ffffff;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-.lang-dropdown:hover {
-  background-color: #778da9;
+.custom-select {
+  width: 120px; /* Ajustez la largeur selon vos besoins */
 }
 </style>
