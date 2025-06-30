@@ -122,8 +122,7 @@ def upload_img(request):
     gray = cv2.cvtColor(image_cv2, cv2.COLOR_BGR2GRAY)
 
     size = request.POST.get('Size')
-    height = request.POST.get('Height')
-    width = request.POST.get('Width')
+    height, width = gray.shape[:2]
     date_taken = request.POST.get('Date_taken') or datetime.now().strftime("%Y-%m-%d")
     avg_rgb = mean_color(image_cv2)
     contrast_level = give_contrast_level(gray)

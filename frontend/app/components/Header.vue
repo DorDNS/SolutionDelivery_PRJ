@@ -20,7 +20,7 @@
           {{ translations[currentLanguage].headernav }}
         </UButton>
         <!-- Menu déroulant pour changer la langue -->
-        <USelect v-model="value" :items="items" value-key="value" :avatar="avatar" class="w-48" @update:modelValue="changeLanguage" />
+        <USelect v-model="value" :items="items" value-key="value" :avatar="avatar" class="w-48" @update:model-value="changeLanguage" />
       </nav>
     </UContainer>
   </header>
