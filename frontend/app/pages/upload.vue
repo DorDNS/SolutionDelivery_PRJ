@@ -22,7 +22,7 @@
                     Déposez votre image ici
                 </p>
                 <p class="text-sm text-[#778da9]">
-                    JPG ou PNG — 5 Mo max — min. 500×500 px
+                    JPG/JPEG/PNG/WEBP — 5 Mo max — min. 500×500 px
                 </p>
             </div>
         </div>
@@ -41,7 +41,7 @@
                         class="w-4 h-4 text-[#778da9]"
                     />
                     <span>
-                        Formats : <strong>JPG</strong>, <strong>PNG</strong> —
+                        Formats : <strong>JPG/JPEG/PNG/WEBP</strong> —
                         max <strong>5 Mo</strong> — min
                         <strong>500×500 px</strong>
                     </span>
@@ -172,9 +172,9 @@ function processFile(file) {
 
     if (!file) return;
 
-    const validTypes = ["image/jpeg", "image/png"];
+    const validTypes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
     if (!validTypes.includes(file.type)) {
-        error.value = "Format non supporté. JPG ou PNG requis.";
+        error.value = "Format non supporté. JPG/JPEG/PNG/WEBP requis.";
         return;
     }
 

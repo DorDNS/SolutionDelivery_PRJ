@@ -137,7 +137,7 @@ def upload_img(request):
     if not image:
         return HttpResponse("No file found", status=400)
 
-    if not image.name.lower().endswith(('.png', '.jpg', '.jpeg', '.webp', '.pdf', '.gif')):
+    if not image.name.lower().endswith(('.png', '.jpg', '.jpeg', '.webp')):
         return HttpResponse("Format de fichier non supporté", status=400)
     if (file_name is None or size is None or height is None or width is None):
         return HttpResponse("Missing argument(s)", status=402)
