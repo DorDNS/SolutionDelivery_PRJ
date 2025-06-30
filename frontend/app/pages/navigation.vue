@@ -10,20 +10,32 @@
         </div>
       </div>
 
-      <!-- Image + infos -->
+      <!-- Contenu -->
       <div v-if="meta && meta.Id_Image" class="flex flex-col lg:flex-row gap-10 items-start justify-center">
-        <!-- Image -->
-        <div class="flex-1 text-center">
-          <img :src="imageUrl" alt="Image" class="max-h-[32rem] mx-auto rounded-xl shadow-lg border object-contain" />
-          <div class="flex justify-between mt-4 max-w-xs mx-auto">
-            <UButton @click="precedente" color="gray" variant="ghost" icon="i-heroicons-chevron-left">Précédente</UButton>
-            <UButton @click="suivante" color="gray" variant="ghost" icon="i-heroicons-chevron-right">Suivante</UButton>
+        <!-- Colonne gauche : Image + Carte -->
+        <div class="flex-1 flex flex-col gap-6">
+          <div class="text-center">
+            <img :src="imageUrl" alt="Image" class="max-h-[32rem] mx-auto rounded-xl shadow-lg border object-contain" />
+            <div class="flex justify-between mt-4 max-w-xs mx-auto">
+              <UButton @click="precedente" color="gray" variant="ghost" icon="i-heroicons-chevron-left">Précédente</UButton>
+              <UButton @click="suivante" color="gray" variant="ghost" icon="i-heroicons-chevron-right">Suivante</UButton>
+            </div>
+          </div>
+
+          <!-- Carte de localisation -->
+          <div>
+            <UCard>
+              <template #header>
+                <h2 class="text-lg font-semibold">Localisation</h2>
+              </template>
+              <MapDepots :highlight-id="meta.Id_Location" />
+            </UCard>
           </div>
         </div>
 
-        <!-- Fiche image complète -->
+        <!-- Colonne droite : Fiche image complète sans la carte -->
         <UCard class="flex-1 text-sm text-[#1b263b]">
-          <!-- Header carte -->
+          <!-- Header -->
           <template #header>
             <div class="flex justify-between items-center">
               <h2 class="text-lg font-semibold">Informations de l'image</h2>
@@ -119,12 +131,6 @@
             <div class="w-full h-60">
               <Bar v-if="histogramLuminance" :data="histogramLuminance" :options="barOptions" />
             </div>
-          </div>
-
-          <!-- Localisation -->
-          <div class="mt-6">
-            <h2 class="text-lg font-semibold mb-2 border-b pb-2">Localisation</h2>
-            <MapDepots :highlight-id="meta.Id_Location" />
           </div>
         </UCard>
       </div>
