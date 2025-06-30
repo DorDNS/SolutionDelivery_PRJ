@@ -312,6 +312,12 @@ def img_detail(request, id):
     finally:
         conn.close()
     conn.close()
+    # Si les histogrammes sont des JSON string, les parser
+    if 'RGB_Histogram' in data and isinstance(data['RGB_Histogram'], str):
+        data['RGB_Histogram'] = json.loads(data['RGB_Histogram'])
+
+    if 'Luminance_Histogram' in data and isinstance(data['Luminance_Histogram'], str):
+        data['Luminance_Histogram'] = json.loads(data['Luminance_Histogram'])
     return JsonResponse(data)
 
 def get_img(request, id):

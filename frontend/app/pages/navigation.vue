@@ -33,7 +33,7 @@
                 size="md"
                 class="font-bold rounded-full"
                 :icon="meta.Status ? 'i-lucide-trash-2' : 'i-lucide-brush-cleaning'"
-                >
+              >
                 {{ meta.Status ? "Pleine" : "Vide" }}
               </UBadge>
             </div>
@@ -85,9 +85,9 @@
             </div>
           </div>
 
-          <!-- Composition RGB -->
+          <!-- Composition RGB PieChart -->
           <div class="mt-6">
-            <h2 class="text-lg font-semibold mb-2 border-b pb-2">Composition RGB</h2>
+            <h2 class="text-lg font-semibold mb-2 border-b pb-2">Composition RGB (Moyenne)</h2>
             <div class="w-60 h-60 mx-auto">
               <PieChart
                 :data="{
@@ -100,18 +100,24 @@
                     borderWidth: 2,
                   }]
                 }"
-                :options="{
-                  responsive: true,
-                  maintainAspectRatio: false,
-                  plugins: {
-                    legend: {
-                      display: true,
-                      position: 'bottom',
-                      labels: { color: '#1b263b', padding: 8, boxWidth: 12, font: { size: 12 } }
-                    }
-                  }
-                }"
+                :options="chartOptions"
               />
+            </div>
+          </div>
+
+          <!-- Histogramme RGB -->
+          <div class="mt-6">
+            <h2 class="text-lg font-semibold mb-2 border-b pb-2">Histogramme RGB</h2>
+            <div class="w-full h-60">
+              <Bar v-if="histogramRGB" :data="histogramRGB" :options="barOptions" />
+            </div>
+          </div>
+
+          <!-- Histogramme Luminance -->
+          <div class="mt-6">
+            <h2 class="text-lg font-semibold mb-2 border-b pb-2">Histogramme de luminance</h2>
+            <div class="w-full h-60">
+              <Bar v-if="histogramLuminance" :data="histogramLuminance" :options="barOptions" />
             </div>
           </div>
 
@@ -133,6 +139,18 @@ import { ref, computed, watch, onMounted, onBeforeUnmount } from "vue";
 import { useFetch } from "#app";
 import PieChart from "~/components/PieChart.vue";
 import MapDepots from "../components/dashboard/MapDepots.vue";
+import { Bar } from "vue-chartjs";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+} from "chart.js";
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const currentId = ref(1);
 if (process.client && localStorage.getItem("currentId")) {
@@ -166,6 +184,53 @@ onMounted(() => {
 });
 onBeforeUnmount(() => { window.removeEventListener("keydown", handleKey); });
 
+// Chart.js options
+const chartOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      display: true,
+      position: "bottom",
+      labels: { color: "#1b263b", padding: 8, boxWidth: 12, font: { size: 12 } }
+    }
+  }
+};
+
+const barOptions = {
+  ...chartOptions,
+  scales: {
+    x: { ticks: { color: "#1b263b" } },
+    y: { beginAtZero: true, ticks: { color: "#1b263b" } }
+  }
+};
+
+const histogramRGB = computed(() => {
+  if (!meta.value || !meta.value.RGB_Histogram) return null;
+  const { red, green, blue } = meta.value.RGB_Histogram;
+  const labels = Array.from({ length: red.length }, (_, i) => i.toString());
+  return {
+    labels,
+    datasets: [
+      { label: "Rouge", data: red, backgroundColor: "rgba(217, 61, 61)" },
+      { label: "Vert", data: green, backgroundColor: "rgba(108, 224, 119)" },
+      { label: "Bleu", data: blue, backgroundColor: "rgba(88, 148, 245)" }
+    ]
+  };
+});
+
+const histogramLuminance = computed(() => {
+  if (!meta.value || !meta.value.Luminance_Histogram) return null;
+  const luminance = meta.value.Luminance_Histogram;
+  const labels = Array.from({ length: luminance.length }, (_, i) => i.toString());
+  return {
+    labels,
+    datasets: [
+      { label: "Luminance", data: luminance, backgroundColor: "rgba(128,128,128,0.7)" }
+    ]
+  };
+});
+
 // Formulaire annotation
 const showForm = ref(false);
 const formData = ref({ Date_taken: "", Latitude: "", Longitude: "", Status: "false" });
@@ -195,7 +260,7 @@ async function submitAnnotation() {
     });
     if (!response.ok) throw new Error("Erreur lors de l'envoi");
     showForm.value = false;
-    await refresh(); // Refresh to update badge immediately
+    await refresh();
     alert("Annotation sauvegardée !");
   } catch (err) {
     console.error(err);
