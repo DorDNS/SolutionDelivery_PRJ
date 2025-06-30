@@ -63,15 +63,30 @@
 import { ref, inject } from 'vue'
 import DashboardPreview from '@/components/dashboard/DashboardPreview.vue'
 
-const gradientStyle = ref('color: transparent; background-image: linear-gradient(90deg, #415a77, #778da9); background-clip: text;')
+const currentLanguage = inject('currentLanguage')
+const translations    = inject('translations')
+
+// gradient de base : bleu vif → bleu foncé
+const gradientStyle = ref(`
+  color: transparent;
+  background-image: linear-gradient(90deg, rgba(11,178,246,1) 0%, #415a77 100%);
+  background-clip: text;
+`)
 
 function updateGradient(event) {
-  const el = event.currentTarget
+  const el   = event.currentTarget
   const rect = el.getBoundingClientRect()
-  const x = ((event.clientX - rect.left) / rect.width) * 100
+  const x    = ((event.clientX - rect.left) / rect.width) * 100
+
+  // radial plus doux au survol, ton pastel pour faire ressortir le bleu
   gradientStyle.value = `
     color: transparent;
-    background-image: radial-gradient(circle at ${x}%, #ffffff, #415a77, #778da9);
+    background-image: radial-gradient(
+      circle at ${x}%,
+      rgba(160,231,245,0.8),
+      rgba(11,178,246,1),
+      #415a77
+    );
     background-clip: text;
   `
 }
@@ -79,25 +94,16 @@ function updateGradient(event) {
 function resetGradient() {
   gradientStyle.value = `
     color: transparent;
-    background-image: linear-gradient(90deg, #415a77, #778da9);
+    background-image: linear-gradient(90deg, rgba(11,178,246,1) 0%, #415a77 100%);
     background-clip: text;
   `
 }
-
-// Traduction
-const currentLanguage = inject('currentLanguage')
-const translations = inject('translations')
-
 </script>
 
 <style scoped>
 @keyframes lightShift {
-  0% {
-    background-position: 0% 50%;
-  }
-  100% {
-    background-position: 100% 50%;
-  }
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
 }
 .group-hover\:animate-lightShift:hover {
   animation: lightShift 2s ease-in-out infinite alternate;
