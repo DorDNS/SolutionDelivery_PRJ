@@ -3,7 +3,7 @@
     <!-- Filtres -->
     <UCard>
       <template #header>
-        <h3 class="text-lg font-semibold text-[#1b263b]">Filtres</h3>
+        <h3 class="text-lg font-semibold text-[#1b263b]">{{ translations[currentLanguage].filtre }}</h3>
       </template>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <USelect v-model="selectedEtat" :items="etats" placeholder="Filtrer par état" />
@@ -13,17 +13,17 @@
 
     <!-- Visualisations -->
     <div v-if="pending || histoPending" class="text-center py-10">
-      <span class="text-[#1b263b]">Chargement des données du dashboard...</span>
+      <span class="text-[#1b263b]">{{ translations[currentLanguage].loaddash }}</span>
     </div>
 
     <div v-else class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
       <!-- Nombre total d'images -->
-      <ChartCard title="Nombre total d’images">
+      <ChartCard :title="translations[currentLanguage].visu1title">
         <Bar :data="barImages" :options="chartOptions" />
       </ChartCard>
 
       <!-- Répartition des annotations -->
-      <ChartCard title="Répartition des annotations">
+      <ChartCard :title="translations[currentLanguage].visu2title">
         <Pie :data="pieAnnotations" :options="pieOptions" />
       </ChartCard>
 
@@ -57,7 +57,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, inject } from "vue";
 import { Bar, Pie, Doughnut } from "vue-chartjs";
 import {
   Chart as ChartJS,
@@ -74,22 +74,26 @@ import MapDepots from "./MapDepots.vue";
 
 ChartJS.register(Title, Tooltip, Legend, ArcElement, BarElement, CategoryScale, LinearScale);
 
+// Traduction
+const currentLanguage = inject('currentLanguage')
+const translations = inject('translations')
+
 // Filtres
-const etats = [
-  { label: "Tous", value: "all" },
-  { label: "Vide", value: "vide" },
-  { label: "Débordée", value: "debordee" },
-];
+const etats = computed(() => [
+  { label: translations[currentLanguage.value]?.allStates ?? "Tous", value: "all" },
+  { label: translations[currentLanguage.value]?.emptyState ?? "Vide", value: "vide" },
+  { label: translations[currentLanguage.value]?.overflowState ?? "Débordée", value: "debordee" },
+]);
 
-const periodes = [
-  { label: "Toutes périodes", value: "all" },
-  { label: "7 derniers jours", value: "7days" },
-  { label: "30 derniers jours", value: "30days" },
-  { label: "Cette année", value: "year" },
-];
+const periodes = computed(() => [
+  { label: translations[currentLanguage.value]?.allPeriods ?? "Toutes périodes", value: "all" },
+  { label: translations[currentLanguage.value]?.last7Days ?? "7 derniers jours", value: "7days" },
+  { label: translations[currentLanguage.value]?.last30Days ?? "30 derniers jours", value: "30days" },
+  { label: translations[currentLanguage.value]?.thisYear ?? "Cette année", value: "year" },
+]);
 
-const selectedEtat = ref(etats[0].value);
-const selectedPeriod = ref(periodes[0].value);
+const selectedEtat = ref(etats.value[0].value);
+const selectedPeriod = ref(periodes.value[0].value);
 
 // API dashboard
 const { data, pending, error } = await useFetch("http://127.0.0.1:8000/dashboard/");
@@ -109,7 +113,11 @@ const barImages = computed(() => ({
 }));
 
 const pieAnnotations = computed(() => ({
-  labels: ["Vide", "Pleine", "Sans label"],
+  labels: [
+    translations[currentLanguage.value]?.emptyLabel ?? "Vide",
+    translations[currentLanguage.value]?.fullLabel ?? "Pleine",
+    translations[currentLanguage.value]?.noLabel ?? "Sans label",
+  ],
   datasets: [{
     label: "Annotations",
     data: [

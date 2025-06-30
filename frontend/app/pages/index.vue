@@ -29,7 +29,7 @@
           :enter="{ opacity: 1, y: 0, delay: 0.2, transition: { duration: 0.6 } }"
         >
           <p class="text-lg text-[#e0e1dd] max-w-2xl mx-auto">
-            Aidez votre ville à rester propre. Uploadez des images de poubelles et contribuez à une meilleure gestion des déchets urbains grâce à l’IA.
+            {{ translations[currentLanguage].slogan }}
           </p>
         </Motion>
 
@@ -39,7 +39,7 @@
         >
           <div class="flex justify-center gap-4">
             <UButton to="/upload" icon="i-heroicons-arrow-up-tray" size="lg" color="primary">
-              Uploader une image
+              {{ translations[currentLanguage].uploadButton }}
             </UButton>
           </div>
         </Motion>
@@ -49,9 +49,9 @@
     <!-- Dashboard Preview Section -->
     <section class="flex-1 py-20 bg-[#e0e1dd] text-center text-[#1b263b]">
       <UContainer class="space-y-6">
-        <h2 class="text-3xl font-bold">Aperçu du Dashboard</h2>
+        <h2 class="text-3xl font-bold">{{ translations[currentLanguage].dashboardprev }}</h2>
         <p class="max-w-2xl mx-auto text-[#415a77]">
-          Ici s’afficheront bientôt les graphiques, les cartes interactives et les statistiques de collecte.
+          {{ translations[currentLanguage].dashboardDescription }}
         </p>
         <DashboardPreview />
       </UContainer>
@@ -60,7 +60,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, inject } from 'vue'
 import DashboardPreview from '@/components/dashboard/DashboardPreview.vue'
 
 const gradientStyle = ref('color: transparent; background-image: linear-gradient(90deg, #415a77, #778da9); background-clip: text;')
@@ -83,6 +83,11 @@ function resetGradient() {
     background-clip: text;
   `
 }
+
+// Traduction
+const currentLanguage = inject('currentLanguage')
+const translations = inject('translations')
+
 </script>
 
 <style scoped>
