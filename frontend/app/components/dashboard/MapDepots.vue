@@ -1,5 +1,5 @@
 <template>
-    <div id="map" class="h-[500px] rounded-lg" />
+  <div id="map" class="h-[500px] rounded-lg" />
 </template>
 
 <script setup>
@@ -12,21 +12,30 @@ const props = defineProps({
 
 const map = ref(null);
 const markers = ref([]);
-const highlightMarker = ref(null);
 
 const { data } = await useFetch("http://127.0.0.1:8000/img/locations/");
 
 onMounted(async () => {
   const L = await import("leaflet");
+
+  const goldIcon = L.icon({
+    iconUrl: "/leaflet/marker-icon-gold.png",
+    shadowUrl: "/leaflet/marker-shadow.png",
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41],
+  });
+
   map.value = L.map("map").setView([48.8566, 2.3522], 14);
 
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution: "&copy; OpenStreetMap contributors",
   }).addTo(map.value);
 
-  // Ajouter tous les markers
+  // Ajouter tous les marqueurs
   data.value.forEach(({ latitude, longitude, id_image }) => {
-    const marker = L.marker([latitude, longitude]).addTo(map.value);
+    const marker = L.marker([latitude, longitude]).addTo(map.value); // icône par défaut
 
     marker.bindPopup(
       `<strong>Image n°${id_image}</strong><br>
@@ -51,10 +60,9 @@ onMounted(async () => {
     markers.value.push({ id: id_image, marker, latitude, longitude });
   });
 
-  updateHighlight(); // premier affichage
+  updateHighlight();
 });
 
-// 🔄 Watch highlightId pour déplacer le marker de highlight
 watch(
   () => props.highlightId,
   () => {
@@ -62,28 +70,34 @@ watch(
   }
 );
 
-function updateHighlight() {
+async function updateHighlight() {
   if (!map.value || !props.highlightId) return;
 
-  // Supprimer la classe highlight de tous les markers
-  markers.value.forEach(({ marker }) => {
-    marker._icon?.classList.remove("huechange");
+  const L = await import("leaflet");
+
+  const goldIcon = L.icon({
+    iconUrl: "/leaflet/marker-icon-gold.png",
+    shadowUrl: "/leaflet/marker-shadow.png",
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41],
   });
 
-  // Trouver le marker correspondant et ajouter la classe highlight
-  const highlightData = markers.value.find(
-    (m) => m.id === props.highlightId
-  );
-  if (highlightData) {
-    highlightData.marker._icon?.classList.add("huechange");
-    map.value.setView(
-      [highlightData.latitude, highlightData.longitude],
-      20
-    );
-  }
+  markers.value.forEach(({ id, marker }) => {
+    if (id === props.highlightId) {
+      marker.setIcon(goldIcon);
+      map.value.setView(marker.getLatLng(), 20);
+      marker.openPopup();
+    } else {
+      marker.setIcon(L.Icon.Default.prototype);
+    }
+  });
 }
 </script>
 
 <style>
-#map { min-height: 500px; }
+#map {
+  min-height: 500px;
+}
 </style>
