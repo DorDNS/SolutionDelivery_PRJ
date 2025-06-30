@@ -1,6 +1,7 @@
 1. Création du .env :
     - Executer `python3 -m venv .env` dans le dossier './backend/'
-    - source .env/bin/activate
+    - source .env/bin/activate (MacOS) ou .env/Scripts/Activite (Windows)
+2. source .env/bin/activate
 2. Executer `pip install -r setup.txt` dans le dossier './backend/'
 3. Executer `python3 manage.py runserver` dans le dossier './backend/src' pour demarrer le serveur
 
