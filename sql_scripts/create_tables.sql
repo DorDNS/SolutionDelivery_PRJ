@@ -26,3 +26,31 @@ CREATE TABLE Location(
    Id_Image INT NOT NULL,
    FOREIGN KEY(Id_Image) REFERENCES Image(Id_Image)
 );
+
+CREATE TABLE ClassificationConstraints (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+    min_size FLOAT,
+    max_size FLOAT,
+
+    min_height INT,
+    max_height INT,
+
+    min_width INT,
+    max_width INT,
+
+    min_avg_r FLOAT,
+    max_avg_r FLOAT,
+
+    min_avg_g FLOAT,
+    max_avg_g FLOAT,
+
+    min_avg_b FLOAT,
+    max_avg_b FLOAT,
+
+    min_contrast FLOAT,
+    max_contrast FLOAT,
+
+    min_edges INT,
+    max_edges INT
+);
