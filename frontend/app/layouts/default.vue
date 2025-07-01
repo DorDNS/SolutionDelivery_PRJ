@@ -20,6 +20,7 @@ const translations = {
     label: "Langue",
     headerup : "Uploader",
     headernav: "Navigation",
+    headerconstraints: "Contraintes",
     //Index
     slogan: "Aidez votre ville à rester propre. Uploadez des images de poubelles et contribuez à une meilleure gestion des déchets urbains grâce à l’IA.",
     uploadButton: 'Uploader une image',
@@ -47,6 +48,7 @@ const translations = {
     label: "Language",
     headerup: "Upload",
     headernav: "Navigation",
+    headerconstraints: "Constraints",
     uploadButton: 'Upload an image',
     //Index
     slogan: "Help your city stay clean. Upload images of trash and contribute to better urban waste management with AI.",

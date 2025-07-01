@@ -19,6 +19,9 @@
         <UButton to="/navigation" variant="ghost" class="text-white hover:text-[#e0e1dd]">
           {{ translations[currentLanguage].headernav }}
         </UButton>
+        <UButton to="/constraints" variant="ghost" class="text-white hover:text-[#e0e1dd]">
+          {{ translations[currentLanguage].headerconstraints }}
+        </UButton>
         <!-- Menu déroulant pour changer la langue -->
         <USelect v-model="value" :items="items" value-key="value" :avatar="avatar" class="custom-select" @update:model-value="changeLanguage" />
       </nav>
