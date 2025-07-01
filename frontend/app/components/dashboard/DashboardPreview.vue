@@ -11,6 +11,9 @@
       </div>
     </UCard>
 
+    <!-- Indicateurs en temps réel -->
+  <RealTimeIndicators :indicators="realtimeIndicators || {}" />
+
     <!-- Visualisations -->
     <div v-if="pending || histoPending" class="text-center py-10">
       <span class="text-[#1b263b]">{{ translations[currentLanguage].loaddash }}</span>
@@ -62,6 +65,9 @@
 </template>
 
 <script setup>
+import { useWebSocket } from '~/composables/useWebSocket'
+import RealTimeIndicators from '~/components/RealTimeIndicators.vue'
+const { data: realtimeIndicators } = useWebSocket()
 import { ref, computed, inject } from "vue";
 import { Bar, Pie, Doughnut } from "vue-chartjs";
 import {
