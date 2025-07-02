@@ -10,7 +10,9 @@ import cv2
 import numpy as np
 from django.views.decorators.csrf import csrf_exempt
 import uuid
-
+from PIL import Image as PILImage
+import io
+import mimetypes
 
 def dashboard(request):
     db_path = os.path.join(s.BASE_DIR, 'db.sqlite3')
@@ -99,12 +101,11 @@ def upload_img(request):
 
     def give_contrast_level(gray_image):
         return float(np.std(gray_image))
-    
+
     def compute_edges(gray_image):
         edges = cv2.Canny(gray_image, 100, 200)
         contour_count = int(np.sum(edges > 0))
         return (contour_count)
-
 
     if (request.method != 'POST'):
         return HttpResponse("Method not autorized", status=405)
@@ -112,9 +113,9 @@ def upload_img(request):
     image = request.FILES.get('image')
     __, file_ext = os.path.splitext(request.POST.get('File_name'))
 
-    file_name = str(uuid.uuid4())+file_ext
-
-    file_path = os.path.join("Data", "uploads", file_name)  # Pour l'enregistrement logique
+    # Conversion en WebP
+    file_name = str(uuid.uuid4()) + ".webp"
+    file_path = os.path.join("Data", "uploads", file_name)
 
     image_bytes = image.read()
     image_np = np.frombuffer(image_bytes, np.uint8)
@@ -139,18 +140,25 @@ def upload_img(request):
 
     if not image.name.lower().endswith(('.png', '.jpg', '.jpeg', '.webp')):
         return HttpResponse("Format de fichier non supporté", status=400)
+
     if (file_name is None or size is None or height is None or width is None):
         return HttpResponse("Missing argument(s)", status=402)
+
+    # Enregistrer l'image en WebP
+    try:
+        image_pil = PILImage.open(io.BytesIO(image_bytes)).convert("RGB")
+        image_pil.save(os.path.join(s.MEDIA_ROOT, file_path), format="WEBP", quality=80)
+    except Exception as e:
+        return JsonResponse({"error": f"Erreur lors de la conversion WebP : {e}"}, status=500)
 
     db_path = os.path.join(s.BASE_DIR, 'db.sqlite3')
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
-    try :
-        # Générer id_image automatiquement
+    try:
         cursor.execute("SELECT MAX(Id_Image) FROM Image")
         result = cursor.fetchone()
         id_image = 1 if result[0] is None else result[0] + 1
-        
+
         query = """
             INSERT INTO Image (
                 Id_Image, File_name, File_path, Size, Height, Width, Date_taken,
@@ -162,7 +170,7 @@ def upload_img(request):
             id_image, file_name, file_path, size, height, width, date_taken,
             avg_rgb["red"], avg_rgb["green"], avg_rgb["blue"], contrast_level,
             json.dumps(rgb_histogram), json.dumps(luminance_histogram),
-            edges, int(status)  # SQLite n'a pas de type bool, 0 ou 1
+            edges, int(status)
         ))
 
         if latitude and longitude and city:
@@ -177,16 +185,13 @@ def upload_img(request):
             cursor.execute(query_loc, (
                 id_location, float(latitude), float(longitude), city, id_image
             ))
-        cv2.imwrite(os.path.join(s.MEDIA_ROOT, file_path), image_cv2)
 
         conn.commit()
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
-
     finally:
         conn.close()
 
-    #A faire : Extraire Location depuis métadonnées ou corps de requête
     return JsonResponse({
         "file_name": file_name,
         "file_path": file_path,
@@ -336,7 +341,13 @@ def get_img(request, id):
         if not os.path.exists(full_path):
             return HttpResponse("Image file missing", status=404)
 
-        return FileResponse(open(full_path, 'rb'), content_type='image/jpeg')
+        # Déterminer le type MIME à partir de l'extension du fichier
+        content_type, _ = mimetypes.guess_type(full_path)
+        if content_type is None:
+            content_type = "application/octet-stream"  # type générique si inconnu
+
+        with open(full_path, 'rb') as f:
+            return FileResponse(f, content_type=content_type)
 
     except Exception as e:
         return HttpResponse(f"Error: {e}", status=500)

@@ -15,7 +15,14 @@
         <!-- Colonne gauche : Image + Carte -->
         <div class="flex-1 flex flex-col gap-6">
           <div class="text-center">
-            <img :src="imageUrl" alt="Image" class="max-h-[32rem] mx-auto rounded-xl shadow-lg border object-contain" />
+            <img
+              :src="imageUrl"
+              alt="Image"
+              class="max-h-[32rem] mx-auto rounded-xl shadow-lg border object-contain"
+              loading="lazy"
+              @error="handleImageError"
+            />
+
             <div class="flex justify-between mt-4 max-w-xs mx-auto">
               <UButton @click="precedente" color="gray" variant="ghost" icon="i-heroicons-chevron-left">Précédente</UButton>
               <UButton @click="suivante" color="gray" variant="ghost" icon="i-heroicons-chevron-right">Suivante</UButton>
@@ -167,7 +174,19 @@ const { data: meta, refresh } = useFetch(
   () => `http://localhost:8000/img/metadatas/${currentId.value}`,
   { key: `image-meta-${currentId.value}` }
 );
-const imageUrl = computed(() => meta.value ? `http://localhost:8000/img/img/${currentId.value}` : "");
+
+const imageUrl = computed(() => {
+  if (!meta.value || !meta.value.File_path) return "";
+  return `http://localhost:8000/media/Data/${meta.value.File_path}`;
+});
+
+
+function handleImageError(event) {
+  if (meta.value?.File_path) {
+    event.target.src = `http://localhost:8000/media/Data/${meta.value.File_path}`;
+  }
+}
+
 
 function suivante() { currentId.value++; }
 function precedente() { if (currentId.value > 1) currentId.value--; }
