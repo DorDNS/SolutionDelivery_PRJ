@@ -14,6 +14,22 @@
     <!-- Indicateurs en temps réel -->
   <RealTimeIndicators :indicators="realtimeIndicators || {}" />
 
+    <UCard class="mt-12">
+      <template #header>
+        <h3 class="text-lg font-semibold text-[#1b263b]">Carte des marchés et chantiers</h3>
+      </template>
+
+      <!-- ✅ Cases à cocher gérées dans le parent -->
+      <UFormGroup label="Options d’affichage" class="mb-4 flex flex-wrap gap-4">
+        <UCheckbox v-model="showMarches" label="Marchés actifs aujourd'hui" />
+        <UCheckbox v-model="showChantiers" label="Chantiers en cours" />
+      </UFormGroup>
+
+      <CarteMarchesChantiers :showMarches="showMarches" :showChantiers="showChantiers" />
+    </UCard>
+
+    <!-- Titre section visualisations -->
+
   <h2 class="text-2xl font-semibold text-[#1b263b]">Visualisations interactives</h2>
 
     <!-- Visualisations -->
@@ -86,6 +102,9 @@ import {
 } from "chart.js";
 import ChartCard from "./ChartCard.vue";
 import MapDepots from "./MapDepots.vue";
+import CarteMarchesChantiers from './CarteMarchesChantiers.vue'
+const showMarches = ref(true)
+const showChantiers = ref(true)
 
 ChartJS.register(Title, Tooltip, Legend, ArcElement, BarElement, CategoryScale, LinearScale);
 
