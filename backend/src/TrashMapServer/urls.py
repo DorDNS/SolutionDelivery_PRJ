@@ -36,5 +36,10 @@ urlpatterns = [
     path('api/image/<str:filename>/', v.img_by_filename),  # GET : infos via nom de fichier
 
     # Map-related
-    path('map/predict/', v.predict_map)            # POST/GET: Predict zones in map
+    path('map/predict/', v.predict_map),            # POST/GET: Predict zones in map
+
+    #Constraints
+    path('api/constraints/', v.get_constraints, name='get_constraints'),
+    path('api/constraints/update/', v.update_constraints, name='update_constraints'),
+
 ]

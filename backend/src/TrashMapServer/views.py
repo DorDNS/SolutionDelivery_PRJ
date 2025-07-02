@@ -492,3 +492,95 @@ def global_histograms(request):
         "Contrast_Histogram": contrast_classes, # ✅ ajouté
         "Average_Contrast": avg_contrast
     })
+
+@csrf_exempt
+def get_constraints(request):
+    """
+    GET: Renvoie les contraintes de classification enregistrées dans la table Constraints.
+    """
+    if request.method != 'GET':
+        return HttpResponseBadRequest("Only GET allowed")
+
+    db_path = os.path.join(s.BASE_DIR, 'db.sqlite3')
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute("SELECT * FROM Constraints LIMIT 1")
+        row = cursor.fetchone()
+        if not row:
+            return JsonResponse({}, status=204)
+
+        columns = [desc[0] for desc in cursor.description]
+        constraints = dict(zip(columns, row))
+
+        # Parser les champs JSON
+        if constraints.get('RGB_Histogram'):
+            constraints['RGB_Histogram'] = json.loads(constraints['RGB_Histogram'])
+        if constraints.get('Luminance_Histogram'):
+            constraints['Luminance_Histogram'] = json.loads(constraints['Luminance_Histogram'])
+
+        return JsonResponse(constraints)
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+    finally:
+        conn.close()
+
+@csrf_exempt
+def update_constraints(request):
+    """
+    POST/PUT: Met à jour ou insère les contraintes de classification.
+    """
+    if request.method not in ['POST', 'PUT']:
+        return HttpResponseBadRequest("Only POST or PUT allowed")
+
+    try:
+        data = json.loads(request.body.decode('utf-8'))
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid JSON body"}, status=400)
+
+    db_path = os.path.join(s.BASE_DIR, 'db.sqlite3')
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+
+    try:
+        # Parser JSONs s'ils existent
+        rgb_hist = json.dumps(data.get('RGB_Histogram')) if 'RGB_Histogram' in data else None
+        lum_hist = json.dumps(data.get('Luminance_Histogram')) if 'Luminance_Histogram' in data else None
+
+        fields = [
+            'Size', 'Height', 'Width', 'Date_taken', 'Avg_R', 'Avg_G', 'Avg_B',
+            'Contrast_level', 'RGB_Histogram', 'Luminance_Histogram', 'Edges'
+        ]
+        placeholders = ', '.join(f + ' = ?' for f in fields)
+        values = [
+            data.get('Size'),
+            data.get('Height'),
+            data.get('Width'),
+            data.get('Date_taken'),
+            data.get('Avg_R'),
+            data.get('Avg_G'),
+            data.get('Avg_B'),
+            data.get('Contrast_level'),
+            rgb_hist,
+            lum_hist,
+            data.get('Edges')
+        ]
+
+        cursor.execute("SELECT COUNT(*) FROM Constraints")
+        exists = cursor.fetchone()[0]
+
+        if exists:
+            cursor.execute(f"UPDATE Constraints SET {placeholders}", values)
+        else:
+            cursor.execute(f"INSERT INTO Constraints ({', '.join(fields)}) VALUES ({', '.join(['?'] * len(fields))})", values)
+
+        conn.commit()
+
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+    finally:
+        conn.close()
+
+    return JsonResponse({"message": "Contraintes enregistrées avec succès."})
