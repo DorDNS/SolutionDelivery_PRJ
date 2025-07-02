@@ -33,11 +33,13 @@
       <!-- Couleur moyenne globale -->
       <ChartCard title="Couleur moyenne globale">
         <div class="relative flex items-center justify-center" style="height: 200px; width: 200px;">
-          <Doughnut :data="rgbDoughnutData" :options="doughnutOptions" />
+          <Doughnut :data="rgbDoughnutData" :options="doughnutOptions"
+            class="relative z-10" />
           <div class="absolute rounded-full border border-[#1b263b] shadow-md"
-            :style="{ backgroundColor: avgRGBColor, width: '80px', height: '80px' }" />
+            :style="{ backgroundColor: avgRGBColor, width: '80px', height: '80px', zIndex: 0 }" />
         </div>
       </ChartCard>
+
 
       <!-- Histogramme global des tailles -->
       <ChartCard title="Histogramme global des tailles (px)">
