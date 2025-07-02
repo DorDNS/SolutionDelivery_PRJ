@@ -70,6 +70,7 @@
                     :src="preview"
                     alt="Aperçu"
                     class="max-h-[32rem] mx-auto rounded-xl shadow-lg border"
+                    loading="lazy"
                 />
 
                 <div class="flex flex-col items-center space-y-6">

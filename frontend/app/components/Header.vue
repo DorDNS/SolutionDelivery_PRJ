@@ -6,6 +6,7 @@
           src="/images/icone-trashmap.svg"
           alt="Logo TrashMap"
           class="h-9 w-auto"
+          loading="lazy"
         />
         <span class="text-2xl font-bold tracking-tight text-white">
           TrashMap
