@@ -24,8 +24,8 @@ const translations = {
     //Index
     slogan: "Aidez votre ville à rester propre. Uploadez des images de poubelles et contribuez à une meilleure gestion des déchets urbains grâce à l’IA.",
     uploadButton: 'Uploader une image',
-    dashboardprev: 'Aperçu du Dashboard',
-    dashboardDescription: 'Ici s’afficheront bientôt les graphiques, les cartes interactives et les statistiques de collecte.',
+    dashboardprev: 'Dashboard',
+    dashboardDescription: 'Retrouvez ici les graphiques, les cartes interactives et les statistiques en temps réel.',
     //DashboardPreview
     filtre : "Filtres",
     allStates: "Tous",

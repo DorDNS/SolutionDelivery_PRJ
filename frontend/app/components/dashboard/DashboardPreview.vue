@@ -14,6 +14,8 @@
     <!-- Indicateurs en temps réel -->
   <RealTimeIndicators :indicators="realtimeIndicators || {}" />
 
+  <h2 class="text-2xl font-semibold text-[#1b263b]">Visualisations interactives</h2>
+
     <!-- Visualisations -->
     <div v-if="pending || histoPending" class="text-center py-10">
       <span class="text-[#1b263b]">{{ translations[currentLanguage].loaddash }}</span>
