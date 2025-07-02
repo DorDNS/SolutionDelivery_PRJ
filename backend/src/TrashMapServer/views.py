@@ -421,6 +421,49 @@ def img_by_filename(request, filename):
         return JsonResponse({"error": str(e)}, status=500)
     finally:
         conn.close()
+        
+def list_images_paginated(request):
+    try:
+        page = int(request.GET.get('page', 1))
+        limit = int(request.GET.get('limit', 10))
+        offset = (page - 1) * limit
+    except ValueError:
+        return JsonResponse({'error': 'Invalid pagination params'}, status=400)
+
+    db_path = os.path.join(s.BASE_DIR, 'db.sqlite3')
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute("SELECT COUNT(*) FROM Image")
+        total = cursor.fetchone()[0]
+
+        cursor.execute("""
+            SELECT Id_Image, File_name, File_path, Status
+            FROM Image
+            ORDER BY Id_Image ASC
+            LIMIT ? OFFSET ?
+        """, (limit, offset))
+
+        rows = cursor.fetchall()
+        images = [
+            {"Id_Image": r[0], "File_name": r[1], "File_path": r[2], "Status": r[3]}
+            for r in rows
+        ]
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+    finally:
+        conn.close()
+
+    return JsonResponse({
+        "page": page,
+        "limit": limit,
+        "total": total,
+        "total_pages": (total + limit - 1) // limit,
+        "images": images
+    })
+
+
 
 def global_histograms(request):
     db_path = os.path.join(s.BASE_DIR, 'db.sqlite3')
@@ -595,3 +638,4 @@ def update_constraints(request):
         conn.close()
 
     return JsonResponse({"message": "Contraintes enregistrées avec succès."})
+

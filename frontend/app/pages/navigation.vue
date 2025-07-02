@@ -149,7 +149,6 @@
 
 <script setup>
 import { ref, computed, watch, onMounted, onBeforeUnmount } from "vue";
-import { useFetch } from "#app";
 import PieChart from "~/components/PieChart.vue";
 import MapDepots from "../components/dashboard/MapDepots.vue";
 import { Bar } from "vue-chartjs";
@@ -165,21 +164,64 @@ import {
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-const currentId = ref(1);
-if (process.client && localStorage.getItem("currentId")) {
-  currentId.value = parseInt(localStorage.getItem("currentId")) || 1;
+const meta = ref(null);
+const currentPage = ref(1);
+const totalPages = ref(1);
+const limit = 1;
+
+async function fetchImage() {
+  try {
+    const response = await fetch(`http://localhost:8000/img/list/?page=${currentPage.value}&limit=${limit}`);
+    const data = await response.json();
+    totalPages.value = Math.ceil(data.total / limit);
+
+    if (data.images.length > 0) {
+      const imageId = data.images[0].Id_Image;
+      // Requête pour récupérer la fiche détaillée
+      const metaResponse = await fetch(`http://localhost:8000/img/metadatas/${imageId}/`);
+      meta.value = await metaResponse.json();
+    } else {
+      meta.value = null;
+    }
+
+    showForm.value = false;
+    formData.value = { Date_taken: "", Latitude: "", Longitude: "", Status: "false" };
+    if (process.client) localStorage.setItem("currentPage", currentPage.value.toString());
+  } catch (error) {
+    console.error("Erreur de chargement des images :", error);
+  }
 }
 
-const { data: meta, refresh } = useFetch(
-  () => `http://localhost:8000/img/metadatas/${currentId.value}`,
-  { key: `image-meta-${currentId.value}` }
-);
+
+if (process.client && localStorage.getItem("currentPage")) {
+  currentPage.value = parseInt(localStorage.getItem("currentPage")) || 1;
+}
+
+onMounted(() => {
+  fetchImage();
+  window.addEventListener("keydown", handleKey);
+});
+onBeforeUnmount(() => {
+  window.removeEventListener("keydown", handleKey);
+});
+
+watch(currentPage, fetchImage);
+
+function suivante() {
+  if (currentPage.value < totalPages.value) currentPage.value++;
+}
+function precedente() {
+  if (currentPage.value > 1) currentPage.value--;
+}
+function handleKey(event) {
+  if (event.key === "ArrowLeft") precedente();
+  else if (event.key === "ArrowRight") suivante();
+}
 
 const imageUrl = computed(() => {
   if (!meta.value || !meta.value.File_path) return "";
   return `http://localhost:8000/media/Data/${meta.value.File_path}`;
 });
-
 
 function handleImageError(event) {
   if (meta.value?.File_path) {
@@ -187,29 +229,7 @@ function handleImageError(event) {
   }
 }
 
-
-function suivante() { currentId.value++; }
-function precedente() { if (currentId.value > 1) currentId.value--; }
-
-function handleKey(event) {
-  if (event.key === "ArrowLeft") precedente();
-  else if (event.key === "ArrowRight") suivante();
-}
-
-watch(currentId, async () => {
-  if (process.client) localStorage.setItem("currentId", currentId.value.toString());
-  await refresh();
-  showForm.value = false;
-  formData.value = { Date_taken: "", Latitude: "", Longitude: "", Status: "false" };
-});
-
-onMounted(() => {
-  refresh();
-  window.addEventListener("keydown", handleKey);
-});
-onBeforeUnmount(() => { window.removeEventListener("keydown", handleKey); });
-
-// Chart.js options
+// Chart.js
 const chartOptions = {
   responsive: true,
   maintainAspectRatio: false,
@@ -263,9 +283,9 @@ const statutOptions = [{ label: "Pleine", value: "true" }, { label: "Vide", valu
 
 function openForm() {
   formData.value = {
-    Date_taken: meta.value.Date_taken || "",
-    Latitude: meta.value.Latitude || "",
-    Longitude: meta.value.Longitude || "",
+    Date_taken: meta.value?.Date_taken || "",
+    Latitude: meta.value?.Latitude || "",
+    Longitude: meta.value?.Longitude || "",
     Status: meta.value?.Status ? "true" : "false",
   };
   showForm.value = true;
@@ -273,7 +293,7 @@ function openForm() {
 
 async function submitAnnotation() {
   try {
-    const response = await fetch(`http://localhost:8000/img/${currentId.value}/modify/`, {
+    const response = await fetch(`http://localhost:8000/img/${meta.value.Id_Image}/modify/`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -285,7 +305,7 @@ async function submitAnnotation() {
     });
     if (!response.ok) throw new Error("Erreur lors de l'envoi");
     showForm.value = false;
-    await refresh();
+    await fetchImage();
     alert("Annotation sauvegardée !");
   } catch (err) {
     console.error(err);

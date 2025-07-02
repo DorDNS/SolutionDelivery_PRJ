@@ -28,6 +28,7 @@ urlpatterns = [
     path('dashboard/', v.dashboard),
     
     # IMG-related routes
+    path("img/list/", v.list_images_paginated),
     path('img/locations/', v.locations_img),     # GET: Return ids and locations of images for map
     path('img/upload/', v.upload_img),           # POST: Upload an image
     path('img/predict/', v.predict_img),         # POST: Classify image(s)
@@ -36,6 +37,8 @@ urlpatterns = [
     path('img/img/<int:id>', v.get_img),                ## GET: Get the image
     path('img/global_histograms/', v.global_histograms),
     path('api/image/<str:filename>/', v.img_by_filename),  # GET : infos via nom de fichier
+    
+
 
     # Map-related
     path('map/predict/', v.predict_map),            # POST/GET: Predict zones in map
