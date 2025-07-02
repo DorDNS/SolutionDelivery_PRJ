@@ -16,16 +16,20 @@
 
     <UCard class="mt-12">
       <template #header>
-        <h3 class="text-lg font-semibold text-[#1b263b]">Carte des marchés et chantiers</h3>
+        <h3 class="text-lg font-semibold text-[#1b263b]">Carte des marchés, chantiers et poubelles</h3>
       </template>
 
-      <!-- ✅ Cases à cocher gérées dans le parent -->
-      <UFormGroup label="Options d’affichage" class="mb-4 flex flex-wrap gap-4">
+      <div class="flex flex-wrap gap-4 mb-4">
         <UCheckbox v-model="showMarches" label="Marchés actifs aujourd'hui" />
         <UCheckbox v-model="showChantiers" label="Chantiers en cours" />
-      </UFormGroup>
+        <UCheckbox v-model="showDepots" label="Poubelles" />
+      </div>
 
-      <CarteMarchesChantiers :showMarches="showMarches" :showChantiers="showChantiers" />
+      <CarteMarchesChantiers
+        :showMarches="showMarches"
+        :showChantiers="showChantiers"
+        :showDepots="showDepots"
+      />
     </UCard>
 
     <!-- Titre section visualisations -->
@@ -74,13 +78,6 @@
         <Bar :data="barContrastes" :options="chartOptions" />
       </ChartCard>
     </div>
-
-    <UCard class="mt-12">
-      <template #header>
-        <h3 class="text-lg font-semibold text-[#1b263b]">Carte des dépôts sauvages</h3>
-      </template>
-      <MapDepots />
-    </UCard>
   </div>
 </template>
 
@@ -101,10 +98,10 @@ import {
   LinearScale,
 } from "chart.js";
 import ChartCard from "./ChartCard.vue";
-import MapDepots from "./MapDepots.vue";
-import CarteMarchesChantiers from './CarteMarchesChantiers.vue'
+import CarteMarchesChantiers from './Carte.vue'
 const showMarches = ref(true)
 const showChantiers = ref(true)
+const showDepots = ref(true)
 
 ChartJS.register(Title, Tooltip, Legend, ArcElement, BarElement, CategoryScale, LinearScale);
 

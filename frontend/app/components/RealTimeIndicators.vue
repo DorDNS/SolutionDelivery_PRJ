@@ -1,6 +1,6 @@
 <template>
   <div class="space-y-6">
-    <h2 class="text-2xl font-semibold text-[#1b263b]">Indicateurs temps réel</h2>
+    <h2 class="text-2xl font-semibold text-[#1b263b]">Indicateurs en temps réel</h2>
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
       <UCard
         v-for="(item, index) in indicators"

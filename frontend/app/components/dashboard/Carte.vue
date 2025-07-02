@@ -3,9 +3,10 @@ import { ref, onMounted } from 'vue'
 import { LMap, LTileLayer, LMarker, LPopup } from '@vue-leaflet/vue-leaflet'
 import axios from 'axios'
 
-const { showMarches, showChantiers } = defineProps({
+const { showMarches, showChantiers, showDepots } = defineProps({
   showMarches: { type: Boolean, default: true },
   showChantiers: { type: Boolean, default: true },
+  showDepots: { type: Boolean, default: true },
 })
 
 const url = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
@@ -13,8 +14,11 @@ const attribution = '&copy; OpenStreetMap contributors';
 
 const marches = ref([]);
 const chantiers = ref([]);
+const depots = ref([]);
+
 const violetIcon = ref(null)
 const orangeIcon = ref(null)
+const blueIcon = ref(null)
 
 const fetchMarches = async () => {
   try {
@@ -66,6 +70,24 @@ const fetchChantiers = async () => {
   }
 }
 
+const fetchDepots = async () => {
+  try {
+    const response = await axios.get("http://127.0.0.1:8000/img/locations/");
+    depots.value = response.data.map(d => ({
+      id: d.id_image,
+      lat: d.latitude,
+      lng: d.longitude
+    }));
+  } catch (error) {
+    console.error("Erreur récupération dépôts :", error);
+  }
+}
+
+function goToNavigation(id) {
+  localStorage.setItem("currentId", id);
+  window.location.href = "/navigation";
+}
+
 onMounted(async () => {
   const leaflet = await import('leaflet')
 
@@ -87,10 +109,22 @@ onMounted(async () => {
     shadowSize: [41, 41]
   })
 
-  fetchMarches();
-  fetchChantiers();
+  blueIcon.value = leaflet.icon({
+    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png',
+    shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
+  })
+
+  await fetchMarches();
+  await fetchChantiers();
+  await fetchDepots();
+
   setInterval(fetchMarches, 24 * 60 * 60 * 1000);
   setInterval(fetchChantiers, 60 * 60 * 1000);
+  setInterval(fetchDepots, 60 * 60 * 1000);
 });
 </script>
 
@@ -100,7 +134,7 @@ onMounted(async () => {
       <LMap :zoom="12" :center="[48.8566, 2.3522]" style="height: 500px;">
         <LTileLayer :url="url" :attribution="attribution" />
 
-        <!-- 🟣 Pins marchés (violet) -->
+        <!-- 🟣 Marchés -->
         <LMarker 
           v-if="showMarches && violetIcon"
           v-for="(marche, index) in marches" 
@@ -115,7 +149,7 @@ onMounted(async () => {
           </LPopup>
         </LMarker>
 
-        <!-- 🟧 Pins chantiers (orange) -->
+        <!-- 🟧 Chantiers -->
         <LMarker 
           v-if="showChantiers && orangeIcon"
           v-for="(chantier, index) in chantiers" 
@@ -127,6 +161,20 @@ onMounted(async () => {
             <strong>{{ chantier.ref }}</strong><br>
             {{ chantier.responsable }}<br>
             Fin : {{ chantier.date_fin }}
+          </LPopup>
+        </LMarker>
+
+        <!-- 🔵 Poubelles -->
+        <LMarker 
+          v-if="showDepots && blueIcon"
+          v-for="(depot, index) in depots" 
+          :key="'depot-' + index" 
+          :lat-lng="[depot.lat, depot.lng]"
+          :icon="blueIcon"
+        >
+          <LPopup>
+            <strong>Dépôt ID {{ depot.id }}</strong><br>
+            <button @click="goToNavigation(depot.id)">Voir l’image</button>
           </LPopup>
         </LMarker>
       </LMap>
