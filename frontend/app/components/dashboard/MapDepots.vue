@@ -45,15 +45,15 @@ onMounted(async () => {
     );
 
     marker.on("popupopen", (e) => {
-      const button = e.target.getPopup().getContent().match(/data-id="(\d+)"/);
+      const popupContent = e.popup.getElement();
+      const button = popupContent.querySelector(".leaflet-popup-button");
+
       if (button) {
-        const id = button[1];
-        document
-          .querySelector(".leaflet-popup-button")
-          .addEventListener("click", () => {
-            localStorage.setItem("currentId", id);
-            window.location.href = "/navigation";
-          });
+        // Ajout : redirection vers /navigation avec l’image sélectionnée
+        L.DomEvent.on(button, "click", () => {
+          localStorage.setItem("currentId", button.dataset.id);
+          window.location.href = "/navigation";
+        });
       }
     });
 
