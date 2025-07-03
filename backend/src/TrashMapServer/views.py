@@ -352,6 +352,7 @@ def global_histograms(request):
         dominant_colors = {'Rouge': 0, 'Vert': 0, 'Bleu': 0}
         dominant_colors_label = {'Pleine': {'Rouge': 0, "Vert": 0, "Bleu": 0}, 'Vide': {'Rouge': 0, "Vert": 0, "Bleu": 0}}
         contrast_classes = {'Faible': 0, 'Moyen': 0, 'Élevé': 0}
+        contrast_avg_label = {'Pleine': {'Faible': 0, "Moyen": 0, "Élevé": 0}, 'Vide': {'Faible': 0, "Moyen": 0, "Élevé": 0}}
         edges_histogram = {'<5000': 0, '5000-10000': 0, '10000-50000': 0, '>50000': 0}
         edges_Average = {'Sans label': 0, 'Pleine': 0, 'Vide': 0}
         contrast_list = []
@@ -402,10 +403,22 @@ def global_histograms(request):
                 contrast_list.append(contrast)
                 if contrast < 30:
                     contrast_classes['Faible'] += 1
+                    if status == 1:
+                        contrast_avg_label['Pleine']['Faible'] += 1
+                    elif status == 0:
+                        contrast_avg_label['Vide']['Faible'] += 1
                 elif contrast < 60:
                     contrast_classes['Moyen'] += 1
+                    if status == 1:
+                        contrast_avg_label['Pleine']['Moyen'] += 1
+                    elif status == 0:
+                        contrast_avg_label['Vide']['Moyen'] += 1
                 else:
                     contrast_classes['Élevé'] += 1
+                    if status == 1:
+                        contrast_avg_label['Pleine']['Élevé'] += 1
+                    elif status == 0:
+                        contrast_avg_label['Vide']['Élevé'] += 1
 
             # Arêtes
             if edges < 5000:
@@ -440,6 +453,7 @@ def global_histograms(request):
             "Dominant_Colors": dominant_colors,
             "Dominant_Colors_Label": dominant_colors_label,
             "Contrast_Histogram": contrast_classes,
+            "Contrast_Level_Label": contrast_avg_label,
             "Average_Contrast": avg_contrast,
             "Edges_Histogram": edges_histogram,
             "Edges_Average": edges_Average

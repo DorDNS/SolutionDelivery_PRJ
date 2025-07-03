@@ -60,17 +60,6 @@
         <Pie :data="pieAnnotations" :options="pieOptions" />
       </ChartCard>
 
-      <!-- Couleur moyenne globale -->
-      <ChartCard :title="translations[currentLanguage].visu3title">
-        <div class="relative flex items-center justify-center" style="height: 200px; width: 200px;">
-          <Doughnut :data="rgbDoughnutData" :options="doughnutOptions" class="relative z-10" />
-          <div
-            class="absolute rounded-full border border-[#1b263b] shadow-md"
-            :style="{ backgroundColor: avgRGBColor, width: '80px', height: '80px', zIndex: 0 }"
-          />
-        </div>
-      </ChartCard>
-
       <!-- Histogramme global des tailles -->
       <ChartCard :title="translations[currentLanguage].visu4title">
         <Bar :data="globalSizeHistogram" :options="chartOptions" />
@@ -81,24 +70,40 @@
         <Bar :data="barCouleurs" :options="chartOptions" />
       </ChartCard>
 
-      <!-- Histogramme des tons dominants par label -->
-      <ChartCard :title="translations[currentLanguage].visu6title">
-        <Bar :data="barTonsDominants" :options="chartOptions" />
-      </ChartCard>
-
       <!-- Histogramme des contrastes -->
       <ChartCard :title="translations[currentLanguage].visu6title">
         <Bar :data="barContrastes" :options="chartOptions" />
       </ChartCard>
-      
+
       <!-- Histogramme des contours -->
       <ChartCard :title="translations[currentLanguage].visu7title">
         <Bar :data="barContours" :options="chartOptions" />
       </ChartCard>
+      
+      <!-- Histogramme des tons dominants par label -->
+      <ChartCard :title="translations[currentLanguage].visu9title">
+        <Bar :data="barTonsDominants" :options="chartOptions" />
+      </ChartCard>
 
-      <!-- Histogramme des contours -->
+      <!-- Histogramme des contrastes par label -->
+      <ChartCard :title="translations[currentLanguage].visu10title">
+        <Bar :data="barContrastesLabel" :options="chartOptions" />
+      </ChartCard>
+
+      <!-- Histogramme des contours moyens -->
       <ChartCard :title="translations[currentLanguage].visu8title">
         <Bar :data="barContoursMoy" :options="chartOptions" />
+      </ChartCard>
+
+      <!-- Couleur moyenne globale -->
+      <ChartCard :title="translations[currentLanguage].visu3title">
+        <div class="relative flex items-center justify-center" style="height: 200px; width: 200px;">
+          <Doughnut :data="rgbDoughnutData" :options="doughnutOptions" class="relative z-10" />
+          <div
+            class="absolute rounded-full border border-[#1b263b] shadow-md"
+            :style="{ backgroundColor: avgRGBColor, width: '80px', height: '80px', zIndex: 0 }"
+          />
+        </div>
       </ChartCard>
     </div>
   </div>
@@ -274,9 +279,43 @@ const barContrastes = computed(() => ({
       histoData.value?.Contrast_Histogram?.Moyen ?? 0,
       histoData.value?.Contrast_Histogram?.Élevé ?? 0,
     ],
-    backgroundColor: ["#6FB1FF", "#006FFF", "#000000"],
+    backgroundColor: ["#FF7F27", "#006FFF", "#000000"],
     borderRadius: 8,
   }],
+}));
+
+// Histogramme contrastes moyen par label
+const barContrastesLabel = computed(() => ({
+  labels: [
+    translations[currentLanguage.value]?.fullLabel ?? "Pleine",
+    translations[currentLanguage.value]?.emptyLabel ?? "Vide",
+  ],
+  datasets: [
+    {
+      label: translations[currentLanguage.value]?.low ?? "Faible",
+      data: [
+        histoData.value?.Contrast_Level_Label?.Vide?.Faible ?? 0,
+        histoData.value?.Contrast_Level_Label?.Pleine?.Faible ?? 0,
+      ],
+      backgroundColor: "#FF7F27",
+    },
+    {
+      label: translations[currentLanguage.value]?.medium ?? "Moyen",
+      data: [
+        histoData.value?.Contrast_Level_Label?.Vide?.Moyen ?? 0,
+        histoData.value?.Contrast_Level_Label?.Pleine?.Moyen ?? 0,
+      ],
+      backgroundColor: "#006FFF",
+    },
+    {
+      label: translations[currentLanguage.value]?.high ?? "Élevé",
+      data: [
+        histoData.value?.Contrast_Level_Label?.Vide?.Élevé ?? 0,
+        histoData.value?.Contrast_Level_Label?.Pleine?.Élevé ?? 0,
+      ],
+      backgroundColor: "#000000",
+    },
+  ],
 }));
 
 // Couleur moyenne et doughnut RGB
