@@ -1,4 +1,6 @@
 import sqlite3
+import settings as s
+import os
 
 def get_constraints_from_db(db_path):
     conn = sqlite3.connect(db_path)
@@ -17,6 +19,19 @@ def get_constraints_from_db(db_path):
     ]
     return dict(zip(columns, row))
 
+def get_image_from_db(db_path, with_label=False):
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+    query = "SELECT * FROM Image"
+
+    if (with_label):
+        query="SELECT * FROM Image WHERE File_Path LIKE '/train/with_label/%' "
+    cursor.execute(query)
+    rows = cursor.fetchall()
+    conn.close()
+
+    return rows
+
 def classify_bin(image_data, constraints):
     # Vérifie si chaque caractéristique est dans la plage définie par les contraintes
     in_range = (
@@ -29,21 +44,22 @@ def classify_bin(image_data, constraints):
         constraints["min_contrast"] <= image_data["Contrast_level"]  <= constraints["max_contrast"] and
         constraints["min_edges"]    <= image_data["Edges"]           <= constraints["max_edges"]
     )
+    # recuperer uniquement les images dont le path est Data/train/with_label/clean ou Data/train/with_label/dirty
+
+
+    # classifier
+    edges...
+
+    # tester l'accuracy.
+
     return 1 if in_range else 0
 
 # Exemple d'utilisation
-db_path = "db.sqlite3"
-image_data = {
-    "Size": 4500.0,
-    "Height": 500,
-    "Width": 400,
-    "Avg_R": 95.0,
-    "Avg_G": 85.0,
-    "Avg_B": 90.0,
-    "Contrast_level": 0.6,
-    "Edges": 6500
-}
+db_path = os.join(s.BASE_DIR, "db.sqlite3")
+
+image_data = get_image_from_db(db_path, True)
 
 constraints = get_constraints_from_db(db_path)
+
 status = classify_bin(image_data, constraints)
 print("Status =", status)

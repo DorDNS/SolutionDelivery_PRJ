@@ -40,10 +40,12 @@ urlpatterns = [
     # Map-related
     path('map/predict/', v.predict_map),            # POST/GET: Predict zones in map
 
-    #Constraints
-    path('api/constraints/', v.get_constraints, name='get_constraints'),
-    path('api/constraints/update/', v.update_constraints, name='update_constraints'),
+    # Constraints
+    path('constraints/', v.get_constraints, name='get_constraints'),
+    path('constraints/update/', v.update_constraints, name='update_constraints'),
 
+    # Classification
+    path('img/<int:id>/classify', v.classify_bin)
 ]
 
 if settings.DEBUG:
