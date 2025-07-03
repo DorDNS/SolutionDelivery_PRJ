@@ -81,6 +81,11 @@
         <Bar :data="barCouleurs" :options="chartOptions" />
       </ChartCard>
 
+      <!-- Histogramme des tons dominants par label -->
+      <ChartCard :title="translations[currentLanguage].visu6title">
+        <Bar :data="barTonsDominants" :options="chartOptions" />
+      </ChartCard>
+
       <!-- Histogramme des contrastes -->
       <ChartCard :title="translations[currentLanguage].visu6title">
         <Bar :data="barContrastes" :options="chartOptions" />
@@ -118,10 +123,10 @@ import ChartCard from "./ChartCard.vue";
 import CarteMarchesChantiers from './Carte.vue'
 
 //Déclarations des switches
-const showMarches = ref(true)
-const showChantiers = ref(true)
+const showMarches = ref(false)
+const showChantiers = ref(false)
 const showDepots = ref(true)
-const showZones = ref(true) 
+const showZones = ref(false) 
 
 // ChartJS register
 ChartJS.register(Title, Tooltip, Legend, ArcElement, BarElement, CategoryScale, LinearScale);
@@ -221,6 +226,40 @@ const barCouleurs = computed(() => ({
   }],
 }));
 
+//Histogramme des tons dominants pour les labels
+const barTonsDominants = computed(() => ({
+  labels: [
+  translations[currentLanguage.value]?.fullLabel ?? "Pleine",
+    translations[currentLanguage.value]?.emptyLabel ?? "Vide",
+  ],
+  datasets: [
+    {
+      label: translations[currentLanguage.value]?.Red ?? "Rouge",
+      data: [
+        histoData.value?.Dominant_Colors_Label?.Vide?.Rouge ?? 0,
+        histoData.value?.Dominant_Colors_Label?.Pleine?.Rouge ?? 0,
+      ],
+      backgroundColor: "#FF4C4C",
+    },
+    {
+      label: translations[currentLanguage.value]?.Green ?? "Vert",
+      data: [
+        histoData.value?.Dominant_Colors_Label?.Vide?.Vert ?? 0,
+        histoData.value?.Dominant_Colors_Label?.Pleine?.Vert ?? 0,
+      ],
+      backgroundColor: "#4CAF50",
+    },
+    {
+      label: translations[currentLanguage.value]?.Blue ?? "Bleu",
+      data: [
+        histoData.value?.Dominant_Colors_Label?.Vide?.Bleu ?? 0,
+        histoData.value?.Dominant_Colors_Label?.Pleine?.Bleu ?? 0,
+      ],
+      backgroundColor: "#2196F3",
+    },
+  ],
+}));
+
 // Histogramme contrastes global
 const barContrastes = computed(() => ({
   labels: [
@@ -235,7 +274,7 @@ const barContrastes = computed(() => ({
       histoData.value?.Contrast_Histogram?.Moyen ?? 0,
       histoData.value?.Contrast_Histogram?.Élevé ?? 0,
     ],
-    backgroundColor: ["#6FB1FF", "#006FFF", "00F8FF"],
+    backgroundColor: ["#6FB1FF", "#006FFF", "#000000"],
     borderRadius: 8,
   }],
 }));
@@ -270,18 +309,16 @@ const barContours = computed(() => ({
 // Histogramme contours moyen par label
 const barContoursMoy = computed(() => ({
   labels: [
-    translations[currentLanguage.value]?.noLabel ?? "Sans label",
     translations[currentLanguage.value]?.fullLabel ?? "Pleine",
     translations[currentLanguage.value]?.emptyLabel ?? "Vide",
   ],
   datasets: [{
     label: translations[currentLanguage.value].nbmoycontours,
     data: [
-      histoData.value?.Edges_Average?.["Sans label"] ?? 0,
       histoData.value?.Edges_Average?.["Pleine"] ?? 0,
       histoData.value?.Edges_Average?.["Vide"] ?? 0,
     ],
-    backgroundColor: ["#9E9E9E", "#FB8C00", "#4CAF50"],
+    backgroundColor: ["#FB8C00", "#4CAF50"],
     borderRadius: 8,
   }],
 }));
@@ -301,7 +338,15 @@ const rgbDoughnutData = computed(() => ({
 const chartOptions = {
   responsive: true,
   plugins: { legend: { display: false } },
-  scales: { y: { beginAtZero: true } },
+  scales: {
+    x: {
+      stacked: true,
+    },
+    y: {
+      stacked: true,
+      beginAtZero: true,
+    },
+  },
 };
 
 const doughnutOptions = {

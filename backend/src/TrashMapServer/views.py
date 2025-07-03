@@ -350,6 +350,7 @@ def global_histograms(request):
         # Init structures
         size_classes = {'<500px': 0, '500-800px': 0, '800-1200px': 0, '>1200px': 0}
         dominant_colors = {'Rouge': 0, 'Vert': 0, 'Bleu': 0}
+        dominant_colors_label = {'Pleine': {'Rouge': 0, "Vert": 0, "Bleu": 0}, 'Vide': {'Rouge': 0, "Vert": 0, "Bleu": 0}}
         contrast_classes = {'Faible': 0, 'Moyen': 0, 'Élevé': 0}
         edges_histogram = {'<5000': 0, '5000-10000': 0, '10000-50000': 0, '>50000': 0}
         edges_Average = {'Sans label': 0, 'Pleine': 0, 'Vide': 0}
@@ -379,10 +380,22 @@ def global_histograms(request):
             max_color = max(sum_r, sum_g, sum_b)
             if max_color == sum_r:
                 dominant_colors['Rouge'] += 1
+                if status == 1:
+                    dominant_colors_label['Pleine']['Rouge'] += 1
+                elif status == 0:
+                    dominant_colors_label['Vide']['Rouge'] += 1
             elif max_color == sum_g:
                 dominant_colors['Vert'] += 1
+                if status == 1:
+                    dominant_colors_label['Pleine']['Vert'] += 1
+                elif status == 0:
+                    dominant_colors_label['Vide']['Vert'] += 1
             else:
                 dominant_colors['Bleu'] += 1
+                if status == 1:
+                    dominant_colors_label['Pleine']['Bleu'] += 1
+                elif status == 0:
+                    dominant_colors_label['Vide']['Bleu'] += 1
 
             # Contraste
             if contrast is not None:
@@ -425,6 +438,7 @@ def global_histograms(request):
         return JsonResponse({
             "Size_Histogram": size_classes,
             "Dominant_Colors": dominant_colors,
+            "Dominant_Colors_Label": dominant_colors_label,
             "Contrast_Histogram": contrast_classes,
             "Average_Contrast": avg_contrast,
             "Edges_Histogram": edges_histogram,

@@ -122,7 +122,7 @@ const translations = {
     medium: "Medium",
     high: "High",
     visu7title: "Histogram of number of edges",
-    visu8title: "Average contours by labels",
+    visu8title: "Average number of edges by labels",
     nbmoycontours: "Average number of edges",
     emptyLabel: "Empty",
     fullLabel: "Full",
