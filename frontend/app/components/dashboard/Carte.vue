@@ -1,7 +1,11 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, inject, onMounted } from "vue";
 import { LMap, LTileLayer, LMarker, LPopup, LCircle } from "@vue-leaflet/vue-leaflet";
 import axios from "axios";
+
+// Traduction
+const currentLanguage = inject("currentLanguage");
+const translations = inject("translations");
 
 // Props
 const { showMarches, showChantiers, showDepots, showZones } = defineProps({
@@ -235,7 +239,7 @@ onMounted(async () => {
           <LPopup>
             <strong>{{ chantier.ref }}</strong><br />
             {{ chantier.responsable }}<br />
-            Fin : {{ chantier.date_fin }}
+            {{ translations[currentLanguage].end }} {{ chantier.date_fin }}
           </LPopup>
         </LMarker>
 
@@ -248,9 +252,9 @@ onMounted(async () => {
           :icon="blueIcon"
         >
           <LPopup>
-            <strong>Dépôt ID {{ depot.id }}</strong><br />
+            <strong>{{ translations[currentLanguage].depID }} {{ depot.id }}</strong><br />
             <button @click="() => goToNavigation(depot.id)">
-              Voir l’image
+                {{ translations[currentLanguage].seeimg }}
             </button>
           </LPopup>
         </LMarker>

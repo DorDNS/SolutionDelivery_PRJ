@@ -72,6 +72,10 @@ const translations = {
     checkboxdepots : "Poubelles",
     checkboxzones : "Zones à risques",
     dashboardDescription : "Visualisations interactives et statistiques en temps réel",
+    //Carte Dashboard
+    end: "Fin : ",
+    depID: "Dépôt ID :",
+    seeimg : "Voir l'image",
   },
   en: {
     //Header
@@ -130,6 +134,10 @@ const translations = {
     checkboxdepots : "Trash bins",
     checkboxzones : "Risk zones",
     dashboardDescription : "Interactive visualizations and real-time statistics",
+    //Carte Dashboard
+    end: "End : ",
+    depID: "Bin ID :",
+    seeimg: "View image",
   },
 }
 
