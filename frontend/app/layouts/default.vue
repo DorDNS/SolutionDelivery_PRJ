@@ -72,6 +72,7 @@ const translations = {
     annotationsLabel: "Annotations",
   },
 }
+
 // Fournir les données aux composants enfants
 provide('currentLanguage', currentLanguage)
 provide('translations', translations)

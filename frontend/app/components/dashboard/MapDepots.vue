@@ -49,7 +49,6 @@ onMounted(async () => {
       const button = popupContent.querySelector(".leaflet-popup-button");
 
       if (button) {
-        // Ajout : redirection vers /navigation avec l’image sélectionnée
         L.DomEvent.on(button, "click", () => {
           localStorage.setItem("currentId", button.dataset.id);
           window.location.href = "/navigation";

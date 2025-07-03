@@ -66,7 +66,7 @@ import DashboardPreview from '@/components/dashboard/DashboardPreview.vue'
 const currentLanguage = inject('currentLanguage')
 const translations    = inject('translations')
 
-// gradient de base : bleu vif → bleu foncé
+// Couleurs
 const gradientStyle = ref(`
   color: transparent;
   background-image: linear-gradient(90deg, rgba(11,178,246,1) 0%, #415a77 100%);
@@ -78,7 +78,6 @@ function updateGradient(event) {
   const rect = el.getBoundingClientRect()
   const x    = ((event.clientX - rect.left) / rect.width) * 100
 
-  // radial plus doux au survol, ton pastel pour faire ressortir le bleu
   gradientStyle.value = `
     color: transparent;
     background-image: radial-gradient(

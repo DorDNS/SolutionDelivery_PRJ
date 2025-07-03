@@ -37,17 +37,17 @@ const updateIndicator = (label, value) => {
   }
 }
 
-// Nouvelle fonction pour récupérer la population via Wikidata
+// Récupérer la population via Wikidata
 async function fetchPopulationFromWikidata(city) {
   try {
-    // 1. Récupérer l’ID Wikidata via API MediaWiki
+    // Récupère l’ID Wikidata via API MediaWiki
     const wikiIdRes = await axios.get(`https://fr.wikipedia.org/w/api.php`, {
       params: {
         action: 'query',
         prop: 'pageprops',
         titles: city,
         format: 'json',
-        origin: '*'  // important pour CORS
+        origin: '*'
       }
     });
 
@@ -58,7 +58,7 @@ async function fetchPopulationFromWikidata(city) {
     }
     const wikidataId = page.pageprops.wikibase_item;
 
-    // 2. Requête SPARQL pour récupérer la population la plus récente
+    //Requête SPARQL pour récupérer la population la plus récente
     const sparqlQuery = `
       SELECT ?population WHERE {
         wd:${wikidataId} wdt:P1082 ?population .

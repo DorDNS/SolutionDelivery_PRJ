@@ -234,7 +234,7 @@
                         </div>
                     </div>
 
-                    <!-- Histogramme Luminance -->
+                    <!-- Histogramme luminance -->
                     <div class="mt-6">
                         <h2 class="text-lg font-semibold mb-2 border-b pb-2">
                             Histogramme de luminance
