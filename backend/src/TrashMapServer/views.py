@@ -16,6 +16,7 @@ import mimetypes
 from threading import Thread
 
 def dashboard(request):
+    # Connexion à la base SQLite pour récupérer les statistiques d'images
     db_path = os.path.join(s.BASE_DIR, 'db.sqlite3')
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
@@ -57,6 +58,7 @@ def dashboard(request):
     })
 
 def locations_img(request):
+    # Récupère les coordonnées et statuts des images avec leur localisation
     db_path = os.path.join(s.BASE_DIR, 'db.sqlite3')
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
@@ -94,6 +96,7 @@ def upload_img(request):
     if not image:
         return HttpResponse("No file found", status=400)
 
+    # Génère un nom de fichier unique et convertit l'image en WebP
     file_name = str(uuid.uuid4()) + ".webp"
     os.makedirs(os.path.join(s.MEDIA_ROOT, "Data", "uploads"), exist_ok=True)
     file_path = os.path.join("Data", "uploads", file_name)
@@ -105,6 +108,7 @@ def upload_img(request):
     except Exception as e:
         return JsonResponse({"error": f"Erreur lors de la conversion WebP : {e}"}, status=500)
 
+    # Récupère les métadonnées fournies via POST
     size = request.POST.get('Size')
     date_taken = request.POST.get('Date_taken') or datetime.datetime.now().strftime("%Y-%m-%d")
     status = request.POST.get('Annotation')
@@ -116,6 +120,7 @@ def upload_img(request):
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     try:
+        # Insère l'image dans la base de données
         cursor.execute("SELECT MAX(Id_Image) FROM Image")
         result = cursor.fetchone()
         id_image = 1 if result[0] is None else result[0] + 1
@@ -126,6 +131,7 @@ def upload_img(request):
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         """, (id_image, file_name, file_path, size, 0, 0, date_taken, int(status)))
 
+        # Insère la localisation si elle est fournie
         if latitude and longitude and city:
             cursor.execute("SELECT MAX(Id_Location) FROM Location")
             loc_id = cursor.fetchone()[0]
@@ -148,6 +154,7 @@ def upload_img(request):
 
 def process_features_async(id_image, full_path):
     try:
+        # Charge et traite l'image avec OpenCV
         image_cv2 = cv2.imread(full_path)
         if image_cv2 is None:
             return
@@ -173,6 +180,7 @@ def process_features_async(id_image, full_path):
             edges = cv2.Canny(gray_image, 100, 200)
             return int(np.sum(edges > 0))
 
+        # Extraction des données
         height, width = gray.shape[:2]
         avg_rgb = mean_color(image_cv2)
         contrast_level = give_contrast_level(gray)
@@ -180,6 +188,7 @@ def process_features_async(id_image, full_path):
         luminance_histogram = compute_brightness_histogram(gray)
         edges = compute_edges(image_cv2)
 
+        # Mise à jour des données dans la base
         db_path = os.path.join(s.BASE_DIR, 'db.sqlite3')
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
@@ -223,7 +232,7 @@ def modify_img(request, id):
         if cursor.fetchone() is None:
             return JsonResponse({"error": f"Image {id} non trouvée"}, status=404)
 
-        # Préparer les champs modifiables
+        # Préparer les champs modifiables dans la table Image
         image_updates = []
         image_params = []
         if 'Date_taken' in data:
@@ -282,6 +291,7 @@ def predict_map(request):
 
 
 def img_detail(request, id):
+    # Récupère les détails d'une image avec sa localisation
     db_path = os.path.join(s.BASE_DIR, 'db.sqlite3')
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
@@ -313,6 +323,7 @@ def img_detail(request, id):
     return JsonResponse(data)
 
 def get_img(request, id):
+    # Récupère l'image physique à partir de son ID
     db_path = os.path.join(s.BASE_DIR, 'db.sqlite3')
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
@@ -343,40 +354,7 @@ def get_img(request, id):
         conn.close()
 
 def img_by_filename(request, filename):
-    db_path = os.path.join(s.BASE_DIR, 'db.sqlite3')
-    conn = sqlite3.connect(db_path)
-    cursor = conn.cursor()
-
-    try:
-        query = """
-        SELECT
-            Id_Image, File_name, File_path, Size, Height, Width,
-            Date_taken, Avg_R, Avg_G, Avg_B, Contrast_level,
-            RGB_Histogram, Luminance_Histogram, Edges, Status
-        FROM Image
-        WHERE File_name = ?
-        """
-        cursor.execute(query, (filename,))
-        row = cursor.fetchone()
-
-        if not row:
-            return JsonResponse({"error": "Image not found"}, status=404)
-
-        keys = [
-            "Id_Image","File_name","File_path","Size","Height","Width","Date_taken",
-            "Avg_R","Avg_G","Avg_B","Contrast_level","RGB_Histogram","Luminance_Histogram",
-            "Edges","Status"
-        ]
-
-        data = dict(zip(keys, row))
-        return JsonResponse(data)
-
-    except Exception as e:
-        return JsonResponse({"error": str(e)}, status=500)
-    finally:
-        conn.close()
-
-def img_by_filename(request, filename):
+    # Recherche d'une image par son nom de fichier
     db_path = os.path.join(s.BASE_DIR, 'db.sqlite3')
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
@@ -411,6 +389,7 @@ def img_by_filename(request, filename):
         conn.close()
         
 def list_images_paginated(request):
+    # Liste paginée des images
     try:
         page = int(request.GET.get('page', 1))
         limit = int(request.GET.get('limit', 10))
@@ -497,7 +476,7 @@ def global_histograms(request):
             rgb_hist = json.loads(rgb_json)
             lum_hist = json.loads(lum_json)
 
-            # **Déterminer la couleur dominante pour cette image**
+            # Déterminer la couleur dominante pour cette image
             for i in range(256):
                 sum_r = rgb_hist['red'][i]*i
                 sum_g = rgb_hist['green'][i]*i
@@ -510,7 +489,7 @@ def global_histograms(request):
             else:
                 dominant_colors['Bleu'] += 1
 
-            # **Classer contraste en faible/moyen/élevé**
+            # Classer contraste en faible/moyen/élevé
             if contrast is not None:
                 contrast_list.append(contrast)
                 if contrast < 30:
@@ -520,7 +499,7 @@ def global_histograms(request):
                 else:
                     contrast_classes['Élevé'] += 1
 
-            # **Classer les contours en fonction du nombre d'arêtes détectées**
+            # Classer les contours en fonction du nombre d'arêtes détectées
             if edges < 5000:
                 edges_histogram['<5000'] += 1
             elif 5000 <= edges < 10000:
@@ -530,7 +509,7 @@ def global_histograms(request):
             else:
                 edges_histogram['>50000'] += 1
 
-            # **Calcul le nombre de contours pour les labels**
+            # Calcul le nombre de contours pour les labels
             if status == 1:
                 edges_Average['Pleine'] += edges
                 count_edges_pleine += 1
@@ -656,4 +635,3 @@ def update_constraints(request):
         conn.close()
 
     return JsonResponse({"message": "Contraintes enregistrées avec succès."})
-
