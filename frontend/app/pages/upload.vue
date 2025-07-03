@@ -103,7 +103,7 @@
                         v-if="annotationSaved"
                         class="text-sm text-[#415a77] font-semibold text-center"
                     >
-                        ✅ Annotation enregistrée
+                        Annotation enregistrée !!!
                         <div class="mt-2">
                             <UButton
                                 color="primary"
@@ -230,9 +230,9 @@ async function saveAnnotation() {
             throw new Error(`Erreur HTTP ${response.status}`);
         }
 
-        console.log(`✅ Annotation envoyée : ${annotationValue}`);
+        console.log(`Annotation envoyée : ${annotationValue}`);
     } catch (err) {
-        console.error(`❌ Erreur : ${err.message}`);
+        console.error(`Erreur : ${err.message}`);
     }
 }
 

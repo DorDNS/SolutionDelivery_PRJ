@@ -107,7 +107,7 @@ import {
 import ChartCard from "./ChartCard.vue";
 import CarteMarchesChantiers from './Carte.vue'
 
-// ✅ Déclarations des switches
+//Déclarations des switches
 const showMarches = ref(true)
 const showChantiers = ref(true)
 const showDepots = ref(true)
@@ -119,7 +119,7 @@ ChartJS.register(Title, Tooltip, Legend, ArcElement, BarElement, CategoryScale, 
 // WebSocket temps réel
 const { data: realtimeIndicators } = useWebSocket()
 
-// Traduction
+//Traduction
 const currentLanguage = inject('currentLanguage')
 const translations = inject('translations')
 
