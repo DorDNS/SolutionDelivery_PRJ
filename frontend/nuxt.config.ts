@@ -18,6 +18,7 @@ export default defineNuxtConfig({
     '@nuxt/image',
     '@nuxt/fonts',
     '@vueuse/motion/nuxt',
+    '@nuxtjs/color-mode',
   ],
 
   ui: {},
@@ -41,5 +42,13 @@ export default defineNuxtConfig({
         }
       }
     }
+  },
+
+  colorMode: {
+    preference: 'light',       // Défaut : light
+    fallback: 'light',         // Si aucune préférence détectée
+    dataValue: 'light',        // Valeur injectée dans l'attribut data-theme
+    classSuffix: '',           // Pas de suffixe : 'light' => .light
+    storageKey: 'color-mode'   // Nom dans le localStorage (optionnel)
   }
 })
