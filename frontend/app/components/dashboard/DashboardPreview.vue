@@ -77,13 +77,19 @@
       </ChartCard>
 
       <!-- Histogramme des couleurs dominantes -->
-      <ChartCard title="Histogramme des couleurs (tons dominants)">
+      <ChartCard title="Histogramme des tons dominants">
         <Bar :data="barCouleurs" :options="chartOptions" />
       </ChartCard>
 
       <!-- Histogramme des contrastes -->
       <ChartCard title="Histogramme des contrastes">
         <Bar :data="barContrastes" :options="chartOptions" />
+      </ChartCard>
+
+      
+      <!-- Histogramme des contours -->
+      <ChartCard title="Histogramme du nombre de contours">
+        <Bar :data="barContours" :options="chartOptions" />
       </ChartCard>
     </div>
   </div>
@@ -232,6 +238,22 @@ const avgRGB = computed(() => {
     B: Math.round(avg.Avg_B),
   };
 });
+
+// Histogramme tailles global
+const barContours = computed(() => ({
+  labels: ["<5000", "5000-10000", "10000-50000", ">50000"],
+  datasets: [{
+    label: "Nombre d’images",
+    data: [
+      histoData.value?.Edges_Histogram?.["<5000"] ?? 0,
+      histoData.value?.Edges_Histogram?.["5000-10000"] ?? 0,
+      histoData.value?.Edges_Histogram?.["10000-50000"] ?? 0,
+      histoData.value?.Edges_Histogram?.[">50000"] ?? 0,
+    ],
+    backgroundColor: ["#4CAF50", "#FFCA28", "#FB8C00", "#E53935"],
+    borderRadius: 8,
+  }],
+}));
 
 const avgRGBColor = computed(() => `rgb(${avgRGB.value.R}, ${avgRGB.value.G}, ${avgRGB.value.B})`);
 

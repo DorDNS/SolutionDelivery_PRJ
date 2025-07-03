@@ -459,7 +459,7 @@ def global_histograms(request):
     cursor = conn.cursor()
 
     try:
-        cursor.execute("SELECT Width, Height, RGB_Histogram, Luminance_Histogram, Contrast_level FROM Image")
+        cursor.execute("SELECT Width, Height, RGB_Histogram, Luminance_Histogram, Contrast_level, Edges FROM Image")
         rows = cursor.fetchall()
 
         total_hist_r = [0]*256
@@ -468,16 +468,19 @@ def global_histograms(request):
         total_luminance = [0]*256
         contrast_list = []
 
-        # 🆕 Histogramme des tailles
+        # Histogramme des tailles
         size_classes = {'<500px': 0, '500-800px': 0, '800-1200px': 0, '>1200px': 0}
 
-        # 🆕 Couleurs dominantes globales
+        # Couleurs dominantes globales
         dominant_colors = {'Rouge': 0, 'Vert': 0, 'Bleu': 0}
 
-        # 🆕 Histogramme contrastes global
+        # Histogramme contrastes global
         contrast_classes = {'Faible': 0, 'Moyen': 0, 'Élevé': 0}
 
-        for width, height, rgb_json, lum_json, contrast in rows:
+        # Histogramme des contours
+        edges_histogram = {'<5000': 0, '5000-10000': 0, '10000-50000': 0, '>50000': 0}
+
+        for width, height, rgb_json, lum_json, contrast, edges in rows:
             max_dim = max(width, height)
             if max_dim < 500:
                 size_classes['<500px'] += 1
@@ -496,10 +499,11 @@ def global_histograms(request):
             total_hist_g = [x + y for x, y in zip(total_hist_g, rgb_hist['green'])]
             total_hist_b = [x + y for x, y in zip(total_hist_b, rgb_hist['blue'])]
 
-            # ✅ **Déterminer la couleur dominante pour cette image**
-            sum_r = sum(rgb_hist['red'])
-            sum_g = sum(rgb_hist['green'])
-            sum_b = sum(rgb_hist['blue'])
+            # **Déterminer la couleur dominante pour cette image**
+            for i in range(256):
+                sum_r = rgb_hist['red'][i]*i
+                sum_g = rgb_hist['green'][i]*i
+                sum_b = rgb_hist['blue'][i]*i
             max_color = max(sum_r, sum_g, sum_b)
             if max_color == sum_r:
                 dominant_colors['Rouge'] += 1
@@ -511,7 +515,7 @@ def global_histograms(request):
             # Sum luminance
             total_luminance = [x + y for x, y in zip(total_luminance, lum_hist)]
 
-            # ✅ **Classer contraste en faible/moyen/élevé**
+            # **Classer contraste en faible/moyen/élevé**
             if contrast is not None:
                 contrast_list.append(contrast)
                 if contrast < 30:
@@ -520,6 +524,15 @@ def global_histograms(request):
                     contrast_classes['Moyen'] += 1
                 else:
                     contrast_classes['Élevé'] += 1
+
+            if edges < 5000:
+                edges_histogram['<5000'] += 1
+            elif 5000 <= edges < 10000:
+                edges_histogram['5000-10000'] += 1
+            elif 10000 <= edges < 50000:
+                edges_histogram['10000-50000'] += 1
+            else:
+                edges_histogram['>50000'] += 1
 
         avg_contrast = sum(contrast_list) / len(contrast_list) if contrast_list else None
 
@@ -530,9 +543,10 @@ def global_histograms(request):
 
     return JsonResponse({
         "Size_Histogram": size_classes,
-        "Dominant_Colors": dominant_colors,    # ✅ ajouté
-        "Contrast_Histogram": contrast_classes, # ✅ ajouté
-        "Average_Contrast": avg_contrast
+        "Dominant_Colors": dominant_colors,    
+        "Contrast_Histogram": contrast_classes,
+        "Average_Contrast": avg_contrast,
+        "Edges_Histogram": edges_histogram
     })
 
 @csrf_exempt
