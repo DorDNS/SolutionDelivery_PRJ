@@ -95,6 +95,7 @@ def upload_img(request):
         return HttpResponse("No file found", status=400)
 
     file_name = str(uuid.uuid4()) + ".webp"
+    os.makedirs(os.path.join(s.MEDIA_ROOT, "Data", "uploads"), exist_ok=True)
     file_path = os.path.join("Data", "uploads", file_name)
 
     image_bytes = image.read()
