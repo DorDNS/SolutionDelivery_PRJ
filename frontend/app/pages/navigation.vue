@@ -76,17 +76,17 @@
                                 Informations de l'image
                             </h2>
                             <UBadge
-                                :color="meta.Status_Man ? 'error' : 'success'"
+                                :color="meta.Status ? 'error' : 'success'"
                                 variant="subtle"
                                 size="md"
                                 class="font-bold rounded-full"
                                 :icon="
-                                    meta.Status_Man
+                                    meta.Status
                                         ? 'i-lucide-trash-2'
                                         : 'i-lucide-brush-cleaning'
                                 "
                             >
-                                {{ meta.Status_Man ? "Pleine" : "Vide" }}
+                                {{ meta.Status ? "Pleine" : "Vide" }}
                             </UBadge>
                         </div>
                     </template>
@@ -171,7 +171,7 @@
                                     >Statut</label
                                 >
                                 <USelect
-                                    v-model="formData.Status_Man"
+                                    v-model="formData.Status"
                                     :items="statutOptions"
                                     placeholder="Sélectionnez le statut"
                                 />
@@ -310,7 +310,7 @@ async function fetchImage() {
             Date_taken: "",
             Latitude: "",
             Longitude: "",
-            Status_Man: "false",
+            Status: "false",
         };
         if (process.client)
             localStorage.setItem("currentPage", currentPage.value.toString());
@@ -427,7 +427,7 @@ const formData = ref({
     Date_taken: "",
     Latitude: "",
     Longitude: "",
-    Status_Man: "false",
+    Status: "false",
 });
 const statutOptions = [
     { label: "Pleine", value: "true" },
@@ -439,7 +439,7 @@ function openForm() {
         Date_taken: meta.value?.Date_taken || "",
         Latitude: meta.value?.Latitude || "",
         Longitude: meta.value?.Longitude || "",
-        Status_Man: meta.value?.Status_Man ? "true" : "false",
+        Status: meta.value?.Status ? "true" : "false",
     };
     showForm.value = true;
 }
@@ -455,7 +455,7 @@ async function submitAnnotation() {
                     Date_taken: formData.value.Date_taken,
                     Latitude: parseFloat(formData.value.Latitude),
                     Longitude: parseFloat(formData.value.Longitude),
-                    Status_Man: formData.value.Status_Man === "true",
+                    Status: formData.value.Status === "true",
                 }),
             }
         );

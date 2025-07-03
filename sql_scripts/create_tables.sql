@@ -13,9 +13,9 @@ CREATE TABLE Image(
    RGB_Histogram JSON,
    Luminance_Histogram JSON,
    Edges INT,
-   Status_Man_Man BOOLEAN,
-   Status_Man_CondIA BOOLEAN,
-   Status_Man_DeepIA BOOLEAN,
+   Status BOOLEAN,
+   Status_CondIA BOOLEAN,
+   Status_DeepIA BOOLEAN,
    UNIQUE(File_name),
    UNIQUE(File_path)
 );
