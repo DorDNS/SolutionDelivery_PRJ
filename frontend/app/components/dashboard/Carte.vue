@@ -21,32 +21,54 @@ const orangeIcon = ref(null);
 const blueIcon = ref(null);
 
 const fetchMarches = async () => {
-    try {
-        const response = await axios.get(
-            "https://opendata.paris.fr/api/records/1.0/search/?dataset=marches-decouverts&rows=1000"
-        );
-        const today = new Date().toLocaleDateString("fr-FR", {
-            weekday: "long",
-        });
-        const todayUpper =
-            today.charAt(0).toUpperCase() + today.slice(1).toLowerCase();
+  try {
+    const response = await axios.get('https://opendata.paris.fr/api/records/1.0/search/?dataset=marches-decouverts&rows=1000');
+    const now = new Date();
+    const todayNum = now.getDay(); // 0 = dimanche, 1 = lundi, ..., 6 = samedi
+    const timeNow = now.toTimeString().slice(0,5); // HH:MM
 
-        marches.value = response.data.records
-            .filter((r) => {
-                const jours = r.fields.jours_tenue || "";
-                return r.fields.geo_point_2d && jours.includes(todayUpper);
-            })
-            .map((r) => ({
-                nom: r.fields.nom || "Sans nom",
-                produit: r.fields.produit || "Produit non précisé",
-                jours: r.fields.jours_tenue || "Jours non précisés",
-                lat: r.fields.geo_point_2d[0],
-                lng: r.fields.geo_point_2d[1],
-            }));
-    } catch (error) {
-        console.error("Erreur récupération marchés :", error);
-    }
-};
+    const joursMap = ["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"];
+
+    marches.value = response.data.records.filter(r => {
+      if (!r.fields.geo_point_2d) return false;
+
+      let isToday = false;
+      let heureDebut = null;
+      let heureFin = null;
+
+      if (todayNum >= 1 && todayNum <= 5) { // lundi à vendredi
+        isToday = r.fields[joursMap[todayNum]] === 1;
+        heureDebut = r.fields.h_deb_sem_1;
+        heureFin = r.fields.h_fin_sem_1;
+      } else if (todayNum === 6) { // samedi
+        isToday = r.fields.samedi === 1;
+        heureDebut = r.fields.h_deb_sam;
+        heureFin = r.fields.h_fin_sam;
+      } else if (todayNum === 0) { // dimanche
+        isToday = r.fields.dimanche === 1;
+        heureDebut = r.fields.h_deb_dim;
+        heureFin = r.fields.h_fin_dim;
+      }
+
+      // Si pas actif aujourd'hui, ignorer
+      if (!isToday) return false;
+
+      // Vérifier si l'heure actuelle est entre heureDebut et heureFin
+      if (!heureDebut || !heureFin) return false;
+
+      return timeNow >= heureDebut && timeNow <= heureFin;
+
+    }).map(r => ({
+      nom: r.fields.nom_long || 'Sans nom',
+      produit: r.fields.produit || 'Produit non précisé',
+      jours: r.fields.jours_tenue || 'Jours non précisés',
+      lat: r.fields.geo_point_2d[0],
+      lng: r.fields.geo_point_2d[1],
+    }));
+  } catch (error) {
+    console.error("Erreur récupération marchés :", error);
+  }
+}
 
 const fetchChantiers = async () => {
     try {
