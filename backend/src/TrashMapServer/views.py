@@ -462,9 +462,6 @@ def global_histograms(request):
         cursor.execute("SELECT Width, Height, RGB_Histogram, Luminance_Histogram, Contrast_level, Edges, Status FROM Image")
         rows = cursor.fetchall()
 
-        total_hist_r = [0]*256
-        total_hist_g = [0]*256
-        total_hist_b = [0]*256
         total_luminance = [0]*256
         contrast_list = []
         count_edges_none = 0
@@ -500,11 +497,6 @@ def global_histograms(request):
             rgb_hist = json.loads(rgb_json)
             lum_hist = json.loads(lum_json)
 
-            # Sum RGB histograms (non utilisé ici mais conservé)
-            total_hist_r = [x + y for x, y in zip(total_hist_r, rgb_hist['red'])]
-            total_hist_g = [x + y for x, y in zip(total_hist_g, rgb_hist['green'])]
-            total_hist_b = [x + y for x, y in zip(total_hist_b, rgb_hist['blue'])]
-
             # **Déterminer la couleur dominante pour cette image**
             for i in range(256):
                 sum_r = rgb_hist['red'][i]*i
@@ -517,9 +509,6 @@ def global_histograms(request):
                 dominant_colors['Vert'] += 1
             else:
                 dominant_colors['Bleu'] += 1
-
-            # Sum luminance
-            total_luminance = [x + y for x, y in zip(total_luminance, lum_hist)]
 
             # **Classer contraste en faible/moyen/élevé**
             if contrast is not None:

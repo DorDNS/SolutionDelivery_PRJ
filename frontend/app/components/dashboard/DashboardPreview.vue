@@ -20,15 +20,15 @@
     <UCard class="mt-12">
       <template #header>
         <h3 class="text-lg font-semibold text-[#1b263b]">
-          Carte des marchés, chantiers, poubelles et zones à risques
+          {{ translations[currentLanguage].cartetitle }}
         </h3>
       </template>
 
       <div class="flex flex-wrap gap-4 mb-4">
-        <UCheckbox v-model="showMarches" label="Marchés actifs aujourd'hui" />
-        <UCheckbox v-model="showChantiers" label="Chantiers en cours" />
-        <UCheckbox v-model="showDepots" label="Poubelles" />
-        <UCheckbox v-model="showZones" label="Zones à risques" />
+        <UCheckbox v-model="showMarches" :label="translations[currentLanguage].checkboxmarche" />
+        <UCheckbox v-model="showChantiers" :label="translations[currentLanguage].checkboxchantiers" />
+        <UCheckbox v-model="showDepots" :label="translations[currentLanguage].checkboxdepots" />
+        <UCheckbox v-model="showZones" :label="translations[currentLanguage].checkboxzones" />
       </div>
 
       <CarteMarchesChantiers
@@ -41,7 +41,7 @@
 
     <!-- Titre section visualisations -->
     <h2 class="text-2xl font-semibold text-[#1b263b]">
-      Visualisations interactives
+      {{ translations[currentLanguage].dashboardDescription }}
     </h2>
 
     <!-- Visualisations -->
@@ -61,7 +61,7 @@
       </ChartCard>
 
       <!-- Couleur moyenne globale -->
-      <ChartCard title="Couleur moyenne globale">
+      <ChartCard :title="translations[currentLanguage].visu3title">
         <div class="relative flex items-center justify-center" style="height: 200px; width: 200px;">
           <Doughnut :data="rgbDoughnutData" :options="doughnutOptions" class="relative z-10" />
           <div
@@ -72,27 +72,27 @@
       </ChartCard>
 
       <!-- Histogramme global des tailles -->
-      <ChartCard title="Histogramme global des tailles (px)">
+      <ChartCard :title="translations[currentLanguage].visu4title">
         <Bar :data="globalSizeHistogram" :options="chartOptions" />
       </ChartCard>
 
       <!-- Histogramme des couleurs dominantes -->
-      <ChartCard title="Histogramme des tons dominants">
+      <ChartCard :title="translations[currentLanguage].visu5title">
         <Bar :data="barCouleurs" :options="chartOptions" />
       </ChartCard>
 
       <!-- Histogramme des contrastes -->
-      <ChartCard title="Histogramme des contrastes">
+      <ChartCard :title="translations[currentLanguage].visu6title">
         <Bar :data="barContrastes" :options="chartOptions" />
       </ChartCard>
       
       <!-- Histogramme des contours -->
-      <ChartCard title="Histogramme du nombre de contours">
+      <ChartCard :title="translations[currentLanguage].visu7title">
         <Bar :data="barContours" :options="chartOptions" />
       </ChartCard>
 
       <!-- Histogramme des contours -->
-      <ChartCard title="Contours moyen selon les labels ">
+      <ChartCard :title="translations[currentLanguage].visu8title">
         <Bar :data="barContoursMoy" :options="chartOptions" />
       </ChartCard>
     </div>
@@ -190,7 +190,7 @@ const pieAnnotations = computed(() => ({
 const globalSizeHistogram = computed(() => ({
   labels: ["<500px", "500-800px", "800-1200px", ">1200px"],
   datasets: [{
-    label: "Nombre d’images",
+    label: translations[currentLanguage.value].nbimg,
     data: [
       histoData.value?.Size_Histogram?.["<500px"] ?? 0,
       histoData.value?.Size_Histogram?.["500-800px"] ?? 0,
@@ -204,9 +204,13 @@ const globalSizeHistogram = computed(() => ({
 
 // Histogramme couleurs dominantes global
 const barCouleurs = computed(() => ({
-  labels: ["Rouge", "Vert", "Bleu"],
+  labels: [
+    translations[currentLanguage.value]?.Red ?? "Rouge",
+    translations[currentLanguage.value]?.Green ?? "Vert",
+    translations[currentLanguage.value]?.Blue ?? "Bleu",
+  ],
   datasets: [{
-    label: "Couleur dominante",
+    label: translations[currentLanguage.value].nbimg,
     data: [
       histoData.value?.Dominant_Colors?.Rouge ?? 0,
       histoData.value?.Dominant_Colors?.Vert ?? 0,
@@ -219,9 +223,13 @@ const barCouleurs = computed(() => ({
 
 // Histogramme contrastes global
 const barContrastes = computed(() => ({
-  labels: ["Faible", "Moyen", "Élevé"],
+  labels: [
+    translations[currentLanguage.value]?.low ?? "Faible",
+    translations[currentLanguage.value]?.medium ?? "Moyen",
+    translations[currentLanguage.value]?.high ?? "Haut",
+  ],
   datasets: [{
-    label: "Contrastes",
+    label: translations[currentLanguage.value].nbimg,
     data: [
       histoData.value?.Contrast_Histogram?.Faible ?? 0,
       histoData.value?.Contrast_Histogram?.Moyen ?? 0,
@@ -247,7 +255,7 @@ const avgRGB = computed(() => {
 const barContours = computed(() => ({
   labels: ["<5000", "5000-10000", "10000-50000", ">50000"],
   datasets: [{
-    label: "Nombre d’images",
+    label: translations[currentLanguage.value].nbimg,
     data: [
       histoData.value?.Edges_Histogram?.["<5000"] ?? 0,
       histoData.value?.Edges_Histogram?.["5000-10000"] ?? 0,
@@ -261,9 +269,13 @@ const barContours = computed(() => ({
 
 // Histogramme contours moyen par label
 const barContoursMoy = computed(() => ({
-  labels: ["Sans label", "Pleine", "Vide"],
+  labels: [
+    translations[currentLanguage.value]?.noLabel ?? "Sans label",
+    translations[currentLanguage.value]?.fullLabel ?? "Pleine",
+    translations[currentLanguage.value]?.emptyLabel ?? "Vide",
+  ],
   datasets: [{
-    label: "Nombre moyen de contours",
+    label: translations[currentLanguage.value].nbmoycontours,
     data: [
       histoData.value?.Edges_Average?.["Sans label"] ?? 0,
       histoData.value?.Edges_Average?.["Pleine"] ?? 0,
