@@ -1,6 +1,6 @@
 <template>
   <div class="space-y-6">
-    <h2 class="text-2xl font-semibold text-[#1b263b]">Indicateurs en temps réel</h2>
+    <h2 class="text-2xl font-semibold text-[#1b263b]">{{ translations[currentLanguage].realtimetitle }}</h2>
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
       <UCard v-for="(item, index) in indicators" :key="index">
         <template #header>
@@ -17,25 +17,48 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, inject, onMounted } from 'vue'
 import axios from 'axios'
+
+const currentLanguage = inject('currentLanguage')
+const translations = inject('translations')
 
 const apiKey = import.meta.env.VITE_OPENWEATHER_API_KEY
 
-const indicators = ref([
-  { label: "Localisation", value: "Chargement..." },
-  { label: "Population", value: "—" },
-  { label: "Jour", value: new Date().toLocaleDateString("fr-FR", { weekday: "long" }) },
-  { label: "Météo", value: "Chargement..." },
-  { label: "Date acquisition", value: new Date().toLocaleString("fr-FR") },
-])
+// Structure réactive pour les valeurs des indicateurs
+const indicatorValues = ref({
+  Localisation: "...",
+  Population: "—",
+  Jour: new Date().toLocaleDateString(currentLanguage.value === "fr" ? "fr-FR" : "en-US", { weekday: "long" }),
+  Météo: "...",
+  Date: new Date().toLocaleString(currentLanguage.value === "fr" ? "fr-FR" : "en-US"),
+});
 
-const updateIndicator = (label, value) => {
-  const index = indicators.value.findIndex(i => i.label === label)
-  if (index !== -1) {
-    indicators.value[index].value = value
+// Labels dynamiques avec computed
+const indicators = computed(() => [
+  { label: translations[currentLanguage.value]?.loc ?? "Localisation", value: indicatorValues.value.Localisation },
+  { label: translations[currentLanguage.value]?.pop ?? "Population", value: indicatorValues.value.Population },
+  { label: translations[currentLanguage.value]?.day ?? "Jour", value: indicatorValues.value.Jour },
+  { label: translations[currentLanguage.value]?.meteo ?? "Météo", value: indicatorValues.value.Météo },
+  { label: translations[currentLanguage.value]?.gettime ?? "Date d’acquisition", value: indicatorValues.value.Date },
+]);
+
+// Fonction pour mettre à jour les valeurs des indicateurs
+const updateIndicator = (key, value) => {
+  if (Object.prototype.hasOwnProperty.call(indicatorValues.value, key)) {
+    indicatorValues.value[key] = value;
+  } else {
+    console.warn(`Clé inconnue : ${key}`);
   }
-}
+};
+
+// Watcher pour la langue courante
+watch(currentLanguage, (newLang) => {
+  updateIndicator("Jour", new Date().toLocaleDateString(newLang === "fr" ? "fr-FR" : "en-US", { weekday: "long" }));
+  updateIndicator("Date", new Date().toLocaleString(newLang === "fr" ? "fr-FR" : "en-US"));
+  fetchLocationAndWeather()
+  setInterval(fetchLocationAndWeather, 60 * 60 * 1000)
+});
 
 // Récupérer la population via Wikidata
 async function fetchPopulationFromWikidata(city) {
@@ -72,7 +95,7 @@ async function fetchPopulationFromWikidata(city) {
 
     const results = sparqlRes.data.results.bindings;
     if (results.length > 0) {
-      return parseInt(results[0].population.value).toLocaleString('fr-FR') + ' hab';
+      return parseInt(results[0].population.value).toLocaleString('fr-FR') + " " + translations[currentLanguage.value].hab || " hab";
     }
     return null;
 
@@ -117,14 +140,13 @@ const fetchLocationAndWeather = async () => {
       updateIndicator("Population", "Non trouvée");
     }
 
-    // Météo
     try {
       const weather = await axios.get(`https://api.openweathermap.org/data/2.5/weather`, {
         params: {
           lat: latitude,
           lon: longitude,
           units: 'metric',
-          lang: 'fr',
+          lang: currentLanguage.value === "fr" ? 'fr' : 'en',
           appid: apiKey
         }
       })

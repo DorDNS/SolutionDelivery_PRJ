@@ -12,7 +12,6 @@
 import { ref, provide } from 'vue'
 import Header from '~/components/Header.vue'
 import Footer from '~/components/Footer.vue'
-import { checkbox } from '#build/ui'
 
 const currentLanguage = ref('fr') // Langue par défaut
 const translations = {
@@ -29,6 +28,14 @@ const translations = {
     uploadButton: 'Uploader une image',
     dashboardprev: 'Dashboard',
     dashboardDescription: 'Retrouvez ici les graphiques, les cartes interactives et les statistiques en temps réel.',
+    // Realtimeindicators
+    realtimetitle: "Indicateurs en temps réel",
+    loc:"Localisation",
+    pop:"Population",
+    day: "Jour",
+    meteo: "Météo",
+    gettime: "Date d’acquisition",
+    hab:"hab",
     //DashboardPreview
     filtre : "Filtres",
     allStates: "Tous",
@@ -79,6 +86,14 @@ const translations = {
     slogan: "Help your city stay clean. Upload images of trash and contribute to better urban waste management with AI.",
     dashboardprev: 'Dashboard Overview',
     dashboardDescription: 'Soon, graphs, interactive maps, and collection statistics will be displayed here.',
+    // Realtimeindicators
+    realtimetitle: "Real-time indicators",
+    loc: "Location",
+    pop:"Population",
+    day: "Day",
+    meteo: "Weather",
+    gettime: "Acquisition date",
+    hab: "inhab",
     //DashboardPreview
     filtre : "Filters",
     allStates: "All",
