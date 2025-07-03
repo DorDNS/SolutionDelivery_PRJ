@@ -25,7 +25,7 @@ const violetIcon = ref(null);
 const orangeIcon = ref(null);
 const blueIcon = ref(null);
 
-// 🟣 Marchés
+// Marchés
 const fetchMarches = async () => {
     try {
         const response = await axios.get("https://opendata.paris.fr/api/records/1.0/search/?dataset=marches-decouverts&rows=1000");
@@ -64,7 +64,7 @@ const fetchMarches = async () => {
     }
 };
 
-// 🟧 Chantiers
+// Chantiers
 const fetchChantiers = async () => {
     try {
         const response = await axios.get("https://opendata.paris.fr/api/records/1.0/search/?dataset=chantiers-a-paris&rows=1000");
@@ -209,7 +209,7 @@ onMounted(async () => {
       <LMap :zoom="12" :center="[48.8566, 2.3522]" style="height: 500px">
         <LTileLayer :url="url" :attribution="attribution" />
 
-        <!-- 🟣 Marchés -->
+        <!-- Marchés -->
         <LMarker
           v-if="showMarches && violetIcon"
           v-for="(marche, index) in marches"
@@ -224,7 +224,7 @@ onMounted(async () => {
           </LPopup>
         </LMarker>
 
-        <!-- 🟧 Chantiers -->
+        <!-- Chantiers -->
         <LMarker
           v-if="showChantiers && orangeIcon"
           v-for="(chantier, index) in chantiers"
@@ -239,7 +239,7 @@ onMounted(async () => {
           </LPopup>
         </LMarker>
 
-        <!-- 🔵 Poubelles -->
+        <!-- Poubelles -->
         <LMarker
           v-if="showDepots && blueIcon"
           v-for="(depot, index) in depots"
@@ -255,7 +255,7 @@ onMounted(async () => {
           </LPopup>
         </LMarker>
 
-        <!-- 🔴🟡🟢 Zones à risques -->
+        <!-- Zones à risques -->
         <LCircle
           v-if="showZones"
           v-for="(zone, index) in riskZones"
