@@ -459,7 +459,7 @@ def global_histograms(request):
     cursor = conn.cursor()
 
     try:
-        cursor.execute("SELECT Width, Height, RGB_Histogram, Luminance_Histogram, Contrast_level, Edges FROM Image")
+        cursor.execute("SELECT Width, Height, RGB_Histogram, Luminance_Histogram, Contrast_level, Edges, Status FROM Image")
         rows = cursor.fetchall()
 
         total_hist_r = [0]*256
@@ -467,6 +467,9 @@ def global_histograms(request):
         total_hist_b = [0]*256
         total_luminance = [0]*256
         contrast_list = []
+        count_edges_none = 0
+        count_edges_vide = 0
+        count_edges_pleine = 0
 
         # Histogramme des tailles
         size_classes = {'<500px': 0, '500-800px': 0, '800-1200px': 0, '>1200px': 0}
@@ -480,7 +483,10 @@ def global_histograms(request):
         # Histogramme des contours
         edges_histogram = {'<5000': 0, '5000-10000': 0, '10000-50000': 0, '>50000': 0}
 
-        for width, height, rgb_json, lum_json, contrast, edges in rows:
+        #Histogramme des contours moyens
+        edges_Average = {'Sans label': 0, 'Pleine': 0, 'Vide': 0}
+
+        for width, height, rgb_json, lum_json, contrast, edges, status in rows:
             max_dim = max(width, height)
             if max_dim < 500:
                 size_classes['<500px'] += 1
@@ -525,6 +531,7 @@ def global_histograms(request):
                 else:
                     contrast_classes['Élevé'] += 1
 
+            # **Classer les contours en fonction du nombre d'arêtes détectées**
             if edges < 5000:
                 edges_histogram['<5000'] += 1
             elif 5000 <= edges < 10000:
@@ -534,7 +541,26 @@ def global_histograms(request):
             else:
                 edges_histogram['>50000'] += 1
 
+            # **Calcul le nombre de contours pour les labels**
+            if status == 1:
+                edges_Average['Pleine'] += edges
+                count_edges_pleine += 1
+            elif status == 0:
+                edges_Average['Vide'] += edges
+                count_edges_vide += 1
+            else:
+                edges_Average['Sans label'] += edges
+                count_edges_none += 1
+
         avg_contrast = sum(contrast_list) / len(contrast_list) if contrast_list else None
+
+        # Calcul des moyennes des contours par label
+        if count_edges_pleine > 0:
+            edges_Average['Pleine'] /= count_edges_pleine
+        if count_edges_vide > 0:
+            edges_Average['Vide'] /= count_edges_vide
+        if count_edges_none > 0:
+            edges_Average['Sans label'] /= count_edges_none
 
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
@@ -546,7 +572,8 @@ def global_histograms(request):
         "Dominant_Colors": dominant_colors,    
         "Contrast_Histogram": contrast_classes,
         "Average_Contrast": avg_contrast,
-        "Edges_Histogram": edges_histogram
+        "Edges_Histogram": edges_histogram,
+        "Edges_Average": edges_Average
     })
 
 @csrf_exempt

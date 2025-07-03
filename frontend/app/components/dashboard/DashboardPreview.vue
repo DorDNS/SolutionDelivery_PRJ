@@ -85,11 +85,15 @@
       <ChartCard title="Histogramme des contrastes">
         <Bar :data="barContrastes" :options="chartOptions" />
       </ChartCard>
-
       
       <!-- Histogramme des contours -->
       <ChartCard title="Histogramme du nombre de contours">
         <Bar :data="barContours" :options="chartOptions" />
+      </ChartCard>
+
+      <!-- Histogramme des contours -->
+      <ChartCard title="Contours moyen selon les labels ">
+        <Bar :data="barContoursMoy" :options="chartOptions" />
       </ChartCard>
     </div>
   </div>
@@ -223,7 +227,7 @@ const barContrastes = computed(() => ({
       histoData.value?.Contrast_Histogram?.Moyen ?? 0,
       histoData.value?.Contrast_Histogram?.Élevé ?? 0,
     ],
-    backgroundColor: ["#9E9E9E", "#FFC107", "#FF5722"],
+    backgroundColor: ["#6FB1FF", "#006FFF", "00F8FF"],
     borderRadius: 8,
   }],
 }));
@@ -239,7 +243,7 @@ const avgRGB = computed(() => {
   };
 });
 
-// Histogramme tailles global
+// Histogramme contours global
 const barContours = computed(() => ({
   labels: ["<5000", "5000-10000", "10000-50000", ">50000"],
   datasets: [{
@@ -250,7 +254,22 @@ const barContours = computed(() => ({
       histoData.value?.Edges_Histogram?.["10000-50000"] ?? 0,
       histoData.value?.Edges_Histogram?.[">50000"] ?? 0,
     ],
-    backgroundColor: ["#4CAF50", "#FFCA28", "#FB8C00", "#E53935"],
+    backgroundColor: ["#58508d", "#bc5090", "#ff6361", "#ffa600"],
+    borderRadius: 8,
+  }],
+}));
+
+// Histogramme contours moyen par label
+const barContoursMoy = computed(() => ({
+  labels: ["Sans label", "Pleine", "Vide"],
+  datasets: [{
+    label: "Nombre moyen de contours",
+    data: [
+      histoData.value?.Edges_Average?.["Sans label"] ?? 0,
+      histoData.value?.Edges_Average?.["Pleine"] ?? 0,
+      histoData.value?.Edges_Average?.["Vide"] ?? 0,
+    ],
+    backgroundColor: ["#9E9E9E", "#FB8C00", "#4CAF50"],
     borderRadius: 8,
   }],
 }));
