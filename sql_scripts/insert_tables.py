@@ -21,7 +21,7 @@ with open('./image.csv', newline='') as csvfile:
             INSERT INTO Image (
                 Id_Image, File_name, File_path, Size, Height, Width,
                 Date_taken, Avg_R, Avg_G, Avg_B,
-                Contrast_level, RGB_Histogram, Luminance_Histogram, Edges, Status
+                Contrast_level, RGB_Histogram, Luminance_Histogram, Edges, Status_Man
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """, (
             safe_int(row['Id_Image']),
@@ -38,7 +38,7 @@ with open('./image.csv', newline='') as csvfile:
             row['RGB_Histogram'] if row['RGB_Histogram'] and row['RGB_Histogram'].upper() != 'NULL' else None,
             row['Luminance_Histogram'] if row['Luminance_Histogram'] and row['Luminance_Histogram'].upper() != 'NULL' else None,
             safe_int(row['Edges']),
-            safe_bool(row['Status'])
+            safe_bool(row['Status_Man'])
         ))
 
 # Charger les localisations

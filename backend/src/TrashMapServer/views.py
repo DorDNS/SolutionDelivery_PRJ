@@ -23,13 +23,13 @@ def dashboard(request):
         cursor.execute("SELECT COUNT(*) FROM Image")
         count = cursor.fetchone()[0]
 
-        cursor.execute("SELECT COUNT(*) FROM Image WHERE Status=0")
+        cursor.execute("SELECT COUNT(*) FROM Image WHERE Status_Man=0")
         empty_count = cursor.fetchone()[0]
 
-        cursor.execute("SELECT COUNT(*) FROM Image WHERE Status=1")
+        cursor.execute("SELECT COUNT(*) FROM Image WHERE Status_Man=1")
         full_count = cursor.fetchone()[0]
 
-        cursor.execute("SELECT COUNT(*) FROM Image WHERE Status is Null")
+        cursor.execute("SELECT COUNT(*) FROM Image WHERE Status_Man is Null")
         no_labeled_count = cursor.fetchone()[0]
 
         cursor.execute("SELECT AVG(Avg_R), AVG(Avg_G), AVG(Avg_B) FROM Image")
@@ -163,7 +163,7 @@ def upload_img(request):
             INSERT INTO Image (
                 Id_Image, File_name, File_path, Size, Height, Width, Date_taken,
                 Avg_R, Avg_G, Avg_B, Contrast_level, RGB_Histogram,
-                Luminance_Histogram, Edges, Status
+                Luminance_Histogram, Edges, Status_Man
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """
         cursor.execute(query, (
@@ -246,9 +246,9 @@ def modify_img(request, id):
             image_updates.append("Edges = ?")
             image_params.append(data['Edges'])
 
-        if 'Status' in data:
-            image_updates.append("Status = ?")
-            image_params.append(int(data['Status']))  # booléen 0/1
+        if 'Status_Man' in data:
+            image_updates.append("Status_Man = ?")
+            image_params.append(int(data['Status_Man']))  # booléen 0/1
 
 
         # Préparer mise à jour de la localisation
@@ -364,7 +364,7 @@ def img_by_filename(request, filename):
         SELECT
             Id_Image, File_name, File_path, Size, Height, Width,
             Date_taken, Avg_R, Avg_G, Avg_B, Contrast_level,
-            RGB_Histogram, Luminance_Histogram, Edges, Status
+            RGB_Histogram, Luminance_Histogram, Edges, Status_Man
         FROM Image
         WHERE File_name = ?
         """
@@ -377,7 +377,7 @@ def img_by_filename(request, filename):
         keys = [
             "Id_Image","File_name","File_path","Size","Height","Width","Date_taken",
             "Avg_R","Avg_G","Avg_B","Contrast_level","RGB_Histogram","Luminance_Histogram",
-            "Edges","Status"
+            "Edges","Status_Man"
         ]
 
         data = dict(zip(keys, row))
@@ -398,7 +398,7 @@ def img_by_filename(request, filename):
         SELECT
             Id_Image, File_name, File_path, Size, Height, Width,
             Date_taken, Avg_R, Avg_G, Avg_B, Contrast_level,
-            RGB_Histogram, Luminance_Histogram, Edges, Status
+            RGB_Histogram, Luminance_Histogram, Edges, Status_Man
         FROM Image
         WHERE File_name = ?
         """
@@ -411,7 +411,7 @@ def img_by_filename(request, filename):
         keys = [
             "Id_Image","File_name","File_path","Size","Height","Width","Date_taken",
             "Avg_R","Avg_G","Avg_B","Contrast_level","RGB_Histogram","Luminance_Histogram",
-            "Edges","Status"
+            "Edges","Status_Man"
         ]
 
         data = dict(zip(keys, row))
@@ -439,7 +439,7 @@ def list_images_paginated(request):
         total = cursor.fetchone()[0]
 
         cursor.execute("""
-            SELECT Id_Image, File_name, File_path, Status
+            SELECT Id_Image, File_name, File_path, Status_Man
             FROM Image
             ORDER BY Id_Image ASC
             LIMIT ? OFFSET ?
@@ -447,7 +447,7 @@ def list_images_paginated(request):
 
         rows = cursor.fetchall()
         images = [
-            {"Id_Image": r[0], "File_name": r[1], "File_path": r[2], "Status": r[3]}
+            {"Id_Image": r[0], "File_name": r[1], "File_path": r[2], "Status_Man": r[3]}
             for r in rows
         ]
     except Exception as e:
