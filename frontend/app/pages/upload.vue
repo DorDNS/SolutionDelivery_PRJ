@@ -103,7 +103,7 @@
                         v-if="annotationSaved"
                         class="text-sm text-[#415a77] font-semibold text-center"
                     >
-                        Annotation enregistrée !!!
+                        Image et annotation enregistrée dans la base de données !!!
                         <div class="mt-2">
                             <UButton
                                 color="primary"
