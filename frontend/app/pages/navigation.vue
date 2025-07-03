@@ -177,30 +177,38 @@ async function fetchImage() {
 
     if (data.images.length > 0) {
       const imageId = data.images[0].Id_Image;
-      // Requête pour récupérer la fiche détaillée
-      const metaResponse = await fetch(`http://localhost:8000/img/metadatas/${imageId}/`);
-      meta.value = await metaResponse.json();
+      await fetchImageById(imageId);
     } else {
       meta.value = null;
     }
-
-    showForm.value = false;
-    formData.value = { Date_taken: "", Latitude: "", Longitude: "", Status: "false" };
-    if (process.client) localStorage.setItem("currentPage", currentPage.value.toString());
   } catch (error) {
     console.error("Erreur de chargement des images :", error);
   }
 }
 
+async function fetchImageById(id) {
+  try {
+    const metaResponse = await fetch(`http://localhost:8000/img/metadatas/${id}/`);
+    meta.value = await metaResponse.json();
 
-if (process.client && localStorage.getItem("currentPage")) {
-  currentPage.value = parseInt(localStorage.getItem("currentPage")) || 1;
+    showForm.value = false;
+    formData.value = { Date_taken: "", Latitude: "", Longitude: "", Status: "false" };
+  } catch (error) {
+    console.error("Erreur de chargement de l'image par ID :", error);
+  }
 }
 
 onMounted(() => {
-  fetchImage();
+  const idFromStorage = localStorage.getItem("currentId");
+  if (idFromStorage) {
+    fetchImageById(idFromStorage);
+    localStorage.removeItem("currentId");
+  } else {
+    fetchImage();
+  }
   window.addEventListener("keydown", handleKey);
 });
+
 onBeforeUnmount(() => {
   window.removeEventListener("keydown", handleKey);
 });
@@ -305,7 +313,7 @@ async function submitAnnotation() {
     });
     if (!response.ok) throw new Error("Erreur lors de l'envoi");
     showForm.value = false;
-    await fetchImage();
+    await fetchImageById(meta.value.Id_Image);
     alert("Annotation sauvegardée !");
   } catch (err) {
     console.error(err);

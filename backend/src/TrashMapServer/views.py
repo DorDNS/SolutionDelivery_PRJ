@@ -61,8 +61,9 @@ def locations_img(request):
     cursor = conn.cursor()
     try :
         query = """
-        SELECT Location.Id_Location , Location.latitude, Location.Longitude, Location.city, Location.id_image
+        SELECT Location.Id_Location, Location.latitude, Location.Longitude, Location.city, Location.id_image, Image.Status
         FROM Location
+        JOIN Image ON Location.id_image = Image.Id_Image
         """
         cursor.execute(query)
         results = cursor.fetchall()
@@ -72,7 +73,8 @@ def locations_img(request):
                 'latitude': row[1],
                 'longitude': row[2],
                 'city': row[3],
-                'id_image': row[4]
+                'id_image': row[4],
+                'status': row[5]
             }
             for row in results
         ]

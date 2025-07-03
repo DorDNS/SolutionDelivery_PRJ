@@ -3,7 +3,9 @@
     <!-- Filtres -->
     <UCard>
       <template #header>
-        <h3 class="text-lg font-semibold text-[#1b263b]">{{ translations[currentLanguage].filtre }}</h3>
+        <h3 class="text-lg font-semibold text-[#1b263b]">
+          {{ translations[currentLanguage].filtre }}
+        </h3>
       </template>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <USelect v-model="selectedEtat" :items="etats" placeholder="Filtrer par état" />
@@ -12,29 +14,35 @@
     </UCard>
 
     <!-- Indicateurs en temps réel -->
-  <RealTimeIndicators :indicators="realtimeIndicators || {}" />
+    <RealTimeIndicators :indicators="realtimeIndicators || {}" />
 
+    <!-- Carte -->
     <UCard class="mt-12">
       <template #header>
-        <h3 class="text-lg font-semibold text-[#1b263b]">Carte des marchés, chantiers et poubelles</h3>
+        <h3 class="text-lg font-semibold text-[#1b263b]">
+          Carte des marchés, chantiers, poubelles et zones à risques
+        </h3>
       </template>
 
       <div class="flex flex-wrap gap-4 mb-4">
         <UCheckbox v-model="showMarches" label="Marchés actifs aujourd'hui" />
         <UCheckbox v-model="showChantiers" label="Chantiers en cours" />
         <UCheckbox v-model="showDepots" label="Poubelles" />
+        <UCheckbox v-model="showZones" label="Zones à risques" />
       </div>
 
       <CarteMarchesChantiers
         :showMarches="showMarches"
         :showChantiers="showChantiers"
         :showDepots="showDepots"
+        :showZones="showZones"
       />
     </UCard>
 
     <!-- Titre section visualisations -->
-
-  <h2 class="text-2xl font-semibold text-[#1b263b]">Visualisations interactives</h2>
+    <h2 class="text-2xl font-semibold text-[#1b263b]">
+      Visualisations interactives
+    </h2>
 
     <!-- Visualisations -->
     <div v-if="pending || histoPending" class="text-center py-10">
@@ -55,13 +63,13 @@
       <!-- Couleur moyenne globale -->
       <ChartCard title="Couleur moyenne globale">
         <div class="relative flex items-center justify-center" style="height: 200px; width: 200px;">
-          <Doughnut :data="rgbDoughnutData" :options="doughnutOptions"
-            class="relative z-10" />
-          <div class="absolute rounded-full border border-[#1b263b] shadow-md"
-            :style="{ backgroundColor: avgRGBColor, width: '80px', height: '80px', zIndex: 0 }" />
+          <Doughnut :data="rgbDoughnutData" :options="doughnutOptions" class="relative z-10" />
+          <div
+            class="absolute rounded-full border border-[#1b263b] shadow-md"
+            :style="{ backgroundColor: avgRGBColor, width: '80px', height: '80px', zIndex: 0 }"
+          />
         </div>
       </ChartCard>
-
 
       <!-- Histogramme global des tailles -->
       <ChartCard title="Histogramme global des tailles (px)">
@@ -84,7 +92,6 @@
 <script setup>
 import { useWebSocket } from '~/composables/useWebSocket'
 import RealTimeIndicators from '~/components/RealTimeIndicators.vue'
-const { data: realtimeIndicators } = useWebSocket()
 import { ref, computed, inject } from "vue";
 import { Bar, Pie, Doughnut } from "vue-chartjs";
 import {
@@ -99,11 +106,18 @@ import {
 } from "chart.js";
 import ChartCard from "./ChartCard.vue";
 import CarteMarchesChantiers from './Carte.vue'
+
+// ✅ Déclarations des switches
 const showMarches = ref(true)
 const showChantiers = ref(true)
 const showDepots = ref(true)
+const showZones = ref(true) 
 
+// ChartJS register
 ChartJS.register(Title, Tooltip, Legend, ArcElement, BarElement, CategoryScale, LinearScale);
+
+// WebSocket temps réel
+const { data: realtimeIndicators } = useWebSocket()
 
 // Traduction
 const currentLanguage = inject('currentLanguage')
@@ -230,6 +244,13 @@ const rgbDoughnutData = computed(() => ({
   }],
 }));
 
+// Chart options
+const chartOptions = {
+  responsive: true,
+  plugins: { legend: { display: false } },
+  scales: { y: { beginAtZero: true } },
+};
+
 const doughnutOptions = {
   responsive: true,
   cutout: "60%",
@@ -248,13 +269,6 @@ const doughnutOptions = {
     },
     legend: { display: false },
   },
-};
-
-// Chart options
-const chartOptions = {
-  responsive: true,
-  plugins: { legend: { display: false } },
-  scales: { y: { beginAtZero: true } },
 };
 
 const pieOptions = {

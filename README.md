@@ -119,6 +119,24 @@ Vous verrez la page d’accueil avec l’image de fond, le titre animé, les bou
 * **Pas besoin de toucher à `node_modules/`** → il est généré par `npm install`
 * **Pas besoin de créer des pages ou composants supplémentaires** → tout est déjà prêt
 
+### ⛅️ Pour faire fonctionner la météo
+
+**1. S'inscrire sur OpenWeatherMap via le lien suivant :**
+
+[Lien d'inscription](https://home.openweathermap.org/users/sign_up)
+
+**2. Récupérer sa clé API via le lien suivant :**
+
+[Récupérer sa clé API](https://home.openweathermap.org/api_keys)
+Elle devrait s'appeler `default`.
+
+**3. Créer la variable pour faire fonctionner le module météo :**
+* Créer un fichier `.env` dans le dossier `frontend` (à la racine)
+* Copier-coller ceci dans ce fichier : `VITE_OPENWEATHER_API_KEY=`
+* Après le = tu copies-colles ta clé API
+
+**Normalement ça marche maintenant !**
+
 ## 🧠 Que contient le projet ?
 
 * `frontend/app/pages/` : les pages Vue/Nuxt (`index.vue`, `upload.vue`)
