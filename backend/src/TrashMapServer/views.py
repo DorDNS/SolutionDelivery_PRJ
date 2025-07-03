@@ -112,7 +112,7 @@ def upload_img(request):
     size = request.POST.get('Size')
     date_taken = request.POST.get('Date_taken') or datetime.datetime.now().strftime("%Y-%m-%d")
     status = request.POST.get('Annotation')
-    latitude = request.POST.get('latitude')
+    latitude = request.POST.get('Latitude')
     longitude = request.POST.get('Longitude')
     city = request.POST.get('City')
 
@@ -131,8 +131,12 @@ def upload_img(request):
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         """, (id_image, file_name, file_path, size, 0, 0, date_taken, int(status)))
 
+        print(f"Latitude: {latitude}, Longitude: {longitude}, City: {city}")
+
         # Insère la localisation si elle est fournie
         if latitude and longitude and city:
+            print(f"Insertion dans Location avec id_image={id_image}")
+
             cursor.execute("SELECT MAX(Id_Location) FROM Location")
             loc_id = cursor.fetchone()[0]
             id_location = 1 if loc_id is None else loc_id + 1

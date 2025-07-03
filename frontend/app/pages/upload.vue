@@ -89,11 +89,17 @@
                         size="lg"
                         color="primary"
                     />
-
+                    <!-- Saisie du lieu -->
+                    <UInput
+                        v-model="locationInput"
+                        placeholder="Entrez un lieu (ex: Paris)"
+                        icon="i-heroicons-map-pin"
+                        class="w-full max-w-xs"
+                    />
                     <!-- Enregistrement -->
                     <UButton
                         color="primary"
-                        :disabled="!annotation || annotationSaved"
+                        :disabled="!annotation || annotationSaved || locationInput"
                         @click="saveAnnotation"
                     >
                         Envoyer
@@ -103,7 +109,7 @@
                         v-if="annotationSaved"
                         class="text-sm text-[#415a77] font-semibold text-center"
                     >
-                        Image et annotation enregistrée dans la base de données !!!
+                    <span class="text-green-600">Image et annotation enregistrée dans la base de données !!!</span>
                         <div class="mt-2">
                             <UButton
                                 color="primary"
@@ -130,6 +136,7 @@ const annotation = ref("");
 const annotationSaved = ref(false);
 const dragging = ref(false);
 const dragCounter = ref(0);
+const locationInput = ref("");
 
 const annotationOptions = [
     { label: "Vide", value: "vide", icon: "i-lucide-brush-cleaning" },
@@ -199,42 +206,66 @@ function processFile(file) {
     reader.readAsDataURL(file);
 }
 
+async function geocodeLocation(place) {
+    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(place)}`;
+    const response = await fetch(url);
+    const results = await response.json();
+    if (results.length === 0) {
+        throw new Error("Lieu introuvable");
+    }
+    const result = results[0];
+    return {
+        lat: parseFloat(result.lat),
+        lon: parseFloat(result.lon),
+        city: result.display_name.split(',')[0]
+    };
+}
+
+
 async function saveAnnotation() {
-    if (!annotation.value || !selectedFile.value) return;
+    if (!annotation.value || !selectedFile.value || !locationInput.value) {
+        error.value = "Veuillez remplir tous les champs.";
+        return;
+    }
 
     annotationSaved.value = true;
 
-    const formData = new FormData();
-    formData.append("image", selectedFile.value);
-    formData.append("File_name", selectedFile.value.name);
-    formData.append("Height", selectedFile.value.height);
-    formData.append("Width", selectedFile.value.width);
-    formData.append("Size", selectedFile.value.size);
-    formData.append("Date_taken", new Date().toISOString().split("T")[0]);
-
-    // Annotation binaire : 1 = pleine, 0 = vide
-    const annotationValue = annotation.value === "pleine" ? 1 : 0;
-    formData.append("Annotation", annotationValue);
-
-    formData.append("Latitude", 48.8566);
-    formData.append("Longitude", 2.3522);
-    formData.append("City", "Paris");
-
     try {
+        const location = await geocodeLocation(locationInput.value);
+
+        const formData = new FormData();
+        formData.append("image", selectedFile.value);
+        formData.append("File_name", selectedFile.value.name);
+        formData.append("Height", selectedFile.value.height);
+        formData.append("Width", selectedFile.value.width);
+        formData.append("Size", selectedFile.value.size);
+        formData.append("Date_taken", new Date().toISOString().split("T")[0]);
+
+        const annotationValue = annotation.value === "pleine" ? 1 : 0;
+        formData.append("Annotation", annotationValue);
+
+        formData.append("Latitude", location.lat);
+        formData.append("Longitude", location.lon);
+        formData.append("City", location.city);
+
+        for (let [key, value] of formData.entries()) {
+            console.log(`${key}: ${value}`);
+        }
+
+
         const response = await fetch("http://localhost:8000/img/upload/", {
             method: "POST",
             body: formData,
         });
 
-        if (!response.ok) {
-            throw new Error(`Erreur HTTP ${response.status}`);
-        }
-
-        console.log(`Annotation envoyée : ${annotationValue}`);
+        if (!response.ok) throw new Error(`Erreur HTTP ${response.status}`);
+        console.log("Upload réussi");
     } catch (err) {
-        console.error(`Erreur : ${err.message}`);
+        console.error("Erreur : ", err.message);
+        annotationSaved.value = false;
     }
 }
+
 
 function resetAnnotation() {
     annotation.value = "";
