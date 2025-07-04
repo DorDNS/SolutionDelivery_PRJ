@@ -4,7 +4,7 @@
             <!-- Titre -->
             <div class="text-center">
                 <h1 class="text-3xl font-bold text-[#1b263b]">
-                    Navigation des images
+                    {{ translations[currentLanguage].navtitle }}
                 </h1>
                 <div
                     class="mt-2 text-[#415a77] text-sm flex items-center justify-center gap-2"
@@ -14,8 +14,7 @@
                         class="w-4 h-4 text-[#778da9]"
                     />
                     <span
-                        >Utilisez les flèches ou raccourcis clavier pour
-                        parcourir les images.</span
+                        >{{ translations[currentLanguage].navtips }}</span
                     >
                 </div>
             </div>
@@ -42,14 +41,14 @@
                                 color="gray"
                                 variant="ghost"
                                 icon="i-heroicons-chevron-left"
-                                >Précédente</UButton
+                                >{{ translations[currentLanguage].prec }}</UButton
                             >
                             <UButton
                                 @click="suivante"
                                 color="gray"
                                 variant="ghost"
                                 icon="i-heroicons-chevron-right"
-                                >Suivante</UButton
+                                >{{ translations[currentLanguage].suiv }}</UButton
                             >
                         </div>
                     </div>
@@ -59,7 +58,7 @@
                         <UCard>
                             <template #header>
                                 <h2 class="text-lg font-semibold">
-                                    Localisation
+                                    {{ translations[currentLanguage].loc }}
                                 </h2>
                             </template>
                             <MapDepots :highlight-id="meta.Id_Location" />
@@ -73,7 +72,7 @@
                     <template #header>
                         <div class="flex justify-between items-center">
                             <h2 class="text-lg font-semibold">
-                                Informations de l'image
+                                {{ translations[currentLanguage].imginfo }}
                             </h2>
                             <UBadge
                                 :color="meta.Status ? 'error' : 'success'"
@@ -86,7 +85,7 @@
                                         : 'i-lucide-brush-cleaning'
                                 "
                             >
-                                {{ meta.Status ? "Pleine" : "Vide" }}
+                                {{ meta.Status ? translations[currentLanguage].fullLabel : translations[currentLanguage].emptyLabel }}
                             </UBadge>
                         </div>
                     </template>
@@ -94,25 +93,25 @@
                     <!-- Métadonnées -->
                     <div>
                         <h2 class="text-lg font-semibold mb-2 border-b pb-2">
-                            Métadonnées
+                            {{ translations[currentLanguage].métadata }}
                         </h2>
                         <div class="grid grid-cols-2 gap-2">
                             <div>
-                                <strong>Date :</strong> {{ meta.Date_taken }}
+                                <strong>{{ translations[currentLanguage].date }} :</strong> {{ meta.Date_taken }}
                             </div>
                             <div>
-                                <strong>Taille :</strong> {{ meta.Size }} ko
+                                <strong>{{ translations[currentLanguage].size }} :</strong> {{ meta.Size }} ko
                             </div>
                             <div>
-                                <strong>Dimensions :</strong> {{ meta.Width }} ×
+                                <strong>{{ translations[currentLanguage].dim }} :</strong> {{ meta.Width }} ×
                                 {{ meta.Height }}
                             </div>
                             <div>
-                                <strong>Contraste :</strong>
+                                <strong>{{ translations[currentLanguage].contrast }} :</strong>
                                 {{ meta.Contrast_level }}
                             </div>
                             <div>
-                                <strong>Contours :</strong> {{ meta.Edges }}
+                                <strong>{{ translations[currentLanguage].edges }} :</strong> {{ meta.Edges }}
                             </div>
                         </div>
                     </div>
@@ -120,19 +119,19 @@
                     <!-- Annotation -->
                     <div class="mt-6">
                         <h2 class="text-lg font-semibold mb-2 border-b pb-2">
-                            Annotation
+                            {{ translations[currentLanguage].annotation }}
                         </h2>
                         <UButton
                             @click="openForm"
                             color="primary"
                             variant="soft"
-                            >Annoter</UButton
+                            >{{ translations[currentLanguage].annoter }}</UButton
                         >
 
                         <div v-if="showForm" class="space-y-4 mt-4">
                             <div>
                                 <label class="block text-sm font-medium mb-1"
-                                    >Date</label
+                                    >{{ translations[currentLanguage].date }}</label
                                 >
                                 <UInput
                                     v-model="formData.Date_taken"
@@ -144,7 +143,7 @@
                                 <div>
                                     <label
                                         class="block text-sm font-medium mb-1"
-                                        >Latitude</label
+                                        >{{ translations[currentLanguage].lat }}</label
                                     >
                                     <UInput
                                         v-model="formData.Latitude"
@@ -156,7 +155,7 @@
                                 <div>
                                     <label
                                         class="block text-sm font-medium mb-1"
-                                        >Longitude</label
+                                        >{{ translations[currentLanguage].lon }}</label
                                     >
                                     <UInput
                                         v-model="formData.Longitude"
@@ -168,7 +167,7 @@
 
                             <div>
                                 <label class="block text-sm font-medium mb-1"
-                                    >Statut</label
+                                    >{{ translations[currentLanguage].statut }}</label
                                 >
                                 <USelect
                                     v-model="formData.Status"
@@ -182,7 +181,7 @@
                                     @click="submitAnnotation"
                                     color="primary"
                                     variant="solid"
-                                    >Valider</UButton
+                                    >{{ translations[currentLanguage].val }}</UButton
                                 >
                             </div>
                         </div>
@@ -191,15 +190,19 @@
                     <!-- Composition RGB PieChart -->
                     <div class="mt-6">
                         <h2 class="text-lg font-semibold mb-2 border-b pb-2">
-                            Composition RGB (Moyenne)
+                            {{ translations[currentLanguage].pietitle }}
                         </h2>
                         <div class="w-60 h-60 mx-auto">
                             <PieChart
                                 :data="{
-                                    labels: ['Rouge', 'Vert', 'Bleu'],
+                                    labels: [
+                                        translations[currentLanguage].Red,
+                                        translations[currentLanguage].Green,
+                                        translations[currentLanguage].Blue,
+                                    ],
                                     datasets: [
                                         {
-                                            label: 'Moyenne RGB',
+                                            label: translations[currentLanguage].moyrgb,
                                             data: [
                                                 meta.Avg_R,
                                                 meta.Avg_G,
@@ -223,7 +226,7 @@
                     <!-- Histogramme RGB -->
                     <div class="mt-6">
                         <h2 class="text-lg font-semibold mb-2 border-b pb-2">
-                            Histogramme RGB
+                            {{ translations[currentLanguage].historgb }}
                         </h2>
                         <div class="w-full h-60">
                             <Bar
@@ -237,7 +240,7 @@
                     <!-- Histogramme luminance -->
                     <div class="mt-6">
                         <h2 class="text-lg font-semibold mb-2 border-b pb-2">
-                            Histogramme de luminance
+                            {{ translations[currentLanguage].histolum }}
                         </h2>
                         <div class="w-full h-60">
                             <Bar
@@ -251,14 +254,14 @@
             </div>
 
             <div v-else class="text-center text-[#778da9] text-sm">
-                Aucune image à afficher.
+                {{ translations[currentLanguage].noimg }}
             </div>
         </UContainer>
     </div>
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted, onBeforeUnmount } from "vue";
+import { ref, inject, computed, watch, onMounted, onBeforeUnmount } from "vue";
 import PieChart from "~/components/PieChart.vue";
 import MapDepots from "../components/dashboard/MapDepots.vue";
 import { Bar } from "vue-chartjs";
@@ -280,6 +283,9 @@ ChartJS.register(
     Tooltip,
     Legend
 );
+
+const translations = inject("translations");
+const currentLanguage = inject("currentLanguage");
 
 const meta = ref(null);
 const currentPage = ref(1);
@@ -389,14 +395,18 @@ const histogramRGB = computed(() => {
     return {
         labels,
         datasets: [
-            { label: "Rouge", data: red, backgroundColor: "rgba(217, 61, 61)" },
             {
-                label: "Vert",
+                label: translations[currentLanguage.value]?.Red ?? "Rouge",
+                data: red,
+                backgroundColor: "rgba(217, 61, 61)",
+            },
+            {
+                label: translations[currentLanguage.value]?.Green ?? "Vert",
                 data: green,
                 backgroundColor: "rgba(108, 224, 119)",
             },
             {
-                label: "Bleu",
+                label: translations[currentLanguage.value]?.Blue ?? "Bleu",
                 data: blue,
                 backgroundColor: "rgba(88, 148, 245)",
             },
@@ -414,7 +424,7 @@ const histogramLuminance = computed(() => {
         labels,
         datasets: [
             {
-                label: "Luminance",
+                label: translations[currentLanguage.value]?.lum ?? "Luminance",
                 data: luminance,
                 backgroundColor: "rgba(128,128,128,0.7)",
             },
@@ -430,10 +440,10 @@ const formData = ref({
     Longitude: "",
     Status: "false",
 });
-const statutOptions = [
-    { label: "Pleine", value: "true" },
-    { label: "Vide", value: "false" },
-];
+const statutOptions = computed(() => [
+    { label: translations[currentLanguage.value]?.fullLabel ?? "Pleine", value: "true" },
+    { label: translations[currentLanguage.value]?.emptyLabel ?? "Vide", value: "false" },
+]);
 
 function openForm() {
     formData.value = {

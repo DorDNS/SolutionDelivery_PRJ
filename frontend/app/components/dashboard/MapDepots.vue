@@ -3,8 +3,11 @@
 </template>
 
 <script setup>
-import { watch, onMounted, ref } from "vue";
+import { watch, onMounted, ref, inject } from "vue";
 import "leaflet/dist/leaflet.css";
+
+const translations = inject("translations");
+const currentLanguage = inject("currentLanguage");
 
 const props = defineProps({
   highlightId: Number,
@@ -34,13 +37,23 @@ onMounted(async () => {
   }).addTo(map.value);
 
   // Ajouter tous les marqueurs
-  data.value.forEach(({ latitude, longitude, id_image }) => {
-    const marker = L.marker([latitude, longitude]).addTo(map.value); // icône par défaut
+  addMarkers(data.value);
+
+  updateHighlight();
+});
+
+// Fonction pour ajouter les marqueurs
+function addMarkers(locations) {
+  markers.value.forEach(({ marker }) => map.value.removeLayer(marker)); // Supprimer les anciens marqueurs
+  markers.value = []; // Réinitialiser les marqueurs
+
+  locations.forEach(({ latitude, longitude, id_image }) => {
+    const marker = L.marker([latitude, longitude]).addTo(map.value);
 
     marker.bindPopup(
-      `<strong>Image n°${id_image}</strong><br>
+      `<strong>${translations[currentLanguage.value]?.depID ?? "ID Dépôt"} ${id_image}</strong><br>
       <button class="leaflet-popup-button" data-id="${id_image}">
-        Voir cette image
+      ${translations[currentLanguage.value]?.seeimg ?? "Voir l'image"}
       </button>`
     );
 
@@ -58,8 +71,11 @@ onMounted(async () => {
 
     markers.value.push({ id: id_image, marker, latitude, longitude });
   });
+}
 
-  updateHighlight();
+// Watch pour détecter les changements de langue
+watch(currentLanguage, () => {
+  addMarkers(data.value); 
 });
 
 watch(
