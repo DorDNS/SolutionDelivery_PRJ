@@ -54,8 +54,8 @@ const updateIndicator = (key, value) => {
 
 // Watcher pour la langue courante
 watch(currentLanguage, (newLang) => {
-  updateIndicator("Jour", new Date().toLocaleDateString(newLang === "fr" ? "fr-FR" : "en-US", { weekday: "long" }));
-  updateIndicator("Date", new Date().toLocaleString(newLang === "fr" ? "fr-FR" : "en-US"));
+  updateIndicator("Jour", new Date().toLocaleDateString(newLang === "fr" ? "fr-FR" : newLang === "en" ? "en-US" : "ar-DZ", { weekday: "long" }));
+  updateIndicator("Date", new Date().toLocaleString(newLang === "fr" ? "fr-FR" : newLang === "en" ? "en-US" : "fr-FR"));
   fetchLocationAndWeather()
   setInterval(fetchLocationAndWeather, 60 * 60 * 1000)
 });
@@ -146,7 +146,7 @@ const fetchLocationAndWeather = async () => {
           lat: latitude,
           lon: longitude,
           units: 'metric',
-          lang: currentLanguage.value === "fr" ? 'fr' : 'en',
+          lang: currentLanguage.value === "fr" ? 'fr' : currentLanguage.value === "en" ? 'en' : 'ar',
           appid: apiKey
         }
       })
