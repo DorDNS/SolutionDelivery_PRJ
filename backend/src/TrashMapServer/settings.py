@@ -146,3 +146,5 @@ CORS_ALLOW_CREDENTIALS = True
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:3000",
 ]
+
+ROBOFLOW_API_KEY = "NZsgeWVOO3DkaAwzxF4Q"

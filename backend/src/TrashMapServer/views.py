@@ -13,6 +13,7 @@ from PIL import Image as PILImage
 import io
 import mimetypes
 from threading import Thread
+import requests
 
 def dashboard(request):
     db_path = os.path.join(s.BASE_DIR, 'db.sqlite3')
@@ -74,6 +75,53 @@ def locations_img(request):
             return JsonResponse(data, safe=False)
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=500)
+        
+
+def call_roboflow_api(image_path):
+    url = "https://detect.roboflow.com/trash-detection-oeuhp/6"
+    api_key = "NZsgeWVOO3DkaAwzxF4Q"
+
+    with open(image_path, "rb") as img_file:
+        response = requests.post(
+            url,
+            params={"api_key": api_key},
+            files={"file": img_file}
+        )
+
+    if response.status_code != 200:
+        print("Erreur Roboflow (fichier) :", response.status_code, response.text)
+        response.raise_for_status()
+
+    return response.json()
+
+
+def crop_trash_region(image_path, detections, classes_to_keep=['Trash', 'Trash-can']):
+    img = PILImage.open(image_path)
+    lefts, tops, rights, bottoms = [], [], [], []
+
+    for obj in detections.get('predictions', []):
+        if obj['class'] in classes_to_keep:
+            x, y, w, h = obj['x'], obj['y'], obj['width'], obj['height']
+            left = int(x - w/2)
+            top = int(y - h/2)
+            right = int(x + w/2)
+            bottom = int(y + h/2)
+            lefts.append(left)
+            tops.append(top)
+            rights.append(right)
+            bottoms.append(bottom)
+
+    if not lefts:
+        return None
+
+    left = max(min(lefts), 0)
+    top = max(min(tops), 0)
+    right = min(max(rights), img.width)
+    bottom = min(max(bottoms), img.height)
+
+    cropped_img = img.crop((left, top, right, bottom))
+    return cropped_img
+
 
 @csrf_exempt
 def upload_img(request):
@@ -84,14 +132,17 @@ def upload_img(request):
     if not image:
         return HttpResponse("No file found", status=400)
 
+    # Sauvegarde image complète en WebP
     file_name = str(uuid.uuid4()) + ".webp"
-    os.makedirs(os.path.join(s.MEDIA_ROOT, "Data", "uploads"), exist_ok=True)
+    upload_dir = os.path.join(s.MEDIA_ROOT, "Data", "uploads")
+    os.makedirs(upload_dir, exist_ok=True)
     file_path = os.path.join("Data", "uploads", file_name)
+    full_path = os.path.join(s.MEDIA_ROOT, file_path)
 
     image_bytes = image.read()
     try:
         image_pil = PILImage.open(io.BytesIO(image_bytes)).convert("RGB")
-        image_pil.save(os.path.join(s.MEDIA_ROOT, file_path), format="WEBP", quality=80)
+        image_pil.save(full_path, format="WEBP", quality=80)
     except Exception as e:
         return JsonResponse({"error": f"Erreur lors de la conversion WebP : {e}"}, status=500)
 
@@ -110,7 +161,7 @@ def upload_img(request):
                 INSERT INTO Image (
                     File_name, File_path, Size, Height, Width, Date_taken, Status
                 ) VALUES (?, ?, ?, ?, ?, ?, ?)
-            """, (file_name, file_path, size, 0, 0, date_taken, int(status)))
+            """, (file_name, file_path, size, 0, 0, date_taken, int(status) if status else 0))
             id_image = cursor.lastrowid
 
             if latitude and longitude and city:
@@ -123,14 +174,30 @@ def upload_img(request):
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=500)
 
-    Thread(target=process_features_async, args=(id_image, os.path.join(s.MEDIA_ROOT, file_path))).start()
+    # Lance le traitement asynchrone avec crop et features
+    Thread(target=process_features_async, args=(id_image, full_path)).start()
+
     return JsonResponse({"message": "Image uploaded", "Id_Image": id_image})
+
 
 def process_features_async(id_image, full_path):
     try:
-        image_cv2 = cv2.imread(full_path)
-        if image_cv2 is None:
-            return
+        detections = call_roboflow_api(full_path)
+
+        # --- Crop englobant Trash + Trash-can ---
+        cropped_img = crop_trash_region(full_path, detections)
+        if cropped_img is None:
+            print(f"Aucune détection Trash/Trash-can pour image {id_image}, extraction features sur image complète.")
+            cropped_img = PILImage.open(full_path)
+            
+        # Sauvegarder le crop
+        crop_dir = os.path.join(s.MEDIA_ROOT, "Data", "crops")
+        crop_file_name = f"crop_{id_image}.webp"
+        crop_path = os.path.join(crop_dir, crop_file_name)
+        cropped_img.save(crop_path, format="WEBP", quality=80)
+
+        # --- Extraction des features sur le crop ---
+        image_cv2 = cv2.cvtColor(np.array(cropped_img), cv2.COLOR_RGB2BGR)
         gray = cv2.cvtColor(image_cv2, cv2.COLOR_BGR2GRAY)
 
         def mean_color(img):
@@ -152,6 +219,7 @@ def process_features_async(id_image, full_path):
         edges = int(np.sum(cv2.Canny(gray, 100, 200) > 0))
         hists = compute_histograms()
 
+        # --- Mise à jour base ---
         with sqlite3.connect(os.path.join(s.BASE_DIR, 'db.sqlite3')) as conn:
             cursor = conn.cursor()
             cursor.execute("""
@@ -164,6 +232,7 @@ def process_features_async(id_image, full_path):
                 contrast_level, json.dumps(hists['rgb']), json.dumps(hists['luminance']), edges, id_image
             ))
             conn.commit()
+
     except Exception as e:
         print(f"Erreur traitement async pour image {id_image} : {e}")
 
