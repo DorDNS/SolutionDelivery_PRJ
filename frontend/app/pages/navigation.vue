@@ -291,6 +291,7 @@ const meta = ref(null);
 const currentPage = ref(1);
 const totalPages = ref(1);
 const limit = 1;
+const isSpecificImage = ref(false);
 
 async function fetchImage() {
     try {
@@ -313,6 +314,7 @@ async function fetchImage() {
 
 async function fetchImageById(id) {
   try {
+    isSpecificImage.value = true;
     const metaResponse = await fetch(`http://localhost:8000/img/metadatas/${id}/`);
     meta.value = await metaResponse.json();
 
@@ -341,10 +343,24 @@ onBeforeUnmount(() => {
 watch(currentPage, fetchImage);
 
 function suivante() {
-    if (currentPage.value < totalPages.value) currentPage.value++;
+    if (isSpecificImage.value) {
+    isSpecificImage.value = false; // Désactiver l'état spécifique
+    currentPage.value++; // Passer à la page suivante
+    fetchImage(); // Charger les images via la pagination
+  } else if (currentPage.value < totalPages.value) {
+    currentPage.value++;
+    fetchImage();
+  }
 }
 function precedente() {
-    if (currentPage.value > 1) currentPage.value--;
+    if (isSpecificImage.value) {
+    isSpecificImage.value = false; // Désactiver l'état spécifique
+    currentPage.value--; // Passer à la page précédente
+    fetchImage(); // Charger les images via la pagination
+  } else if (currentPage.value > 1) {
+    currentPage.value--;
+    fetchImage();
+  }
 }
 function handleKey(event) {
     if (event.key === "ArrowLeft") precedente();

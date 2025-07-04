@@ -19,7 +19,7 @@
                     class="text-[#415a77] w-12 h-12 mx-auto"
                 />
                 <p class="text-lg text-[#1b263b] font-semibold">
-                    Déposez votre image ici
+                    {{translations[currentLanguage].drag}}
                 </p>
                 <p class="text-sm text-[#778da9]">
                     JPG/JPEG/PNG/WEBP — 5 Mo max — min. 500×500 px
@@ -31,7 +31,7 @@
             <!-- Titre -->
             <div class="text-center">
                 <h1 class="text-3xl font-bold text-[#1b263b]">
-                    Uploader une image
+                    {{ translations[currentLanguage].upload }}
                 </h1>
                 <div
                     class="mt-2 text-[#415a77] text-sm flex items-center justify-center gap-2"
@@ -41,7 +41,7 @@
                         class="w-4 h-4 text-[#778da9]"
                     />
                     <span>
-                        Formats : <strong>JPG/JPEG/PNG/WEBP</strong> —
+                        {{ translations[currentLanguage].fromat }}<strong>JPG/JPEG/PNG/WEBP</strong> —
                         max <strong>5 Mo</strong> — min
                         <strong>500×500 px</strong>
                     </span>
@@ -52,11 +52,11 @@
             <UCard>
                 <div class="space-y-4">
                     <label class="block font-medium text-[#1b263b]"
-                        >Image</label
+                        >{{ translations[currentLanguage].img }}</label
                     >
                     <UInput
                         type="file"
-                        accept=".jpg,.jpeg,.png"
+                        accept=".jpg,.jpeg,.png,.webp"
                         icon="i-heroicons-photo"
                         @change="handleFileChange"
                     />
@@ -75,7 +75,7 @@
 
                 <div class="flex flex-col items-center space-y-6">
                     <p class="text-sm font-medium text-[#415a77]">
-                        Sélectionnez l’état de la poubelle :
+                        {{ translations[currentLanguage].selc }}
                     </p>
 
                     <!-- Sélecteur élégant -->
@@ -102,21 +102,21 @@
                         :disabled="!annotation || annotationSaved || locationInput"
                         @click="saveAnnotation"
                     >
-                        Envoyer
+                        {{ translations[currentLanguage].env }}
                     </UButton>
 
                     <div
                         v-if="annotationSaved"
                         class="text-sm text-[#415a77] font-semibold text-center"
                     >
-                    <span class="text-green-600">Image et annotation enregistrée dans la base de données !!!</span>
+                    <span class="text-green-600">{{ translations[currentLanguage].safe }}</span>
                         <div class="mt-2">
                             <UButton
                                 color="primary"
                                 variant="ghost"
                                 @click="resetAnnotation"
                             >
-                                Modifier l'annotation
+                                {{ translations[currentLanguage].modano }}
                             </UButton>
                         </div>
                     </div>
@@ -127,7 +127,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, inject,  computed } from "vue";
 
 const selectedFile = ref(null);
 const preview = ref(null);
@@ -137,6 +137,9 @@ const annotationSaved = ref(false);
 const dragging = ref(false);
 const dragCounter = ref(0);
 const locationInput = ref("");
+
+const translations = inject("translations");
+const currentLanguage = inject("currentLanguage");
 
 const annotationOptions = [
     { label: "Vide", value: "vide", icon: "i-lucide-brush-cleaning" },

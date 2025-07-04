@@ -78,12 +78,10 @@ watch(currentLanguage, () => {
   addMarkers(data.value); 
 });
 
-watch(
-  () => props.highlightId,
-  () => {
-    updateHighlight();
-  }
-);
+// Mettre en surbrillance le marqueur lié à l'image
+watch([currentLanguage, () => props.highlightId], () => {
+  updateHighlight(); 
+});
 
 async function updateHighlight() {
   if (!map.value || !props.highlightId) return;

@@ -79,6 +79,15 @@ const translations = {
     end: "Fin : ",
     depID: "Dépôt ID :",
     seeimg : "Voir l'image",
+    //Upload
+    drag:"Déposez votre image ici",
+    upload:"Uploader une image",
+    fromat : "Formats : ",
+    img:"Image",
+    selc:"Sélectionnez l'état de la poubelle :",
+    env:"Envoyer",
+    safe:"Image et annotation enregistrée dans la base de données !!!",
+    modano:"Modifier l'annotation",
     //Navigation
     navtitle: "Navigation des images",
     navtips:"Utilisez les flèches ou raccourcis clavier pour parcourir les images.",
@@ -168,6 +177,15 @@ const translations = {
     end: "End : ",
     depID: "Bin ID :",
     seeimg: "View image",
+    //Upload
+    drag: "Drop your image here",
+    upload: "Upload an image",
+    fromat: "Formats: ",
+    img: "Image",
+    selc: "Select the state of the trash bin:",
+    env: "Send",
+    safe: "Image and annotation saved in the database!!!",
+    modano: "Modify annotation",
     //Navigation
     navtitle: "Image Navigation",
     navtips: "Use the arrows or keyboard shortcuts to navigate through the images.",
