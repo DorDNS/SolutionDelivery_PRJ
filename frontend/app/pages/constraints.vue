@@ -29,7 +29,9 @@
           size="lg"
         />
         <span class="text-sm text-[#415a77] min-w-[180px] text-center">
-          {{ intelligentMode ? translations[currentLanguage.value]?.modeint ?? "Mode intelligent activé" : translations[currentLanguage.value]?.modeman ?? "Mode manuel activé" }}
+          {{ intelligentMode 
+            ? translations[currentLanguage]?.modeint ?? "Mode intelligent activé" 
+            : translations[currentLanguage]?.modeman ?? "Mode manuel activé" }}
         </span>
       </div>
 
