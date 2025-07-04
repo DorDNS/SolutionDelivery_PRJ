@@ -54,12 +54,33 @@
                     <label class="block font-medium text-[#1b263b]"
                         >{{ translations[currentLanguage].img }}</label
                     >
-                    <UInput
-                        type="file"
-                        accept=".jpg,.jpeg,.png,.webp"
-                        icon="i-heroicons-photo"
-                        @change="handleFileChange"
-                    />
+                    <div class="relative">
+                        <!-- Label personnalisé -->
+                        <label
+                            for="file-upload"
+                            class="w-full rounded-md border-0 placeholder:text-gray-500 
+                            focus:outline-none disabled:cursor-not-allowed disabled:opacity-75 
+                            transition-colors px-3 py-2 text-sm gap-1.5 text-gray-600 
+                            bg-default ring ring-inset ring-accented file:me-1.5 file:font-medium 
+                            file:text-gray-400 file:outline-none focus-visible:ring-2 
+                            focus-visible:ring-inset focus-visible:ring-primary"
+                        >
+                        <UIcon
+                            name="i-heroicons-photo"
+                            class="w-5 h-5 text-[#415a77] inline-block me-1 translate-y-1"
+                        />
+                        {{ (fileName) || (translations[currentLanguage]?.instruc ?? "Cliquez pour choisir un fichier à uploader") }}
+                        </label>
+                        <!-- Champ de type file caché -->
+                        <UInput
+                            id="file-upload"
+                            type="file"
+                            accept=".jpg,.jpeg,.png,.webp"
+                            class="hidden"
+                            icon="i-heroicons-photo"
+                            @change="handleFileChange"
+                        />
+                    </div>
                     <p v-if="error" class="text-red-600 text-sm">{{ error }}</p>
                 </div>
             </UCard>
@@ -84,7 +105,7 @@
                         :items="annotationOptions"
                         value-key="value"
                         :icon="annotationIcon"
-                        placeholder="Choisissez un état"
+                        :placeholder="translations[currentLanguage].selc"
                         class="w-full max-w-xs"
                         size="lg"
                         color="primary"
@@ -92,14 +113,14 @@
                     <!-- Saisie du lieu -->
                     <UInput
                         v-model="locationInput"
-                        placeholder="Entrez un lieu (ex: Paris)"
+                        :placeholder="translations[currentLanguage].lieu"
                         icon="i-heroicons-map-pin"
                         class="w-full max-w-xs"
                     />
                     <!-- Enregistrement -->
                     <UButton
                         color="primary"
-                        :disabled="!annotation || annotationSaved || locationInput"
+                        :disabled="!annotation || annotationSaved || !locationInput"
                         @click="saveAnnotation"
                     >
                         {{ translations[currentLanguage].env }}
@@ -137,29 +158,36 @@ const annotationSaved = ref(false);
 const dragging = ref(false);
 const dragCounter = ref(0);
 const locationInput = ref("");
+const fileName = ref("");
 
 const translations = inject("translations");
 const currentLanguage = inject("currentLanguage");
 
-const annotationOptions = [
-    { label: "Vide", value: "vide", icon: "i-lucide-brush-cleaning" },
-    { label: "Pleine", value: "pleine", icon: "i-lucide-trash-2" },
-];
+const annotationOptions = computed(() => [
+    { label: translations[currentLanguage.value]?.emptyLabel ?? "Vide", value: "vide", icon: "i-lucide-brush-cleaning" },
+    { label: translations[currentLanguage.value]?.fullLabel ?? "Pleine", value: "pleine", icon: "i-lucide-trash-2" },
+]);
 
 const annotationIcon = computed(
-    () => annotationOptions.find((opt) => opt.value === annotation.value)?.icon
+    () => annotationOptions.value.find((opt) => opt.value === annotation.value)?.icon
 );
 
 function handleFileChange(event) {
     const file = event.target.files[0];
-    processFile(file);
+    if (file) {
+        fileName.value = file.name;
+        processFile(file);
+    }
 }
 
 function handleDrop(event) {
     dragCounter.value = 0;
     dragging.value = false;
     const file = event.dataTransfer.files[0];
-    processFile(file);
+    if (file) {
+        fileName.value = file.name;
+        processFile(file);
+    }
 }
 
 function handleDragEnter() {
@@ -185,12 +213,12 @@ function processFile(file) {
 
     const validTypes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
     if (!validTypes.includes(file.type)) {
-        error.value = "Format non supporté. JPG/JPEG/PNG/WEBP requis.";
+        error.value = translations[currentLanguage.value].err1;
         return;
     }
 
     if (file.size > 5 * 1024 * 1024) {
-        error.value = "Fichier trop volumineux. 5 Mo max.";
+        error.value = translations[currentLanguage.value].err2;
         return;
     }
 
@@ -199,7 +227,7 @@ function processFile(file) {
         const img = new Image();
         img.onload = () => {
             if (img.width < 500 || img.height < 500) {
-                error.value = "Image trop petite. Minimum 500×500 px.";
+                error.value = translations[currentLanguage.value].err3;
             } else {
                 preview.value = e.target.result;
             }
@@ -214,7 +242,7 @@ async function geocodeLocation(place) {
     const response = await fetch(url);
     const results = await response.json();
     if (results.length === 0) {
-        throw new Error("Lieu introuvable");
+        throw new Error(translations[currentLanguage.value].err4);
     }
     const result = results[0];
     return {
@@ -227,7 +255,7 @@ async function geocodeLocation(place) {
 
 async function saveAnnotation() {
     if (!annotation.value || !selectedFile.value || !locationInput.value) {
-        error.value = "Veuillez remplir tous les champs.";
+        error.value = translations[currentLanguage.value].err5;
         return;
     }
 
@@ -262,7 +290,7 @@ async function saveAnnotation() {
         });
 
         if (!response.ok) throw new Error(`Erreur HTTP ${response.status}`);
-        console.log("Upload réussi");
+        console.log(translations[currentLanguage.value].err6);
     } catch (err) {
         console.error("Erreur : ", err.message);
         annotationSaved.value = false;
