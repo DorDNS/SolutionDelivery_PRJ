@@ -78,7 +78,7 @@ def locations_img(request):
         
 
 def call_roboflow_api(image_path):
-    url = "https://detect.roboflow.com/trash-detection-oeuhp/6"
+    url = "https://detect.roboflow.com/trash-detection-oeuhp/5"
     api_key = "NZsgeWVOO3DkaAwzxF4Q"
 
     with open(image_path, "rb") as img_file:
