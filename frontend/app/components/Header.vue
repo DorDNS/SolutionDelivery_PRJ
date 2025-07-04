@@ -52,7 +52,15 @@ const items = ref([
     value: 'en',
     avatar: {
       src: '/images/Flag_of_the_UK.svg',
-      alt: 'rn'
+      alt: 'en'
+    }
+  },
+  {
+    label: 'اللغة العربية',
+    value: 'ar',
+    avatar: {
+      src: '/images/Flag_of_Algeria.svg',
+      alt: 'ar'
     }
   }
 ] satisfies SelectItem[])

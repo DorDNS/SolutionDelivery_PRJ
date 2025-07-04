@@ -120,6 +120,12 @@ const translations = {
     historgb: "Histogramme RGB",
     histolum: "Histogramme de luminance",
     noimg:"Aucune image à afficher.",
+    //Contraintes
+    constraintsTitle: "Configuration des contraintes",
+    constraintsDescription: "Paramétrez les règles de classification et activez le mode intelligent.",
+    modeint:"Mode intelligent activé",
+    modeman:"Mode manuel activé",
+    save:"Enregistrer",
   },
   en: {
     //Header
@@ -226,7 +232,18 @@ const translations = {
     historgb: "RGB Histogram",
     histolum: "Luminance Histogram",
     noimg: "No image to display.",
+    //Contraintes
+    constraintsTitle: "Constraints Configuration",
+    constraintsDescription: "Set classification rules and enable intelligent mode.",
+    modeint: "Intelligent mode enabled",
+    modeman: "Manual mode enabled",
+    save: "Save",
   },
+  ar: {
+    //Header
+    label: "اللغة",
+    headerup: "تحميل",
+  }
 }
 
 // Fournir les données aux composants enfants

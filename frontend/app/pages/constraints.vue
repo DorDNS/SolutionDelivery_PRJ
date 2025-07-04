@@ -4,7 +4,7 @@
       <!-- Titre -->
       <div class="text-center">
         <h1 class="text-3xl font-bold text-[#1b263b]">
-          Configuration des contraintes
+          {{ translations[currentLanguage].constraintsTitle}}
         </h1>
         <div
           class="mt-2 text-[#415a77] text-sm flex items-center justify-center gap-2"
@@ -14,7 +14,7 @@
             class="w-4 h-4 text-[#778da9]"
           />
           <span>
-            Paramétrez les règles de classification et activez le mode intelligent.
+            {{ translations[currentLanguage].constraintsDescription }}
           </span>
         </div>
       </div>
@@ -29,7 +29,7 @@
           size="lg"
         />
         <span class="text-sm text-[#415a77] min-w-[180px] text-center">
-          {{ intelligentMode ? 'Mode intelligent activé' : 'Mode manuel activé' }}
+          {{ intelligentMode ? translations[currentLanguage.value]?.modeint ?? "Mode intelligent activé" : translations[currentLanguage.value]?.modeman ?? "Mode manuel activé" }}
         </span>
       </div>
 
@@ -44,7 +44,7 @@
           />
         </div>
         <button type="submit" class="mt-4 bg-blue-600 text-white px-4 py-2 rounded">
-          Enregistrer
+          {{ translations[currentLanguage].save }}
         </button>
       </form>
 
@@ -54,11 +54,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, inject,  onMounted } from 'vue'
 import axios from 'axios'
 
 const constraints = ref({})
 const message = ref('')
+
+const currentLanguage = inject('currentLanguage')
+const translations = inject('translations')
 
 // Switch intelligent mode
 const intelligentMode = ref(false)
