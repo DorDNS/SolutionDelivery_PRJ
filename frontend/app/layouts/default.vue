@@ -338,9 +338,9 @@ const translations = {
     lon: "خط الطول",
     statut: "الحالة",
     val: "تأكيد",
-    pietitle: "تركيب ألوان RGB (المتوسط)",
+    pietitle: "RGB تركيب ألوان (المتوسط)",
     moyrgb: "المتوسط",
-    historgb: "رسم بياني لألوان RGB",
+    historgb: "RGB رسم بياني لألوان",
     histolum: "رسم بياني للسطوع",
     noimg: "لا توجد صورة لعرضها.",
     //Contraintes
