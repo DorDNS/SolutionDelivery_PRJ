@@ -47,6 +47,11 @@ urlpatterns = [
     path('api/constraints/', v.get_constraints, name='get_constraints'),
     path('api/constraints/update/', v.update_constraints, name='update_constraints'),
 
+    path('api/config/',          v.get_app_config),
+    path('api/config/update/',   v.update_app_config),
+
+    path('img/predict_crops_all/', v.predict_crops_all),
+    path('img/predict_missing_crops/', v.predict_missing_crops),
 ]
 
 if settings.DEBUG:
