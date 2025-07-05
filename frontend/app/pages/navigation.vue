@@ -334,7 +334,7 @@ async function fetchImageById(id) {
     isSpecificImage.value = true;
 
     if (intelligentMode.value) {
-      // 🔥 Prédire les images manquantes avant de charger les métadonnées
+      // Prédire les images manquantes avant de charger les métadonnées
       await axios.post('http://localhost:8000/img/predict_missing_crops/');
     }
 

@@ -139,7 +139,7 @@ def upload_img(request):
     os.makedirs(upload_dir, exist_ok=True)
     file_path = os.path.join("Data", "uploads", file_name)
     full_path = os.path.join(s.MEDIA_ROOT, file_path)
-
+    file_path = "uploads/"+ file_name + ".webp"
     image_bytes = image.read()
     try:
         image_pil = PILImage.open(io.BytesIO(image_bytes)).convert("RGB")
