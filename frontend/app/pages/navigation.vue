@@ -71,22 +71,35 @@
                     <!-- Header -->
                     <template #header>
                         <div class="flex justify-between items-center">
+                            <!-- Titre à gauche -->
                             <h2 class="text-lg font-semibold">
                                 {{ translations[currentLanguage].imginfo }}
                             </h2>
-                            <UBadge
-                                :color="meta.Status ? 'error' : 'success'"
-                                variant="subtle"
-                                size="md"
-                                class="font-bold rounded-full"
-                                :icon="
-                                    meta.Status
-                                        ? 'i-lucide-trash-2'
-                                        : 'i-lucide-brush-cleaning'
-                                "
-                            >
-                                {{ meta.Status ? translations[currentLanguage].fullLabel : translations[currentLanguage].emptyLabel }}
-                            </UBadge>
+                            <!-- Badges à droite -->
+                            <div class="flex items-center gap-x-2">
+                                <UBadge
+                                    :color="meta.Status ? 'error' : 'success'"
+                                    variant="subtle"
+                                    size="md"
+                                    class="font-bold rounded-full"
+                                    :icon="
+                                        meta.Status
+                                            ? 'i-lucide-trash-2'
+                                            : 'i-lucide-brush-cleaning'
+                                    "
+                                >
+                                    {{ meta.Status ? translations[currentLanguage].fullLabel : translations[currentLanguage].emptyLabel }}
+                                </UBadge>
+                                <UBadge
+                                    v-if="intelligentMode && meta.Status_DeepIA !== null"
+                                    variant="solid"
+                                    size="md"
+                                    class="font-bold rounded-full bg-gradient-to-r from-purple-500 to-purple-300 text-white flex items-center gap-1"
+                                >
+                                    <UIcon name="i-lucide-sparkles" class="w-4 h-4" />
+                                    IA : {{ meta.Status_DeepIA ? translations[currentLanguage].fullLabel : translations[currentLanguage].emptyLabel }}
+                                </UBadge>
+                            </div>
                         </div>
                     </template>
 
@@ -262,6 +275,7 @@
 
 <script setup>
 import { ref, inject, computed, watch, onMounted, onBeforeUnmount } from "vue";
+import axios from "axios";
 import PieChart from "~/components/PieChart.vue";
 import MapDepots from "../components/dashboard/MapDepots.vue";
 import { Bar } from "vue-chartjs";
@@ -293,6 +307,9 @@ const totalPages = ref(1);
 const limit = 1;
 const isSpecificImage = ref(false);
 
+const intelligentMode = ref(false);
+
+
 async function fetchImage() {
     try {
         const response = await fetch(
@@ -315,6 +332,12 @@ async function fetchImage() {
 async function fetchImageById(id) {
   try {
     isSpecificImage.value = true;
+
+    if (intelligentMode.value) {
+      // 🔥 Prédire les images manquantes avant de charger les métadonnées
+      await axios.post('http://localhost:8000/img/predict_missing_crops/');
+    }
+
     const metaResponse = await fetch(`http://localhost:8000/img/metadatas/${id}/`);
     meta.value = await metaResponse.json();
 
@@ -325,7 +348,17 @@ async function fetchImageById(id) {
   }
 }
 
+async function loadIntelligentMode() {
+  try {
+    const res = await axios.get('http://localhost:8000/api/config/');
+    intelligentMode.value = res.data.intelligent_mode;
+  } catch (err) {
+    console.error('Erreur loadIntelligentMode:', err);
+  }
+}
+
 onMounted(() => {
+  loadIntelligentMode();
   const idFromStorage = localStorage.getItem("currentId");
   if (idFromStorage) {
     fetchImageById(idFromStorage);

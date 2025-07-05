@@ -77,7 +77,8 @@ import { ref, inject, onMounted, watch } from 'vue'
 import axios from 'axios'
 
 const constraints      = ref({})
-const intelligentMode  = ref(false)
+const intelligentMode  = ref(true)
+const isInitializing   = ref(true) // ✅ ajouter l'initialisation
 const message          = ref('')
 
 const currentLanguage = inject('currentLanguage')
@@ -87,20 +88,12 @@ const translations    = inject('translations')
 async function loadMode() {
   try {
     const res = await axios.get('http://localhost:8000/api/config/')
+    console.log('Mode intelligent récupéré :', res.data.intelligent_mode)
     intelligentMode.value = res.data.intelligent_mode
   } catch (err) {
     console.error('Erreur loadMode:', err)
-  }
-}
-
-// 🌱 Sauvegarder l'état du switch
-async function saveMode(val) {
-  try {
-    await axios.post('http://localhost:8000/api/config/update/', {
-      intelligent_mode: val
-    })
-  } catch (err) {
-    console.error('Erreur saveMode:', err)
+  } finally {
+    isInitializing.value = false // ✅ terminer l'initialisation après le chargement
   }
 }
 
@@ -126,7 +119,17 @@ async function submitConstraints() {
 }
 
 // 🎯 Détecter un changement de switch et persister
-watch(intelligentMode, saveMode)
+watch(intelligentMode, async (newVal) => {
+  if (isInitializing.value) return // 🔥 ignore le set initial
+  console.log('Sauvegarde mode intelligent :', newVal)
+  try {
+    await axios.post('http://localhost:8000/api/config/update/', {
+      intelligent_mode: newVal
+    })
+  } catch (err) {
+    console.error('Erreur saveMode:', err)
+  }
+})
 
 // 🛠 pour déterminer le type d’input
 function getInputType(value) {

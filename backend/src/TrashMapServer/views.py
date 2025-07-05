@@ -14,6 +14,7 @@ import io
 import mimetypes
 from threading import Thread
 import requests
+from TrashMapServer import deep_model
 
 def dashboard(request):
     db_path = os.path.join(s.BASE_DIR, 'db.sqlite3')
@@ -632,9 +633,74 @@ def update_app_config(request):
     db = os.path.join(s.BASE_DIR, 'db.sqlite3')
     with sqlite3.connect(db) as conn:
         cur = conn.cursor()
-        cur.execute(
-          "UPDATE AppConfig SET value = ? WHERE key = 'intelligent_mode'",
-          (val,)
-        )
+        # 🔥 UPSERT : insert si absent, update si présent
+        cur.execute("""
+            INSERT INTO AppConfig (key, value)
+            VALUES ('intelligent_mode', ?)
+            ON CONFLICT(key) DO UPDATE SET value=excluded.value
+        """, (val,))
         conn.commit()
     return JsonResponse({ "intelligent_mode": bool(int(val)) })
+
+@csrf_exempt
+def predict_crops_all(request):
+    """
+    Parcourt tous les crops sauvegardés, prédit avec le modèle CNN importé
+    et retourne un dictionnaire { id_image : [proba classes] }
+    """
+    crops_dir = os.path.join(s.MEDIA_ROOT, "Data", "crops")
+    results = {}
+
+    for filename in os.listdir(crops_dir):
+        if not filename.endswith(".webp"):
+            continue
+
+        id_image = filename.replace("crop_", "").replace(".webp", "")
+        img_path = os.path.join(crops_dir, filename)
+
+        preds = deep_model.predict_image(img_path)
+        results[id_image] = preds
+
+    return JsonResponse({"predictions": results})
+
+@csrf_exempt
+def predict_missing_crops(request):
+    """
+    Prédit uniquement les images dont Status_DeepIA est NULL
+    en utilisant les crops dans Data/crops/crop_{id}.webp
+    """
+    db_path = os.path.join(s.BASE_DIR, 'db.sqlite3')
+    crops_dir = os.path.join(s.MEDIA_ROOT, "Data", "crops")
+
+    try:
+        with sqlite3.connect(db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT Id_Image FROM Image WHERE Status_DeepIA IS NULL")
+            images = cursor.fetchall()
+
+            results = []
+            for (id_image,) in images:
+                crop_filename = f"crop_{id_image}.webp"
+                crop_path = os.path.join(crops_dir, crop_filename)
+
+                if not os.path.exists(crop_path):
+                    print(f"[WARN] Crop non trouvé : {crop_path}")
+                    continue  # 🔥 Ignore si crop absent
+
+                # Prédiction sur l'image cropée
+                status_ia = int(deep_model.predict_image(crop_path))  # True -> 1, False -> 0
+
+                # Mise à jour en BDD
+                cursor.execute(
+                    "UPDATE Image SET Status_DeepIA = ? WHERE Id_Image = ?",
+                    (status_ia, id_image)
+                )
+                results.append({"Id_Image": id_image, "prediction": status_ia})
+
+            conn.commit()
+
+        return JsonResponse({"predictions": results})
+
+    except Exception as e:
+        print(f"[ERROR] predict_missing_crops : {e}")
+        return HttpResponseBadRequest(f"Erreur : {e}")
