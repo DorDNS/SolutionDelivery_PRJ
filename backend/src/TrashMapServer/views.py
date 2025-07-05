@@ -608,3 +608,33 @@ def update_constraints(request):
 
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
+
+def get_app_config(request):
+    if request.method != 'GET':
+        return HttpResponseBadRequest("Only GET allowed")
+    db = os.path.join(s.BASE_DIR, 'db.sqlite3')
+    with sqlite3.connect(db) as conn:
+        cur = conn.cursor()
+        cur.execute("SELECT value FROM AppConfig WHERE key='intelligent_mode'")
+        row = cur.fetchone()
+    mode = bool(int(row[0])) if row else False
+    return JsonResponse({ "intelligent_mode": mode })
+
+@csrf_exempt
+def update_app_config(request):
+    if request.method not in ('POST','PUT'):
+        return HttpResponseBadRequest("Only POST/PUT allowed")
+    try:
+        data = json.loads(request.body)
+        val = '1' if data.get('intelligent_mode') else '0'
+    except:
+        return HttpResponseBadRequest("Invalid JSON")
+    db = os.path.join(s.BASE_DIR, 'db.sqlite3')
+    with sqlite3.connect(db) as conn:
+        cur = conn.cursor()
+        cur.execute(
+          "UPDATE AppConfig SET value = ? WHERE key = 'intelligent_mode'",
+          (val,)
+        )
+        conn.commit()
+    return JsonResponse({ "intelligent_mode": bool(int(val)) })
