@@ -646,7 +646,7 @@ def update_app_config(request):
 def predict_crops_all(request):
     """
     Parcourt tous les crops sauvegardés, prédit avec le modèle CNN importé
-    et retourne un dictionnaire { id_image : [proba classes] }
+    et retourne un dictionnaire { id_image : prediction }
     """
     crops_dir = os.path.join(s.MEDIA_ROOT, "Data", "crops")
     results = {}
@@ -658,8 +658,11 @@ def predict_crops_all(request):
         id_image = filename.replace("crop_", "").replace(".webp", "")
         img_path = os.path.join(crops_dir, filename)
 
+        # 🔥 Cast la prédiction en float ou int natif
         preds = deep_model.predict_image(img_path)
-        results[id_image] = preds
+        pred_value = float(preds) if hasattr(preds, '__float__') else bool(preds)
+
+        results[id_image] = pred_value
 
     return JsonResponse({"predictions": results})
 

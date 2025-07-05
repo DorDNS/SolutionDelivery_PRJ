@@ -37,6 +37,19 @@
         </span>
       </div>
 
+      <!-- Bouton relancer prédiction IA -->
+      <div v-if="intelligentMode" class="text-center mt-6">
+        <UButton
+          color="primary"
+          variant="solid"
+          size="md"
+          icon="i-lucide-sparkles"
+          @click="confirmRelance"
+        >
+          {{ translations[currentLanguage]?.relanceIA ?? "Relancer prédiction IA sur toutes les images" }}
+        </UButton>
+      </div>
+
       <!-- Formulaire de contraintes -->
       <form @submit.prevent="submitConstraints" class="grid gap-4 max-w-4xl mx-auto">
         <div 
@@ -138,6 +151,23 @@ function getInputType(value) {
   else if (typeof value === 'string' 
         && /^\d{4}-\d{2}-\d{2}$/.test(value))                    return 'date'
   else                                                           return 'text'
+}
+
+// ✅ Relancer prédiction IA sur toutes les images avec confirmation
+async function relancerPredictionIA() {
+  try {
+    const res = await axios.post('http://localhost:8000/img/predict_crops_all/')
+    alert("✅ Prédictions IA relancées avec succès.")
+  } catch (err) {
+    console.error('Erreur relancerPredictionIA:', err)
+    alert("❌ Erreur lors de la relance des prédictions IA.")
+  }
+}
+
+function confirmRelance() {
+  if (confirm("⚠️ Cette action va relancer la prédiction IA sur toutes les images.\nContinuer ?")) {
+    relancerPredictionIA()
+  }
 }
 
 onMounted(() => {

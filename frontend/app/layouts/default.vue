@@ -238,6 +238,7 @@ const translations = {
     modeint: "Intelligent mode enabled",
     modeman: "Manual mode enabled",
     save: "Save",
+    relanceIA: "Relaunch AI prediction on all images",
   },
   ar: {
     //Header
@@ -349,6 +350,7 @@ const translations = {
     modeint: "تم تفعيل الوضع الذكي",
     modeman: "تم تفعيل الوضع اليدوي",
     save: "حفظ",
+    relanceIA: "إعادة تشغيل تنبؤات الذكاء الاصطناعي على جميع الصور",
   }
 }
 
