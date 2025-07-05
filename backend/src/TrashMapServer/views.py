@@ -167,9 +167,9 @@ def upload_img(request):
 
             if latitude and longitude and city:
                 cursor.execute("""
-                    INSERT INTO Location (Latitude, Longitude, City, Id_Image)
-                    VALUES (?, ?, ?, ?)
-                """, (float(latitude), float(longitude), city, id_image))
+                    INSERT INTO Location (Id_Location, Latitude, Longitude, City, Id_Image)
+                    VALUES (?, ?, ?, ?, ?)
+                """, (id_image, float(latitude), float(longitude), city, id_image))
 
             conn.commit()
         except Exception as e:
