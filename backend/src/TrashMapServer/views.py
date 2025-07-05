@@ -158,18 +158,23 @@ def upload_img(request):
     with sqlite3.connect(db_path) as conn:
         cursor = conn.cursor()
         try:
+            id_column = "Id_Image"
+            table_name = "Image"
+            cursor.execute(f"SELECT MAX({id_column}) FROM {table_name}")
+            max_id = cursor.fetchone()[0] or 0
+            new_id = max_id + 1
             cursor.execute("""
                 INSERT INTO Image (
-                    File_name, File_path, Size, Height, Width, Date_taken, Status
-                ) VALUES (?, ?, ?, ?, ?, ?, ?)
-            """, (file_name, file_path, size, 0, 0, date_taken, int(status) if status else 0))
+                    Id_Image, File_name, File_path, Size, Height, Width, Date_taken, Status
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            """, (new_id, file_name, file_path, size, 0, 0, date_taken, int(status) if status else 0))
             id_image = cursor.lastrowid
 
             if latitude and longitude and city:
                 cursor.execute("""
-                    INSERT INTO Location (Latitude, Longitude, City, Id_Image)
-                    VALUES (?, ?, ?, ?)
-                """, (float(latitude), float(longitude), city, id_image))
+                    INSERT INTO Location (Id_Location, Latitude, Longitude, City, Id_Image)
+                    VALUES (?, ?, ?, ?, ?)
+                """, (id_image, float(latitude), float(longitude), city, id_image))
 
             conn.commit()
         except Exception as e:
