@@ -190,11 +190,14 @@ def upload_img(request):
     prediction_result = None
 
     if prediction_ia is not None:
-        # 🔥 Utiliser la prédiction locale transmise
+        # 🔥 Utiliser la prédiction IA pour Status_DeepIA
         status_ia = int(prediction_ia)
         with sqlite3.connect(db_path) as conn:
             cursor = conn.cursor()
-            cursor.execute("UPDATE Image SET Status_DeepIA = ?, Status = ? WHERE Id_Image = ?", (status_ia, status_ia, id_image))
+            # MAJ Status_DeepIA avec la prédiction IA
+            cursor.execute("UPDATE Image SET Status_DeepIA = ? WHERE Id_Image = ?", (status_ia, id_image))
+            # MAJ Status avec le choix utilisateur (déjà inséré lors du INSERT, mais on confirme ici au cas où)
+            cursor.execute("UPDATE Image SET Status = ? WHERE Id_Image = ?", (int(status) if status else 0, id_image))
             conn.commit()
         prediction_result = status_ia
 

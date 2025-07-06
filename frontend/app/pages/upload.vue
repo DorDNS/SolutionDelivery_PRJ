@@ -181,6 +181,7 @@ const dragging = ref(false);
 const dragCounter = ref(0);
 const fileName = ref("");
 const intelligentMode = ref(false);
+const predictionIAValue = ref(null); // 🔥 nouvelle variable
 
 // 🔥 localisation via Leaflet
 const lat = ref(48.8566);  // Paris par défaut
@@ -295,6 +296,7 @@ async function processFile(file) {
   annotationSaved.value = false;
   predictionDone.value = false;
   selectedFile.value = file;
+  predictionIAValue.value = null; // 🔥 reset à chaque nouveau fichier
 
   if (!file) return;
 
@@ -336,6 +338,7 @@ async function processFile(file) {
 
             if (data.prediction !== null && data.prediction !== undefined) {
               annotation.value = data.prediction === 1 ? "pleine" : "vide";
+              predictionIAValue.value = data.prediction; // 🔥 stocke la prédiction IA
             }
           } catch (err) {
             console.error("Erreur prédiction IA :", err);
@@ -388,8 +391,8 @@ async function saveAnnotation() {
     formData.append("Longitude", lon.value);
     formData.append("City", city);
 
-    if (intelligentMode.value) {
-      formData.append("Prediction_IA", annotationValue);
+    if (intelligentMode.value && predictionIAValue.value !== null) {
+        formData.append("Prediction_IA", predictionIAValue.value); // 🔥 utilise la prédiction IA originale
     }
 
     const response = await fetch("http://localhost:8000/img/upload/", {
