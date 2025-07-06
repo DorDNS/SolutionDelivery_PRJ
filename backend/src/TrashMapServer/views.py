@@ -134,7 +134,7 @@ def upload_img(request):
 
     # Sauvegarde image complète en WebP
     file_name = str(uuid.uuid4()) + ".webp"
-    
+
     # Chemin relatif à MEDIA_ROOT à enregistrer en BDD (sans "Data")
     file_path = os.path.join("uploads", file_name)
 
@@ -847,6 +847,23 @@ def geocode_proxy(request):
 
     try:
         headers = {'User-Agent': 'YourAppName/1.0'}
+        response = requests.get(url, headers=headers)
+        data = response.json()
+        return JsonResponse(data, safe=False)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+@csrf_exempt
+def reverse_geocode_proxy(request):
+    lat = request.GET.get('lat')
+    lon = request.GET.get('lon')
+    if not lat or not lon:
+        return HttpResponseBadRequest("Missing lat or lon parameters.")
+
+    url = f"https://nominatim.openstreetmap.org/reverse?format=json&lat={lat}&lon={lon}"
+
+    try:
+        headers = {'User-Agent': 'TrashMapApp/1.0'}
         response = requests.get(url, headers=headers)
         data = response.json()
         return JsonResponse(data, safe=False)

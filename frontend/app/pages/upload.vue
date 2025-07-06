@@ -88,10 +88,10 @@
       </UCard>
 
       <!-- Barre de chargement Prédiction IA -->
-        <div v-if="predicting" class="flex flex-col items-center justify-center mt-4 space-y-2">
+      <div v-if="predicting" class="flex flex-col items-center justify-center mt-4 space-y-2">
         <UProgress size="xl" />
         <p class="text-sm text-[#415a77]">Prédiction IA en cours...</p>
-        </div>
+      </div>
 
       <!-- Aperçu & annotation -->
       <div v-if="preview && predictionDone" class="text-center mt-8 space-y-6">
@@ -120,25 +120,25 @@
             :disabled="loading"
           />
 
-          <!-- Saisie du lieu -->
-          <UInput
-            v-model="locationInput"
-            :placeholder="translations[currentLanguage].lieu"
-            icon="i-heroicons-map-pin"
-            class="w-full max-w-xs"
-            :disabled="loading"
-          />
+          <p class="text-sm font-medium text-[#415a77]">
+            {{ translations[currentLanguage].lieu }}
+          </p>
 
-            <!-- Barre de chargement Upload -->
-            <div v-if="loading" class="flex flex-col items-center justify-center mt-4 space-y-2">
-                <UProgress size="xl" />
-                <p class="text-sm text-[#415a77]">Upload en cours...</p>
-            </div>
+          <!-- Carte Leaflet pour la localisation -->
+          <div class="w-full max-w-md h-96 rounded-md overflow-hidden border shadow">
+            <div id="mapid" class="w-full h-full"></div>
+          </div>
+
+          <!-- Barre de chargement Upload -->
+          <div v-if="loading" class="flex flex-col items-center justify-center mt-4 space-y-2">
+            <UProgress size="xl" />
+            <p class="text-sm text-[#415a77]">Upload en cours...</p>
+          </div>
 
           <!-- Enregistrement -->
           <UButton
             color="primary"
-            :disabled="!annotation || annotationSaved || !locationInput || loading"
+            :disabled="!annotation || annotationSaved || loading"
             @click="saveAnnotation"
           >
             {{ translations[currentLanguage].env }}
@@ -167,7 +167,7 @@
 </template>
 
 <script setup>
-import { ref, inject, computed, onMounted } from "vue";
+import { ref, inject, computed, watch, nextTick } from "vue";
 
 const loading = ref(false);
 const predicting = ref(false);
@@ -179,155 +179,200 @@ const annotation = ref("");
 const annotationSaved = ref(false);
 const dragging = ref(false);
 const dragCounter = ref(0);
-const locationInput = ref("");
 const fileName = ref("");
 const intelligentMode = ref(false);
+
+// 🔥 localisation via Leaflet
+const lat = ref(48.8566);  // Paris par défaut
+const lon = ref(2.3522);
+let L; // Leaflet instance
+let map, marker;
 
 const translations = inject("translations");
 const currentLanguage = inject("currentLanguage");
 
+async function initializeMap() {
+  await nextTick(); // 🔥 attend que le DOM soit rendu
+
+  if (!document.getElementById("mapid")) {
+    console.error("Div #mapid introuvable pour Leaflet");
+    return;
+  }
+
+  const leaflet = await import("leaflet");
+  await import("leaflet/dist/leaflet.css");
+  L = leaflet.default;
+
+  // 🔄 Supprimer ancienne carte si elle existe (hot reload, navigation)
+  if (map) {
+    map.remove();
+    map = null;
+  }
+
+  map = L.map("mapid").setView([lat.value, lon.value], 13);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19,
+    attribution: '&copy; OpenStreetMap contributors',
+  }).addTo(map);
+
+  marker = L.marker([lat.value, lon.value], { draggable: true }).addTo(map);
+  marker.on("dragend", (e) => {
+    const pos = e.target.getLatLng();
+    lat.value = pos.lat;
+    lon.value = pos.lng;
+    console.log("Nouvelles coordonnées :", lat.value, lon.value);
+  });
+
+  map.on("click", function (e) {
+    const { lat: newLat, lng: newLng } = e.latlng;
+    marker.setLatLng(e.latlng);
+    lat.value = newLat;
+    lon.value = newLng;
+    console.log("Coordonnées sélectionnées :", lat.value, lon.value);
+  });
+}
+
+watch(predictionDone, async (newVal) => {
+  if (newVal) {
+    await initializeMap();
+  }
+});
+
 onMounted(async () => {
-    try {
-        const res = await fetch("http://localhost:8000/api/config/");
-        const data = await res.json();
-        intelligentMode.value = data.intelligent_mode;
-        console.log("Mode intelligent:", intelligentMode.value);
-    } catch (err) {
-        console.error("Erreur loadMode:", err);
-    }
+  try {
+    const res = await fetch("http://localhost:8000/api/config/");
+    const data = await res.json();
+    intelligentMode.value = data.intelligent_mode;
+    console.log("Mode intelligent:", intelligentMode.value);
+  } catch (err) {
+    console.error("Erreur loadMode:", err);
+  }
 });
 
 const annotationOptions = computed(() => [
-    { label: translations[currentLanguage.value]?.emptyLabel ?? "Vide", value: "vide", icon: "i-lucide-brush-cleaning" },
-    { label: translations[currentLanguage.value]?.fullLabel ?? "Pleine", value: "pleine", icon: "i-lucide-trash-2" },
+  { label: translations[currentLanguage.value]?.emptyLabel ?? "Vide", value: "vide", icon: "i-lucide-brush-cleaning" },
+  { label: translations[currentLanguage.value]?.fullLabel ?? "Pleine", value: "pleine", icon: "i-lucide-trash-2" },
 ]);
 
 const annotationIcon = computed(
-    () => annotationOptions.value.find((opt) => opt.value === annotation.value)?.icon
+  () => annotationOptions.value.find((opt) => opt.value === annotation.value)?.icon
 );
 
 function handleFileChange(event) {
-    const file = event.target.files[0];
-    if (file) {
-        fileName.value = file.name;
-        processFile(file);
-    }
+  const file = event.target.files[0];
+  if (file) {
+    fileName.value = file.name;
+    processFile(file);
+  }
 }
 
 function handleDrop(event) {
-    dragCounter.value = 0;
-    dragging.value = false;
-    const file = event.dataTransfer.files[0];
-    if (file) {
-        fileName.value = file.name;
-        processFile(file);
-    }
+  dragCounter.value = 0;
+  dragging.value = false;
+  const file = event.dataTransfer.files[0];
+  if (file) {
+    fileName.value = file.name;
+    processFile(file);
+  }
 }
 
 function handleDragEnter() {
-    dragCounter.value++;
-    dragging.value = true;
+  dragCounter.value++;
+  dragging.value = true;
 }
 
 function handleDragLeave() {
-    dragCounter.value--;
-    if (dragCounter.value <= 0) {
-        dragging.value = false;
-    }
+  dragCounter.value--;
+  if (dragCounter.value <= 0) {
+    dragging.value = false;
+  }
 }
 
 async function processFile(file) {
-    error.value = "";
-    preview.value = null;
-    annotation.value = "";
-    annotationSaved.value = false;
-    predictionDone.value = false;
-    selectedFile.value = file;
+  error.value = "";
+  preview.value = null;
+  annotation.value = "";
+  annotationSaved.value = false;
+  predictionDone.value = false;
+  selectedFile.value = file;
 
-    if (!file) return;
+  if (!file) return;
 
-    const validTypes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
-    if (!validTypes.includes(file.type)) {
-        error.value = translations[currentLanguage.value].err1;
-        return;
-    }
+  const validTypes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
+  if (!validTypes.includes(file.type)) {
+    error.value = translations[currentLanguage.value].err1;
+    return;
+  }
 
-    if (file.size > 5 * 1024 * 1024) {
-        error.value = translations[currentLanguage.value].err2;
-        return;
-    }
+  if (file.size > 5 * 1024 * 1024) {
+    error.value = translations[currentLanguage.value].err2;
+    return;
+  }
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        const img = new Image();
-        img.onload = async () => {
-            if (img.width < 500 || img.height < 500) {
-                error.value = translations[currentLanguage.value].err3;
-            } else {
-                preview.value = e.target.result;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const img = new Image();
+    img.onload = async () => {
+      if (img.width < 500 || img.height < 500) {
+        error.value = translations[currentLanguage.value].err3;
+      } else {
+        preview.value = e.target.result;
 
-                if (intelligentMode.value) {
-                    predicting.value = true;
-                    try {
-                        // 🔥 Nouveau : prédiction sans upload
-                        const formData = new FormData();
-                        formData.append("image", file);
+        if (intelligentMode.value) {
+          predicting.value = true;
+          try {
+            const formData = new FormData();
+            formData.append("image", file);
 
-                        const res = await fetch("http://localhost:8000/img/predict_only/", {
-                            method: "POST",
-                            body: formData,
-                        });
+            const res = await fetch("http://localhost:8000/img/predict_only/", {
+              method: "POST",
+              body: formData,
+            });
 
-                        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                        const data = await res.json();
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const data = await res.json();
 
-                        console.log("Prédiction IA reçue :", data.prediction);
+            console.log("Prédiction IA reçue :", data.prediction);
 
-                        if (data.prediction !== null && data.prediction !== undefined) {
-                            annotation.value = data.prediction === 1 ? "pleine" : "vide";
-                        }
-                    } catch (err) {
-                        console.error("Erreur prédiction IA :", err);
-                    } finally {
-                        predicting.value = false;
-                        predictionDone.value = true;
-                    }
-                } else {
-                    predictionDone.value = true;
-                }
+            if (data.prediction !== null && data.prediction !== undefined) {
+              annotation.value = data.prediction === 1 ? "pleine" : "vide";
             }
-        };
-        img.src = e.target.result;
+          } catch (err) {
+            console.error("Erreur prédiction IA :", err);
+          } finally {
+            predicting.value = false;
+            predictionDone.value = true;
+          }
+        } else {
+          predictionDone.value = true;
+        }
+      }
     };
-    reader.readAsDataURL(file);
-}
-
-async function geocodeLocation(place) {
-    const url = `http://localhost:8000/api/geocode_proxy/?place=${encodeURIComponent(place)}`;
-    const response = await fetch(url);
-    const results = await response.json();
-    if (results.length === 0) {
-        throw new Error(translations[currentLanguage.value].err4);
-    }
-    const result = results[0];
-    return {
-        lat: parseFloat(result.lat),
-        lon: parseFloat(result.lon),
-        city: result.display_name.split(',')[0]
-    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
 }
 
 async function saveAnnotation() {
-  if (!selectedFile.value || !locationInput.value || !annotation.value) {
+  if (!selectedFile.value || !annotation.value) {
     error.value = translations[currentLanguage.value].err5;
     return;
   }
 
-  loading.value = true; // 🔥 active loading
+  loading.value = true;
   annotationSaved.value = true;
 
   try {
-    const location = await geocodeLocation(locationInput.value);
+    // 🔄 Reverse geocoding pour récupérer la ville
+    let city = "Unknown";
+    try {
+      const url = `http://localhost:8000/api/reverse_geocode_proxy/?lat=${lat.value}&lon=${lon.value}`;
+      const res = await fetch(url);
+      const data = await res.json();
+      city = data.address.city || data.address.town || data.address.village || "Unknown";
+    } catch (e) {
+      console.error("Erreur reverse geocoding :", e);
+    }
 
     const formData = new FormData();
     formData.append("image", selectedFile.value);
@@ -339,11 +384,10 @@ async function saveAnnotation() {
 
     const annotationValue = annotation.value === "pleine" ? 1 : 0;
     formData.append("Annotation", annotationValue);
-    formData.append("Latitude", location.lat);
-    formData.append("Longitude", location.lon);
-    formData.append("City", location.city);
+    formData.append("Latitude", lat.value);
+    formData.append("Longitude", lon.value);
+    formData.append("City", city);
 
-    // ✅ N'ajoute Prediction_IA que si intelligentMode est actif
     if (intelligentMode.value) {
       formData.append("Prediction_IA", annotationValue);
     }
@@ -359,12 +403,12 @@ async function saveAnnotation() {
     console.error("Erreur :", err.message);
     annotationSaved.value = false;
   } finally {
-    loading.value = false; // 🔥 désactive loading
+    loading.value = false;
   }
 }
 
 function resetAnnotation() {
-    annotation.value = "";
-    annotationSaved.value = false;
+  annotation.value = "";
+  annotationSaved.value = false;
 }
 </script>
