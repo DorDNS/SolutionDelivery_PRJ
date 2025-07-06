@@ -134,6 +134,7 @@ const translations = {
         constraintsFormDesctiption:
             "Pour désactiver une règle, attribuez lui un score de zéro.",
         save: "Enregistrer",
+        relanceCond: "Relancer la prédiction sur toutes les images",
     },
     en: {
         //Header
@@ -253,6 +254,7 @@ const translations = {
         modeman: "Manual mode enabled",
         save: "Save",
         relanceIA: "Relaunch AI prediction on all images",
+        relanceCond: "Relaunch prediction on all images",
     },
     ar: {
         //Header
@@ -366,6 +368,7 @@ const translations = {
         modeman: "تم تفعيل الوضع اليدوي",
         save: "حفظ",
         relanceIA: "إعادة تشغيل تنبؤات الذكاء الاصطناعي على جميع الصور",
+        relanceCond: "إعادة تشغيل التنبؤ على جميع الصور",
     },
 };
 

@@ -59,6 +59,18 @@
 
             <!-- Formulaire de contraintes -->
             <div v-if="!intelligentMode" class="space-y-4">
+                <UButton
+                    color="primary"
+                    variant="solid"
+                    size="md"
+                    icon="i-lucide-sparkles"
+                    @click="confirmRelanceCond"
+                >
+                    {{
+                        translations[currentLanguage]?.relanceCond ??
+                        "Relancer la prédiction sur toutes les images"
+                    }}
+                </UButton>
                 <div
                     v-for="(rule, index) in constraints"
                     :key="rule.id"
@@ -255,6 +267,28 @@ async function relancerPredictionIA() {
     } catch (err) {
         console.error("Erreur relancerPredictionIA:", err);
         alert("❌ Erreur lors de la relance des prédictions IA.");
+    }
+}
+
+async function relancerPredictionCond() {
+    try {
+        const res = await axios.post(
+            "http://localhost:8000/img/predict_cond_all/"
+        );
+        alert("✅ Prédictions IA relancées avec succès.");
+    } catch (err) {
+        console.error("Erreur relancerPredictionIA:", err);
+        alert("❌ Erreur lors de la relance des prédictions IA.");
+    }
+}
+
+function confirmRelanceCond() {
+    if (
+        confirm(
+            "⚠️ Cette action va relancer la prédiction connditionelles sur toutes les images.\nContinuer ?"
+        )
+    ) {
+        relancerPredictionCond();
     }
 }
 

@@ -51,6 +51,8 @@ urlpatterns = [
     path('api/config/update/',   v.update_app_config),
 
     path('img/predict_crops_all/', v.predict_crops_all),
+    path('img/predict_cond_all/', v.predict_cond_all),
+    
     path('img/predict_missing_crops/', v.predict_missing_crops),
     path('api/geocode_proxy/', v.geocode_proxy),
     path('api/reverse_geocode_proxy/', v.reverse_geocode_proxy),

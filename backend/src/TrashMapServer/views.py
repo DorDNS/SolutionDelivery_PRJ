@@ -1,5 +1,5 @@
 import TrashMapServer.settings as s
-import TrashMapServer.model_classification as models
+import TrashMapServer.model_classification as mdl
 from django.http import FileResponse, HttpResponse, JsonResponse, HttpResponseNotFound, HttpResponseBadRequest
 import sqlite3
 import datetime
@@ -15,6 +15,7 @@ import mimetypes
 from threading import Thread
 import requests
 from TrashMapServer import deep_model
+import pandas as pd
 
 def dashboard(request):
     db_path = os.path.join(s.BASE_DIR, 'db.sqlite3')
@@ -864,3 +865,34 @@ def count_images_without_prediction(request):
         cursor.execute("SELECT COUNT(*) FROM Image WHERE Status_DeepIA IS NULL")
         count = cursor.fetchone()[0]
     return JsonResponse({"count": count})
+
+# ---- Model Cond
+@csrf_exempt
+def predict_cond_all(request):
+    db_path = os.path.join(s.BASE_DIR, 'db.sqlite3')
+    with sqlite3.connect(db_path) as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM Image WHERE Status_CondIA IS NULL")
+        image_data = cursor.fetchall()
+        # preprocessing
+        # Conversion en DataFrame avec noms de colonnes explicites
+        image_data = pd.DataFrame(image_data, columns=[
+            "Id_Image", "File_name", "File_path", "Size", "Height", "Width", "Date_taken",
+            "Avg_R", "Avg_G", "Avg_B", "Contrast_level", "RGB_Histogram", "Luminance_Histogram",
+            "Edges", "Status", "Status_CondIA", "Status_DeepIA"
+        ])
+
+        image_data[["Max_Red_Index", "Max_Green_Index", "Max_Blue_Index"]] = image_data["RGB_Histogram"].apply(mdl.extract_max_indices)
+        image_data["sum_rgb"] = image_data[["Avg_R", "Avg_G", "Avg_B"]].astype(float).sum(axis=1)
+        image_data.drop(columns=["File_name", "File_path", "Date_taken", "RGB_Histogram", "Luminance_Histogram", "Height", "Width"], inplace=True)
+        image_data = image_data.astype(float)
+
+        cursor.execute("SELECT * FROM ClassificationConstraints")
+        rules = cursor.fetchall()
+
+        for data in image_data:
+            data["Predicted_Status"] = mdl.predict_status(data, rules) # le resultat bien sauvé dans le df ?
+        
+        # savuvegarder dans la database pour chaque image avec l'id.
+
+        return HttpResponse("ok")
