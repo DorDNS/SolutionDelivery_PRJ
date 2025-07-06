@@ -59,31 +59,49 @@
 
             <!-- Formulaire de contraintes -->
             <div v-if="!intelligentMode">
-                <form
+                <UForm
+                    :state="constraints"
                     @submit.prevent="submitConstraints"
-                    class="grid gap-4 max-w-4xl mx-auto"
+                    class="space-y-6 max-w-4xl mx-auto"
                 >
                     <div
-                        v-for="field in Object.keys(constraints)"
-                        :key="field"
-                        class="grid grid-cols-2 gap-2"
+                        v-for="(rule, index) in constraints"
+                        :key="rule.id"
+                        class="grid grid-cols-4 gap-4 items-center"
                     >
-                        <label class="font-semibold capitalize text-[#1b263b]">
-                            {{ field.replaceAll("_", " ") }}
-                        </label>
-                        <input
-                            v-model="constraints[field]"
-                            :type="getInputType(constraints[field])"
-                            class="border border-gray-300 rounded px-2 py-1"
+                        <!-- Feature -->
+                        <UInput
+                            v-model="rule.feature"
+                            label="Feature"
+                            placeholder="e.g. Avg_B"
+                        />
+
+                        <!-- Operator -->
+                        <USelect
+                            v-model="rule.operator"
+                            :options="['>', '<', '>=', '<=', '==']"
+                            label="Operator"
+                        />
+
+                        <!-- Threshold -->
+                        <UInput
+                            v-model="rule.threshold"
+                            type="number"
+                            label="Threshold"
+                        />
+
+                        <!-- Score -->
+                        <UInput
+                            v-model="rule.score"
+                            type="number"
+                            step="0.01"
+                            label="Score"
                         />
                     </div>
-                    <button
-                        type="submit"
-                        class="mt-4 bg-blue-600 text-white px-4 py-2 rounded"
-                    >
+                    <UButton type="submit">
                         {{ translations[currentLanguage].save }}
-                    </button>
-                </form>
+                    </UButton>
+                </UForm>
             </div>
 
             <div v-if="message" class="mt-4 text-green-600 text-center">
@@ -98,6 +116,7 @@ import { ref, inject, onMounted, watch } from "vue";
 import axios from "axios";
 
 const constraints = ref({});
+const operators = [">", "<", ">=", "<=", "=="];
 const intelligentMode = ref(true);
 const isInitializing = ref(true); // ✅ ajouter l'initialisation
 const message = ref("");
