@@ -30,29 +30,16 @@ CREATE TABLE Location(
 );
 
 CREATE TABLE ClassificationConstraints (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-
-    min_size FLOAT,
-    max_size FLOAT,
-
-    min_height INT,
-    max_height INT,
-
-    min_width INT,
-    max_width INT,
-
-    min_avg_r FLOAT,
-    max_avg_r FLOAT,
-
-    min_avg_g FLOAT,
-    max_avg_g FLOAT,
-
-    min_avg_b FLOAT,
-    max_avg_b FLOAT,
-
-    min_contrast FLOAT,
-    max_contrast FLOAT,
-
-    min_edges INT,
-    max_edges INT
+   id INTEGER PRIMARY KEY AUTOINCREMENT,
+   feature VARCHAR(64),
+   operator VARCHAR(16),
+   threshold INT,
+   SCORE FLOAT
 );
+
+INSERT INTO ClassificationConstraints (feature, operator, threshold, SCORE) VALUES
+('Size', '>', 500, 0.26),
+('Avg_B', '>', 85, 0.115),
+('Contrast_level', '>', 50, 0.5),
+('Edges', '>', 65000, 0.29),
+('Max_Blue_Index', '>', 200, 0.12);
