@@ -58,50 +58,77 @@
             </div>
 
             <!-- Formulaire de contraintes -->
-            <div v-if="!intelligentMode">
-                <UForm
-                    :state="constraints"
-                    @submit.prevent="submitConstraints"
-                    class="space-y-6 max-w-4xl mx-auto"
+            <div v-if="!intelligentMode" class="space-y-4">
+                <div
+                    v-for="(rule, index) in constraints"
+                    :key="rule.id"
+                    class="border border-gray-200 rounded-xl p-4 shadow-sm bg-gray-50"
                 >
-                    <div
-                        v-for="(rule, index) in constraints"
-                        :key="rule.id"
-                        class="grid grid-cols-4 gap-4 items-center"
-                    >
-                        <!-- Feature -->
-                        <UInput
-                            v-model="rule.feature"
-                            label="Feature"
-                            placeholder="e.g. Avg_B"
+                    <div class="flex justify-between items-center mb-2">
+                        <p>
+                            SI {{ rule.feature }} {{ rule.operator }}
+                            {{ rule.threshold }} → la poubelle est pleine. Score
+                            :
+                            <span class="font-bold text-blue-700">{{
+                                rule.score
+                            }}</span>
+                        </p>
+                        <UButton
+                            :label="openForm === index ? 'Fermer' : 'Modifier'"
+                            color="gray"
+                            variant="ghost"
+                            size="sm"
+                            @click="toggleForm(index)"
+                            style="cursor: pointer"
+                            icon="i-lucide-edit"
                         />
+                    </div>
 
+                    <div
+                        v-if="openForm === index"
+                        class="grid grid-cols-1 md:grid-cols-4 gap-4 items-center mt-4"
+                    >
                         <!-- Operator -->
                         <USelect
                             v-model="rule.operator"
-                            :options="['>', '<', '>=', '<=', '==']"
-                            label="Operator"
+                            :options="operators"
+                            label="Opérateur"
+                            :aria-hidden="false"
                         />
 
                         <!-- Threshold -->
                         <UInput
-                            v-model="rule.threshold"
+                            v-model.number="rule.threshold"
                             type="number"
-                            label="Threshold"
+                            label="Seuil"
+                            icon="i-lucide-sliders"
                         />
 
                         <!-- Score -->
                         <UInput
-                            v-model="rule.score"
+                            v-model.number="rule.score"
                             type="number"
                             step="0.01"
                             label="Score"
+                            icon="i-lucide-percent"
                         />
+
+                        <UButton
+                            color="primary"
+                            icon="i-lucide-check-circle"
+                            size="md"
+                            class="mt-1"
+                            @click="submitConstraint(rule)"
+                        >
+                            {{ translations[currentLanguage].save }}
+                        </UButton>
                     </div>
-                    <UButton type="submit">
-                        {{ translations[currentLanguage].save }}
-                    </UButton>
-                </UForm>
+                </div>
+                <span>
+                    {{
+                        translations[currentLanguage].constraintsFormDesctiption
+                    }}
+                </span>
             </div>
 
             <div v-if="message" class="mt-4 text-green-600 text-center">
@@ -118,13 +145,17 @@ import axios from "axios";
 const constraints = ref({});
 const operators = [">", "<", ">=", "<=", "=="];
 const intelligentMode = ref(true);
-const isInitializing = ref(true); // ✅ ajouter l'initialisation
+const isInitializing = ref(true);
 const message = ref("");
 
 const currentLanguage = inject("currentLanguage");
 const translations = inject("translations");
 
-// 🍀 Charger l'état du switch
+const openForm = ref(null);
+const toggleForm = (index) => {
+    openForm.value = openForm.value === index ? null : index;
+};
+
 async function loadMode() {
     try {
         const res = await axios.get("http://localhost:8000/api/config/");
@@ -133,11 +164,10 @@ async function loadMode() {
     } catch (err) {
         console.error("Erreur loadMode:", err);
     } finally {
-        isInitializing.value = false; // ✅ terminer l'initialisation après le chargement
+        isInitializing.value = false;
     }
 }
 
-// 📦 Charger les contraintes existantes
 async function getConstraints() {
     try {
         const res = await axios.get("http://localhost:8000/api/constraints/");
@@ -147,12 +177,12 @@ async function getConstraints() {
     }
 }
 
-// 💾 Enregistrer les contraintes modifiées
-async function submitConstraints() {
+async function submitConstraint(constraint) {
     try {
+        console.log(constraint);
         await axios.post(
             "http://localhost:8000/api/constraints/update/",
-            constraints.value
+            constraint
         );
         message.value = translations[currentLanguage].savedSuccess;
     } catch (err) {
@@ -161,9 +191,8 @@ async function submitConstraints() {
     }
 }
 
-// 🎯 Détecter un changement de switch et persister
 watch(intelligentMode, async (newVal) => {
-    if (isInitializing.value) return; // 🔥 ignore le set initial
+    if (isInitializing.value) return;
     console.log("Sauvegarde mode intelligent :", newVal);
     try {
         await axios.post("http://localhost:8000/api/config/update/", {
@@ -174,7 +203,6 @@ watch(intelligentMode, async (newVal) => {
     }
 });
 
-// 🛠 pour déterminer le type d’input
 function getInputType(value) {
     if (typeof value === "number" && Number.isInteger(value)) return "number";
     else if (typeof value === "number") return "number";
@@ -183,7 +211,6 @@ function getInputType(value) {
     else return "text";
 }
 
-// ✅ Relancer prédiction IA sur toutes les images avec confirmation
 async function relancerPredictionIA() {
     try {
         const res = await axios.post(
