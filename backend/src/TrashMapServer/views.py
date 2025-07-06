@@ -123,7 +123,6 @@ def crop_trash_region(image_path, detections, classes_to_keep=['Trash', 'Trash-c
     cropped_img = img.crop((left, top, right, bottom))
     return cropped_img
 
-
 @csrf_exempt
 def upload_img(request):
     if request.method != 'POST':
@@ -139,7 +138,7 @@ def upload_img(request):
     os.makedirs(upload_dir, exist_ok=True)
     file_path = os.path.join("Data", "uploads", file_name)
     full_path = os.path.join(s.MEDIA_ROOT, file_path)
-    file_path = "uploads/"+ file_name + ".webp"
+
     image_bytes = image.read()
     try:
         image_pil = PILImage.open(io.BytesIO(image_bytes)).convert("RGB")
@@ -153,6 +152,7 @@ def upload_img(request):
     latitude = request.POST.get('Latitude')
     longitude = request.POST.get('Longitude')
     city = request.POST.get('City')
+    prediction_ia = request.POST.get('Prediction_IA')  # 🔥 nouvelle ligne
 
     db_path = os.path.join(s.BASE_DIR, 'db.sqlite3')
     with sqlite3.connect(db_path) as conn:
@@ -168,7 +168,7 @@ def upload_img(request):
                     Id_Image, File_name, File_path, Size, Height, Width, Date_taken, Status
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """, (new_id, file_name, file_path, size, 0, 0, date_taken, int(status) if status else 0))
-            id_image = cursor.lastrowid
+            id_image = new_id
 
             if latitude and longitude and city:
                 cursor.execute("""
@@ -180,11 +180,102 @@ def upload_img(request):
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=500)
 
-    # Lance le traitement asynchrone avec crop et features
-    Thread(target=process_features_async, args=(id_image, full_path)).start()
+    # 🔥 Traitement synchrone complet : crop + features
+    process_features_sync(id_image, full_path)
 
-    return JsonResponse({"message": "Image uploaded", "Id_Image": id_image})
+    prediction_result = None
 
+    if prediction_ia is not None:
+        # 🔥 Utiliser la prédiction locale transmise
+        status_ia = int(prediction_ia)
+        with sqlite3.connect(db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute("UPDATE Image SET Status_DeepIA = ?, Status = ? WHERE Id_Image = ?", (status_ia, status_ia, id_image))
+            conn.commit()
+        prediction_result = status_ia
+
+    else:
+        # 🔥 SI mode intelligent activé, prédire immédiatement et maj Status_DeepIA
+        intelligent_mode = False
+        config_db = os.path.join(s.BASE_DIR, 'db.sqlite3')
+        with sqlite3.connect(config_db) as conn:
+            cur = conn.cursor()
+            cur.execute("SELECT value FROM AppConfig WHERE key='intelligent_mode'")
+            row = cur.fetchone()
+            intelligent_mode = bool(int(row[0])) if row else False
+
+        if intelligent_mode:
+            crop_path = os.path.join(s.MEDIA_ROOT, "Data", "crops", f"crop_{id_image}.webp")
+            if os.path.exists(crop_path):
+                pred = deep_model.predict_image(crop_path)
+                status_ia = int(pred)  # True -> 1, False -> 0
+
+                with sqlite3.connect(db_path) as conn:
+                    cursor = conn.cursor()
+                    cursor.execute("UPDATE Image SET Status_DeepIA = ?, Status = ? WHERE Id_Image = ?", (status_ia, status_ia, id_image))
+                    conn.commit()
+
+                prediction_result = status_ia
+
+    return JsonResponse({
+        "message": "Image uploaded",
+        "Id_Image": id_image,
+        "prediction_ia": prediction_result
+    })
+
+
+def process_features_sync(id_image, full_path):
+    try:
+        detections = call_roboflow_api(full_path)
+
+        cropped_img = crop_trash_region(full_path, detections)
+        if cropped_img is None:
+            print(f"Aucune détection Trash/Trash-can pour image {id_image}, extraction features sur image complète.")
+            cropped_img = PILImage.open(full_path)
+            
+        crop_dir = os.path.join(s.MEDIA_ROOT, "Data", "crops")
+        os.makedirs(crop_dir, exist_ok=True)
+        crop_file_name = f"crop_{id_image}.webp"
+        crop_path = os.path.join(crop_dir, crop_file_name)
+        cropped_img.save(crop_path, format="WEBP", quality=80)
+
+        image_cv2 = cv2.cvtColor(np.array(cropped_img), cv2.COLOR_RGB2BGR)
+        gray = cv2.cvtColor(image_cv2, cv2.COLOR_BGR2GRAY)
+
+        def mean_color(img):
+            mean = cv2.mean(img)
+            return {'blue': mean[0], 'green': mean[1], 'red': mean[2]}
+
+        def compute_histograms():
+            return {
+                'rgb': {
+                    col: cv2.calcHist([image_cv2], [2 - i], None, [256], [0, 256]).flatten().tolist()
+                    for i, col in enumerate(['red', 'green', 'blue'])
+                },
+                'luminance': cv2.calcHist([gray], [0], None, [256], [0, 256]).flatten().tolist()
+            }
+
+        height, width = gray.shape[:2]
+        avg_rgb = mean_color(image_cv2)
+        contrast_level = float(np.std(gray))
+        edges = int(np.sum(cv2.Canny(gray, 100, 200) > 0))
+        hists = compute_histograms()
+
+        with sqlite3.connect(os.path.join(s.BASE_DIR, 'db.sqlite3')) as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                UPDATE Image SET
+                    Height = ?, Width = ?, Avg_R = ?, Avg_G = ?, Avg_B = ?,
+                    Contrast_level = ?, RGB_Histogram = ?, Luminance_Histogram = ?, Edges = ?
+                WHERE Id_Image = ?
+            """, (
+                height, width, avg_rgb['red'], avg_rgb['green'], avg_rgb['blue'],
+                contrast_level, json.dumps(hists['rgb']), json.dumps(hists['luminance']), edges, id_image
+            ))
+            conn.commit()
+
+    except Exception as e:
+        print(f"Erreur traitement sync pour image {id_image} : {e}")
 
 def process_features_async(id_image, full_path):
     try:
@@ -712,3 +803,48 @@ def predict_missing_crops(request):
     except Exception as e:
         print(f"[ERROR] predict_missing_crops : {e}")
         return HttpResponseBadRequest(f"Erreur : {e}")
+    
+@csrf_exempt
+def predict_only(request):
+    """
+    Prédit le statut d'une image sans l'enregistrer en base.
+    """
+    if request.method != 'POST':
+        return HttpResponseBadRequest("Only POST allowed")
+    
+    image = request.FILES.get('image')
+    if not image:
+        return HttpResponseBadRequest("No image provided")
+    
+    try:
+        image_pil = PILImage.open(image).convert("RGB")
+        temp_path = os.path.join(s.MEDIA_ROOT, "temp_predict.webp")
+        image_pil.save(temp_path, format="WEBP", quality=80)
+
+        crop_path = temp_path  # utilise temp si besoin d'un crop complet
+        pred = deep_model.predict_image(crop_path)
+        os.remove(temp_path)
+
+        return JsonResponse({"prediction": int(pred)})
+    
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+    
+@csrf_exempt
+def geocode_proxy(request):
+    if request.method != 'GET':
+        return HttpResponseBadRequest("Only GET allowed")
+    
+    place = request.GET.get('place')
+    if not place:
+        return JsonResponse({'error': 'Missing place parameter'}, status=400)
+
+    url = f"https://nominatim.openstreetmap.org/search?format=json&q={place}"
+
+    try:
+        headers = {'User-Agent': 'YourAppName/1.0'}
+        response = requests.get(url, headers=headers)
+        data = response.json()
+        return JsonResponse(data, safe=False)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)

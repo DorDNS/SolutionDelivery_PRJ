@@ -1,155 +1,177 @@
 <template>
+  <div
+    class="min-h-[calc(100vh-64px-80px)] py-16 px-4 bg-white relative"
+    @dragenter.prevent="handleDragEnter"
+    @dragleave.prevent="handleDragLeave"
+    @dragover.prevent
+    @drop.prevent="handleDrop"
+  >
+    <!-- Zone Drag & Drop -->
     <div
-        class="min-h-[calc(100vh-64px-80px)] py-16 px-4 bg-white relative"
-        @dragenter.prevent="handleDragEnter"
-        @dragleave.prevent="handleDragLeave"
-        @dragover.prevent
-        @drop.prevent="handleDrop"
+      v-if="dragging"
+      class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50"
     >
-        <!-- Zone Drag & Drop -->
+      <div
+        class="bg-white px-6 py-10 rounded-xl shadow-xl border-2 border-dashed border-[#778da9] text-center space-y-4"
+      >
+        <UIcon
+          name="i-heroicons-arrow-down-tray"
+          class="text-[#415a77] w-12 h-12 mx-auto"
+        />
+        <p class="text-lg text-[#1b263b] font-semibold">
+          {{ translations[currentLanguage].drag }}
+        </p>
+        <p class="text-sm text-[#778da9]">
+          JPG/JPEG/PNG/WEBP — 5 Mo max — min. 500×500 px
+        </p>
+      </div>
+    </div>
+
+    <UContainer class="max-w-xl mx-auto space-y-8">
+      <!-- Titre -->
+      <div class="text-center">
+        <h1 class="text-3xl font-bold text-[#1b263b]">
+          {{ translations[currentLanguage].upload }}
+        </h1>
         <div
-            v-if="dragging"
-            class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50"
+          class="mt-2 text-[#415a77] text-sm flex items-center justify-center gap-2"
         >
-            <div
-                class="bg-white px-6 py-10 rounded-xl shadow-xl border-2 border-dashed border-[#778da9] text-center space-y-4"
+          <UIcon
+            name="i-heroicons-information-circle"
+            class="w-4 h-4 text-[#778da9]"
+          />
+          <span>
+            {{ translations[currentLanguage].fromat }}<strong>JPG/JPEG/PNG/WEBP</strong> —
+            max <strong>5 Mo</strong> — min
+            <strong>500×500 px</strong>
+          </span>
+        </div>
+      </div>
+
+      <!-- Upload -->
+      <UCard>
+        <div class="space-y-4">
+          <label class="block font-medium text-[#1b263b]">
+            {{ translations[currentLanguage].img }}
+          </label>
+          <div class="relative">
+            <!-- Label personnalisé -->
+            <label
+              for="file-upload"
+              class="w-full rounded-md border-0 placeholder:text-gray-500 
+              focus:outline-none disabled:cursor-not-allowed disabled:opacity-75 
+              transition-colors px-3 py-2 text-sm gap-1.5 text-gray-600 
+              bg-default ring ring-inset ring-accented file:me-1.5 file:font-medium 
+              file:text-gray-400 file:outline-none focus-visible:ring-2 
+              focus-visible:ring-inset focus-visible:ring-primary"
+              :class="{ 'opacity-50 cursor-not-allowed': loading }"
             >
-                <UIcon
-                    name="i-heroicons-arrow-down-tray"
-                    class="text-[#415a77] w-12 h-12 mx-auto"
-                />
-                <p class="text-lg text-[#1b263b] font-semibold">
-                    {{translations[currentLanguage].drag}}
-                </p>
-                <p class="text-sm text-[#778da9]">
-                    JPG/JPEG/PNG/WEBP — 5 Mo max — min. 500×500 px
-                </p>
-            </div>
+              <UIcon
+                name="i-heroicons-photo"
+                class="w-5 h-5 text-[#415a77] inline-block me-1 translate-y-1"
+              />
+              {{ (fileName) || (translations[currentLanguage]?.instruc ?? "Cliquez pour choisir un fichier à uploader") }}
+            </label>
+            <!-- Champ de type file caché -->
+            <UInput
+              id="file-upload"
+              type="file"
+              accept=".jpg,.jpeg,.png,.webp"
+              class="hidden"
+              icon="i-heroicons-photo"
+              @change="handleFileChange"
+              :disabled="loading"
+            />
+          </div>
+          <p v-if="error" class="text-red-600 text-sm">{{ error }}</p>
+        </div>
+      </UCard>
+
+      <!-- Barre de chargement Prédiction IA -->
+        <div v-if="predicting" class="flex flex-col items-center justify-center mt-4 space-y-2">
+        <UProgress size="xl" />
+        <p class="text-sm text-[#415a77]">Prédiction IA en cours...</p>
         </div>
 
-        <UContainer class="max-w-xl mx-auto space-y-8">
-            <!-- Titre -->
-            <div class="text-center">
-                <h1 class="text-3xl font-bold text-[#1b263b]">
-                    {{ translations[currentLanguage].upload }}
-                </h1>
-                <div
-                    class="mt-2 text-[#415a77] text-sm flex items-center justify-center gap-2"
-                >
-                    <UIcon
-                        name="i-heroicons-information-circle"
-                        class="w-4 h-4 text-[#778da9]"
-                    />
-                    <span>
-                        {{ translations[currentLanguage].fromat }}<strong>JPG/JPEG/PNG/WEBP</strong> —
-                        max <strong>5 Mo</strong> — min
-                        <strong>500×500 px</strong>
-                    </span>
-                </div>
+      <!-- Aperçu & annotation -->
+      <div v-if="preview && predictionDone" class="text-center mt-8 space-y-6">
+        <img
+          :src="preview"
+          alt="Aperçu"
+          class="max-h-[32rem] mx-auto rounded-xl shadow-lg border"
+          loading="lazy"
+        />
+
+        <div class="flex flex-col items-center space-y-6">
+          <p class="text-sm font-medium text-[#415a77]">
+            {{ translations[currentLanguage].selc }}
+          </p>
+
+          <!-- Sélecteur élégant -->
+          <USelect
+            v-model="annotation"
+            :items="annotationOptions"
+            value-key="value"
+            :icon="annotationIcon"
+            :placeholder="translations[currentLanguage].selc"
+            class="w-full max-w-xs"
+            size="lg"
+            color="primary"
+            :disabled="loading"
+          />
+
+          <!-- Saisie du lieu -->
+          <UInput
+            v-model="locationInput"
+            :placeholder="translations[currentLanguage].lieu"
+            icon="i-heroicons-map-pin"
+            class="w-full max-w-xs"
+            :disabled="loading"
+          />
+
+            <!-- Barre de chargement Upload -->
+            <div v-if="loading" class="flex flex-col items-center justify-center mt-4 space-y-2">
+                <UProgress size="xl" />
+                <p class="text-sm text-[#415a77]">Upload en cours...</p>
             </div>
 
-            <!-- Upload -->
-            <UCard>
-                <div class="space-y-4">
-                    <label class="block font-medium text-[#1b263b]"
-                        >{{ translations[currentLanguage].img }}</label
-                    >
-                    <div class="relative">
-                        <!-- Label personnalisé -->
-                        <label
-                            for="file-upload"
-                            class="w-full rounded-md border-0 placeholder:text-gray-500 
-                            focus:outline-none disabled:cursor-not-allowed disabled:opacity-75 
-                            transition-colors px-3 py-2 text-sm gap-1.5 text-gray-600 
-                            bg-default ring ring-inset ring-accented file:me-1.5 file:font-medium 
-                            file:text-gray-400 file:outline-none focus-visible:ring-2 
-                            focus-visible:ring-inset focus-visible:ring-primary"
-                        >
-                        <UIcon
-                            name="i-heroicons-photo"
-                            class="w-5 h-5 text-[#415a77] inline-block me-1 translate-y-1"
-                        />
-                        {{ (fileName) || (translations[currentLanguage]?.instruc ?? "Cliquez pour choisir un fichier à uploader") }}
-                        </label>
-                        <!-- Champ de type file caché -->
-                        <UInput
-                            id="file-upload"
-                            type="file"
-                            accept=".jpg,.jpeg,.png,.webp"
-                            class="hidden"
-                            icon="i-heroicons-photo"
-                            @change="handleFileChange"
-                        />
-                    </div>
-                    <p v-if="error" class="text-red-600 text-sm">{{ error }}</p>
-                </div>
-            </UCard>
+          <!-- Enregistrement -->
+          <UButton
+            color="primary"
+            :disabled="!annotation || annotationSaved || !locationInput || loading"
+            @click="saveAnnotation"
+          >
+            {{ translations[currentLanguage].env }}
+          </UButton>
 
-            <!-- Aperçu & annotation -->
-            <div v-if="preview" class="text-center mt-8 space-y-6">
-                <img
-                    :src="preview"
-                    alt="Aperçu"
-                    class="max-h-[32rem] mx-auto rounded-xl shadow-lg border"
-                    loading="lazy"
-                />
-
-                <div class="flex flex-col items-center space-y-6">
-                    <p class="text-sm font-medium text-[#415a77]">
-                        {{ translations[currentLanguage].selc }}
-                    </p>
-
-                    <!-- Sélecteur élégant -->
-                    <USelect
-                        v-model="annotation"
-                        :items="annotationOptions"
-                        value-key="value"
-                        :icon="annotationIcon"
-                        :placeholder="translations[currentLanguage].selc"
-                        class="w-full max-w-xs"
-                        size="lg"
-                        color="primary"
-                    />
-                    <!-- Saisie du lieu -->
-                    <UInput
-                        v-model="locationInput"
-                        :placeholder="translations[currentLanguage].lieu"
-                        icon="i-heroicons-map-pin"
-                        class="w-full max-w-xs"
-                    />
-                    <!-- Enregistrement -->
-                    <UButton
-                        color="primary"
-                        :disabled="!annotation || annotationSaved || !locationInput"
-                        @click="saveAnnotation"
-                    >
-                        {{ translations[currentLanguage].env }}
-                    </UButton>
-
-                    <div
-                        v-if="annotationSaved"
-                        class="text-sm text-[#415a77] font-semibold text-center"
-                    >
-                    <span class="text-green-600">{{ translations[currentLanguage].safe }}</span>
-                        <div class="mt-2">
-                            <UButton
-                                color="primary"
-                                variant="ghost"
-                                @click="resetAnnotation"
-                            >
-                                {{ translations[currentLanguage].modano }}
-                            </UButton>
-                        </div>
-                    </div>
-                </div>
+          <div
+            v-if="annotationSaved"
+            class="text-sm text-[#415a77] font-semibold text-center"
+          >
+            <span class="text-green-600">{{ translations[currentLanguage].safe }}</span>
+            <div class="mt-2">
+              <UButton
+                color="primary"
+                variant="ghost"
+                @click="resetAnnotation"
+                :disabled="loading"
+              >
+                {{ translations[currentLanguage].modano }}
+              </UButton>
             </div>
-        </UContainer>
-    </div>
+          </div>
+        </div>
+      </div>
+    </UContainer>
+  </div>
 </template>
 
 <script setup>
-import { ref, inject,  computed } from "vue";
+import { ref, inject, computed, onMounted } from "vue";
 
+const loading = ref(false);
+const predicting = ref(false);
+const predictionDone = ref(false);
 const selectedFile = ref(null);
 const preview = ref(null);
 const error = ref("");
@@ -159,9 +181,21 @@ const dragging = ref(false);
 const dragCounter = ref(0);
 const locationInput = ref("");
 const fileName = ref("");
+const intelligentMode = ref(false);
 
 const translations = inject("translations");
 const currentLanguage = inject("currentLanguage");
+
+onMounted(async () => {
+    try {
+        const res = await fetch("http://localhost:8000/api/config/");
+        const data = await res.json();
+        intelligentMode.value = data.intelligent_mode;
+        console.log("Mode intelligent:", intelligentMode.value);
+    } catch (err) {
+        console.error("Erreur loadMode:", err);
+    }
+});
 
 const annotationOptions = computed(() => [
     { label: translations[currentLanguage.value]?.emptyLabel ?? "Vide", value: "vide", icon: "i-lucide-brush-cleaning" },
@@ -202,11 +236,12 @@ function handleDragLeave() {
     }
 }
 
-function processFile(file) {
+async function processFile(file) {
     error.value = "";
     preview.value = null;
     annotation.value = "";
     annotationSaved.value = false;
+    predictionDone.value = false;
     selectedFile.value = file;
 
     if (!file) return;
@@ -225,11 +260,41 @@ function processFile(file) {
     const reader = new FileReader();
     reader.onload = (e) => {
         const img = new Image();
-        img.onload = () => {
+        img.onload = async () => {
             if (img.width < 500 || img.height < 500) {
                 error.value = translations[currentLanguage.value].err3;
             } else {
                 preview.value = e.target.result;
+
+                if (intelligentMode.value) {
+                    predicting.value = true;
+                    try {
+                        // 🔥 Nouveau : prédiction sans upload
+                        const formData = new FormData();
+                        formData.append("image", file);
+
+                        const res = await fetch("http://localhost:8000/img/predict_only/", {
+                            method: "POST",
+                            body: formData,
+                        });
+
+                        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                        const data = await res.json();
+
+                        console.log("Prédiction IA reçue :", data.prediction);
+
+                        if (data.prediction !== null && data.prediction !== undefined) {
+                            annotation.value = data.prediction === 1 ? "pleine" : "vide";
+                        }
+                    } catch (err) {
+                        console.error("Erreur prédiction IA :", err);
+                    } finally {
+                        predicting.value = false;
+                        predictionDone.value = true;
+                    }
+                } else {
+                    predictionDone.value = true;
+                }
             }
         };
         img.src = e.target.result;
@@ -238,7 +303,7 @@ function processFile(file) {
 }
 
 async function geocodeLocation(place) {
-    const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(place)}`;
+    const url = `http://localhost:8000/api/geocode_proxy/?place=${encodeURIComponent(place)}`;
     const response = await fetch(url);
     const results = await response.json();
     if (results.length === 0) {
@@ -252,13 +317,13 @@ async function geocodeLocation(place) {
     };
 }
 
-
 async function saveAnnotation() {
-    if (!annotation.value || !selectedFile.value || !locationInput.value) {
+    if (!selectedFile.value || !locationInput.value || !annotation.value) {
         error.value = translations[currentLanguage.value].err5;
         return;
     }
 
+    loading.value = true; // 🔥 active loading
     annotationSaved.value = true;
 
     try {
@@ -274,15 +339,10 @@ async function saveAnnotation() {
 
         const annotationValue = annotation.value === "pleine" ? 1 : 0;
         formData.append("Annotation", annotationValue);
-
         formData.append("Latitude", location.lat);
         formData.append("Longitude", location.lon);
         formData.append("City", location.city);
-
-        for (let [key, value] of formData.entries()) {
-            console.log(`${key}: ${value}`);
-        }
-
+        formData.append("Prediction_IA", annotationValue);
 
         const response = await fetch("http://localhost:8000/img/upload/", {
             method: "POST",
@@ -292,11 +352,12 @@ async function saveAnnotation() {
         if (!response.ok) throw new Error(`Erreur HTTP ${response.status}`);
         console.log(translations[currentLanguage.value].err6);
     } catch (err) {
-        console.error("Erreur : ", err.message);
+        console.error("Erreur :", err.message);
         annotationSaved.value = false;
+    } finally {
+        loading.value = false; // 🔥 désactive loading
     }
 }
-
 
 function resetAnnotation() {
     annotation.value = "";

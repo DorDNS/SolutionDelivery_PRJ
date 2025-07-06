@@ -88,7 +88,7 @@ const translations = {
     selc:"Sélectionnez l'état de la poubelle",
     lieu:"Entrez un lieu (ex: Paris)",
     env:"Envoyer",
-    safe:"Image et annotation enregistrée dans la base de données !!!",
+    safe:"Image et annotation enregistrées dans la base de données.",
     modano:"Modifier l'annotation",
     err1 : "Format non supporté. JPG/JPEG/PNG/WEBP requis.",
     err2 : "Fichier trop volumineux. 5 Mo max.",
