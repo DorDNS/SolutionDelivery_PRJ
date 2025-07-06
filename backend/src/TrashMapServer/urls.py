@@ -55,6 +55,7 @@ urlpatterns = [
     path('api/geocode_proxy/', v.geocode_proxy),
     path('api/reverse_geocode_proxy/', v.reverse_geocode_proxy),
     path('img/predict_only/', v.predict_only),
+    path('img/count_missing_predictions/', v.count_images_without_prediction),
 
 ]
 

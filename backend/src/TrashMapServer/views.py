@@ -872,3 +872,12 @@ def reverse_geocode_proxy(request):
         return JsonResponse(data, safe=False)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+    
+@csrf_exempt
+def count_images_without_prediction(request):
+    db_path = os.path.join(s.BASE_DIR, 'db.sqlite3')
+    with sqlite3.connect(db_path) as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT COUNT(*) FROM Image WHERE Status_DeepIA IS NULL")
+        count = cursor.fetchone()[0]
+    return JsonResponse({"count": count})

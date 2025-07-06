@@ -25,7 +25,7 @@
         <USwitch
           v-model="intelligentMode"
           checked-icon="i-lucide-brain-cog"
-          unchecked-icon="i-lucide-cpu"
+          unchecked-icon="i-lucide-hand"
           color="primary"
           size="lg"
         />
@@ -93,6 +93,7 @@ const constraints      = ref({})
 const intelligentMode  = ref(true)
 const isInitializing   = ref(true) // ✅ ajouter l'initialisation
 const message          = ref('')
+const missingPredictionsCount = ref(0)
 
 const currentLanguage = inject('currentLanguage')
 const translations    = inject('translations')
@@ -141,9 +142,15 @@ watch(intelligentMode, async (newVal) => {
 
     // 🔥 Si mode intelligent activé, prédire toutes les images manquantes
     if (newVal) {
-      const res = await axios.post('http://localhost:8000/img/predict_missing_crops/');
-      console.log('Prédictions IA manquantes lancées :', res.data);
-      alert('✅ Prédictions IA lancées pour toutes les images sans prédiction.');
+      await loadMissingPredictionsCount(); // 🔥 recharge le nombre avant
+
+      if (missingPredictionsCount.value > 0) {
+        const res = await axios.post('http://localhost:8000/img/predict_missing_crops/');
+        console.log('Prédictions IA manquantes lancées :', res.data);
+        alert('✅ Prédictions IA lancées pour toutes les images sans prédiction.');
+      } else {
+        console.log('Toutes les images ont déjà une prédiction IA, aucune relance nécessaire.');
+      }
     }
 
   } catch (err) {
@@ -158,6 +165,16 @@ function getInputType(value) {
   else if (typeof value === 'string' 
         && /^\d{4}-\d{2}-\d{2}$/.test(value))                    return 'date'
   else                                                           return 'text'
+}
+
+async function loadMissingPredictionsCount() {
+  try {
+    const res = await axios.get('http://localhost:8000/img/count_missing_predictions/')
+    missingPredictionsCount.value = res.data.count
+    console.log('Images sans Status_DeepIA :', missingPredictionsCount.value)
+  } catch (err) {
+    console.error('Erreur loadMissingPredictionsCount:', err)
+  }
 }
 
 // ✅ Relancer prédiction IA sur toutes les images avec confirmation
@@ -180,6 +197,7 @@ function confirmRelance() {
 onMounted(() => {
   loadMode()
   getConstraints()
+  loadMissingPredictionsCount()
 })
 </script>
 
