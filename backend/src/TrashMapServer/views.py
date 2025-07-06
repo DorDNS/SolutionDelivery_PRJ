@@ -572,47 +572,25 @@ def get_constraints(request):
 
 @csrf_exempt
 def update_constraints(request):
-    if request.method not in ['POST', 'PUT']:
+    if request.method not in ['POST']:
         return HttpResponseBadRequest("Only POST or PUT allowed")
 
     try:
         data = json.loads(request.body.decode('utf-8'))
+        id = request.POST.get('id')
+        feature = request.POST.get('feature')
+        operator = request.POST.get('operator')
+        threshold = request.POST.get('threshold')
+        score = request.POST.get('score')
+
     except json.JSONDecodeError:
         return JsonResponse({"error": "Invalid JSON body"}, status=400)
-
-    fields = [
-        'Size', 'Height', 'Width', 'Date_taken', 'Avg_R', 'Avg_G', 'Avg_B',
-        'Contrast_level', 'RGB_Histogram', 'Luminance_Histogram', 'Edges'
-    ]
-    values = [
-        data.get('Size'),
-        data.get('Height'),
-        data.get('Width'),
-        data.get('Date_taken'),
-        data.get('Avg_R'),
-        data.get('Avg_G'),
-        data.get('Avg_B'),
-        data.get('Contrast_level'),
-        json.dumps(data.get('RGB_Histogram')) if data.get('RGB_Histogram') else None,
-        json.dumps(data.get('Luminance_Histogram')) if data.get('Luminance_Histogram') else None,
-        data.get('Edges')
-    ]
 
     try:
         with sqlite3.connect(os.path.join(s.BASE_DIR, 'db.sqlite3')) as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT COUNT(*) FROM Constraints")
-            exists = cursor.fetchone()[0]
-
-            if exists:
-                placeholders = ', '.join(f + ' = ?' for f in fields)
-                cursor.execute(f"UPDATE Constraints SET {placeholders}", values)
-            else:
-                placeholders = ', '.join(['?'] * len(fields))
-                cursor.execute(
-                    f"INSERT INTO Constraints ({', '.join(fields)}) VALUES ({placeholders})",
-                    values
-                )
+            cursor.execute(("UPDATE ClassificationConstraints SET feature=?, operator=?, threshold=?, SCORE=? WHERE id=?"), 
+                           (feature, operator, threshold, score, id))
             conn.commit()
 
         return JsonResponse({"message": "Contraintes enregistrées avec succès."})
