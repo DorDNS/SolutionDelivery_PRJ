@@ -546,20 +546,17 @@ def get_constraints(request):
     try:
         with sqlite3.connect(os.path.join(s.BASE_DIR, 'db.sqlite3')) as conn:
             cursor = conn.cursor()
-            cursor.execute("SELECT * FROM Constraints LIMIT 1")
-            row = cursor.fetchone()
+            cursor.execute("SELECT * FROM ClassificationConstraints")
+            rows = cursor.fetchall()
 
-            if not row:
+            if not rows:
                 return JsonResponse({}, status=204)
 
-            columns = [desc[0] for desc in cursor.description]
-            constraints = dict(zip(columns, row))
-
-        for key in ['RGB_Histogram', 'Luminance_Histogram']:
+        """ for key in ['RGB_Histogram', 'Luminance_Histogram']:
             if constraints.get(key) and isinstance(constraints[key], str):
                 constraints[key] = json.loads(constraints[key])
-
-        return JsonResponse(constraints)
+        """
+        return JsonResponse(rows)
 
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
