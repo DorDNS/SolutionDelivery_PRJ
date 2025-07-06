@@ -318,45 +318,49 @@ async function geocodeLocation(place) {
 }
 
 async function saveAnnotation() {
-    if (!selectedFile.value || !locationInput.value || !annotation.value) {
-        error.value = translations[currentLanguage.value].err5;
-        return;
+  if (!selectedFile.value || !locationInput.value || !annotation.value) {
+    error.value = translations[currentLanguage.value].err5;
+    return;
+  }
+
+  loading.value = true; // 🔥 active loading
+  annotationSaved.value = true;
+
+  try {
+    const location = await geocodeLocation(locationInput.value);
+
+    const formData = new FormData();
+    formData.append("image", selectedFile.value);
+    formData.append("File_name", selectedFile.value.name);
+    formData.append("Height", selectedFile.value.height);
+    formData.append("Width", selectedFile.value.width);
+    formData.append("Size", selectedFile.value.size);
+    formData.append("Date_taken", new Date().toISOString().split("T")[0]);
+
+    const annotationValue = annotation.value === "pleine" ? 1 : 0;
+    formData.append("Annotation", annotationValue);
+    formData.append("Latitude", location.lat);
+    formData.append("Longitude", location.lon);
+    formData.append("City", location.city);
+
+    // ✅ N'ajoute Prediction_IA que si intelligentMode est actif
+    if (intelligentMode.value) {
+      formData.append("Prediction_IA", annotationValue);
     }
 
-    loading.value = true; // 🔥 active loading
-    annotationSaved.value = true;
+    const response = await fetch("http://localhost:8000/img/upload/", {
+      method: "POST",
+      body: formData,
+    });
 
-    try {
-        const location = await geocodeLocation(locationInput.value);
-
-        const formData = new FormData();
-        formData.append("image", selectedFile.value);
-        formData.append("File_name", selectedFile.value.name);
-        formData.append("Height", selectedFile.value.height);
-        formData.append("Width", selectedFile.value.width);
-        formData.append("Size", selectedFile.value.size);
-        formData.append("Date_taken", new Date().toISOString().split("T")[0]);
-
-        const annotationValue = annotation.value === "pleine" ? 1 : 0;
-        formData.append("Annotation", annotationValue);
-        formData.append("Latitude", location.lat);
-        formData.append("Longitude", location.lon);
-        formData.append("City", location.city);
-        formData.append("Prediction_IA", annotationValue);
-
-        const response = await fetch("http://localhost:8000/img/upload/", {
-            method: "POST",
-            body: formData,
-        });
-
-        if (!response.ok) throw new Error(`Erreur HTTP ${response.status}`);
-        console.log(translations[currentLanguage.value].err6);
-    } catch (err) {
-        console.error("Erreur :", err.message);
-        annotationSaved.value = false;
-    } finally {
-        loading.value = false; // 🔥 désactive loading
-    }
+    if (!response.ok) throw new Error(`Erreur HTTP ${response.status}`);
+    console.log(translations[currentLanguage.value].err6);
+  } catch (err) {
+    console.error("Erreur :", err.message);
+    annotationSaved.value = false;
+  } finally {
+    loading.value = false; // 🔥 désactive loading
+  }
 }
 
 function resetAnnotation() {

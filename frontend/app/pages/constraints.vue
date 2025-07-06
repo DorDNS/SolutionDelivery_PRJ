@@ -131,7 +131,6 @@ async function submitConstraints() {
   }
 }
 
-// 🎯 Détecter un changement de switch et persister
 watch(intelligentMode, async (newVal) => {
   if (isInitializing.value) return // 🔥 ignore le set initial
   console.log('Sauvegarde mode intelligent :', newVal)
@@ -139,11 +138,19 @@ watch(intelligentMode, async (newVal) => {
     await axios.post('http://localhost:8000/api/config/update/', {
       intelligent_mode: newVal
     })
+
+    // 🔥 Si mode intelligent activé, prédire toutes les images manquantes
+    if (newVal) {
+      const res = await axios.post('http://localhost:8000/img/predict_missing_crops/');
+      console.log('Prédictions IA manquantes lancées :', res.data);
+      alert('✅ Prédictions IA lancées pour toutes les images sans prédiction.');
+    }
+
   } catch (err) {
     console.error('Erreur saveMode:', err)
+    alert('❌ Erreur lors de l\'activation du mode intelligent.');
   }
 })
-
 // 🛠 pour déterminer le type d’input
 function getInputType(value) {
   if      (typeof value === 'number' && Number.isInteger(value)) return 'number'

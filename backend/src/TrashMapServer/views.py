@@ -134,10 +134,14 @@ def upload_img(request):
 
     # Sauvegarde image complète en WebP
     file_name = str(uuid.uuid4()) + ".webp"
+    
+    # Chemin relatif à MEDIA_ROOT à enregistrer en BDD (sans "Data")
+    file_path = os.path.join("uploads", file_name)
+
+    # Chemin complet pour sauvegarde du fichier (incluant "Data/uploads")
     upload_dir = os.path.join(s.MEDIA_ROOT, "Data", "uploads")
     os.makedirs(upload_dir, exist_ok=True)
-    file_path = os.path.join("Data", "uploads", file_name)
-    full_path = os.path.join(s.MEDIA_ROOT, file_path)
+    full_path = os.path.join(upload_dir, file_name)
 
     image_bytes = image.read()
     try:
