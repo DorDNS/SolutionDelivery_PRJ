@@ -15,6 +15,7 @@ import mimetypes
 from threading import Thread
 import requests
 from TrashMapServer import deep_model
+from TrashMapServer import utils
 import pandas as pd
 
 def dashboard(request):
@@ -792,7 +793,7 @@ def predict_missing_crops(request):
         return HttpResponseBadRequest(f"Erreur : {e}")
     
 @csrf_exempt
-def predict_only(request):
+def predict_only_deep(request):
     """
     Prédit le statut d'une image sans l'enregistrer en base.
     """
@@ -816,7 +817,63 @@ def predict_only(request):
     
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=500)
+
+@csrf_exempt
+def predict_only_cond(request):
+    """
+    Prédit le statut d'une image sans l'enregistrer en base.
+    """
+    if request.method != 'POST':
+        return HttpResponseBadRequest("Only POST allowed")
     
+    image = request.FILES.get('image')
+    if not image:
+        return HttpResponseBadRequest("No image provided")
+
+    try:
+        import os, uuid, io
+        from PIL import Image as PILImage
+        import sqlite3
+        import tempfile
+        import json
+        from django.conf import settings as s
+
+        # 1. Sauvegarde temporaire de l'image (en WebP)
+        temp_dir = tempfile.mkdtemp()
+        file_name = str(uuid.uuid4()) + ".webp"
+        temp_path = os.path.join(temp_dir, file_name)
+
+        image_bytes = image.read()
+        image_pil = PILImage.open(io.BytesIO(image_bytes)).convert("RGB")
+        image_pil.save(temp_path, format="WEBP", quality=80)
+
+        # 2. Extraire les features (⚠️ fonction à adapter selon ton projet)
+        features = utils.extract_features_from_path(temp_path)  # à adapter
+
+        # 3. Charger les règles conditionnelles depuis la BDD
+        rules = []
+        db_path = os.path.join(s.BASE_DIR, 'db.sqlite3')
+        with sqlite3.connect(db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT feature, operator, threshold, score FROM ClassificationConstraints")
+            rows = cursor.fetchall()
+            for row in rows:
+                rules.append({
+                    "feature": row[0],
+                    "operator": row[1],
+                    "threshold": row[2],
+                    "score": row[3],
+                })
+
+        # 4. Prédiction via le modèle conditionnel
+        pred = mdl.predict_status(features, rules)
+
+        return JsonResponse({"prediction": int(pred)})
+
+    except Exception as e:
+        print("error",e)
+        return JsonResponse({"error": str(e)}, status=500)
+  
 @csrf_exempt
 def geocode_proxy(request):
     if request.method != 'GET':

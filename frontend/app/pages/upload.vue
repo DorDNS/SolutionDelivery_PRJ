@@ -374,7 +374,7 @@ async function processFile(file) {
                         formData.append("image", file);
 
                         const res = await fetch(
-                            "http://localhost:8000/img/predict_only/",
+                            "http://localhost:8000/img/predict_only/deep/",
                             {
                                 method: "POST",
                                 body: formData,
@@ -401,7 +401,38 @@ async function processFile(file) {
                         predictionDone.value = true;
                     }
                 } else {
-                    predictionDone.value = true;
+                    predicting.value = true;
+                    try {
+                        const formData = new FormData();
+                        formData.append("image", file);
+
+                        const res = await fetch(
+                            "http://localhost:8000/img/predict_only/cond/",
+                            {
+                                method: "POST",
+                                body: formData,
+                            }
+                        );
+
+                        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                        const data = await res.json();
+
+                        console.log("Prédiction IA reçue :", data.prediction);
+
+                        if (
+                            data.prediction !== null &&
+                            data.prediction !== undefined
+                        ) {
+                            annotation.value =
+                                data.prediction === 1 ? "pleine" : "vide";
+                            predictionIAValue.value = data.prediction; // 🔥 stocke la prédiction IA
+                        }
+                    } catch (err) {
+                        console.error("Erreur prédiction IA :", err);
+                    } finally {
+                        predicting.value = false;
+                        predictionDone.value = true;
+                    }
                 }
             }
         };

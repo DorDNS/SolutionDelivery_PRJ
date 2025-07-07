@@ -52,7 +52,9 @@ urlpatterns = [
     path('img/predict_missing_crops/', v.predict_missing_crops),
     path('api/geocode_proxy/', v.geocode_proxy),
     path('api/reverse_geocode_proxy/', v.reverse_geocode_proxy),
-    path('img/predict_only/', v.predict_only),
+    path('img/predict_only/deep/', v.predict_only_deep),
+    path('img/predict_only/cond/', v.predict_only_cond),
+
     path('img/count_missing_predictions/', v.count_images_without_prediction),
 
 ]

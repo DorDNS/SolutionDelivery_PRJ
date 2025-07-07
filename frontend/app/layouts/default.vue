@@ -127,7 +127,7 @@ const translations = {
         historgb: "Histogramme RGB",
         histolum: "Histogramme de luminance",
         noimg: "Aucune image à afficher.",
-        //Contraintes
+        //Analyse IA
         constraintsTitle: "Configuration des contraintes",
         constraintsDescription:
             "Paramétrez les règles de classification et activez le mode intelligent.",
@@ -252,7 +252,7 @@ const translations = {
         historgb: "RGB Histogram",
         histolum: "Luminance Histogram",
         noimg: "No image to display.",
-        //Contraintes
+        //Analyse IA
         constraintsTitle: "Constraints Configuration",
         constraintsDescription:
             "Set classification rules and enable intelligent mode.",
@@ -370,7 +370,7 @@ const translations = {
         historgb: "RGB رسم بياني لألوان",
         histolum: "رسم بياني للسطوع",
         noimg: "لا توجد صورة لعرضها.",
-        //Contraintes
+        //Analyse IA
         constraintsTitle: "إعداد القيود",
         constraintsDescription: "اضبط قواعد التصنيف وفعّل الوضع الذكي.",
         modeint: "تم تفعيل الوضع الذكي",
