@@ -129,11 +129,15 @@
                         v-if="!intelligentMode"
                         variant="solid"
                         size="md"
-                        class="font-bold rounded-full bg-gradient-to-r from-purple-500 to-purple-300 text-white flex items-center gap-1"
+                        class="font-bold rounded-full bg-gradient-to-r from-gray-400 to-gray-300 text-white flex items-center gap-1"
                     >
-                        <UIcon name="i-lucide-sparkles" class="w-4 h-4" />
+                        <UIcon
+                            name="i-lucide-sliders-horizontal"
+                            class="w-4 h-4"
+                        />
                         {{ translations[currentLanguage].modelCond }}
                     </UBadge>
+
                     <USelect
                         v-model="annotation"
                         :items="annotationOptions"

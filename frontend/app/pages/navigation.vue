@@ -13,9 +13,7 @@
                         name="i-heroicons-eye"
                         class="w-4 h-4 text-[#778da9]"
                     />
-                    <span
-                        >{{ translations[currentLanguage].navtips }}</span
-                    >
+                    <span>{{ translations[currentLanguage].navtips }}</span>
                 </div>
             </div>
 
@@ -41,14 +39,18 @@
                                 color="gray"
                                 variant="ghost"
                                 icon="i-heroicons-chevron-left"
-                                >{{ translations[currentLanguage].prec }}</UButton
+                                >{{
+                                    translations[currentLanguage].prec
+                                }}</UButton
                             >
                             <UButton
                                 @click="suivante"
                                 color="gray"
                                 variant="ghost"
                                 icon="i-heroicons-chevron-right"
-                                >{{ translations[currentLanguage].suiv }}</UButton
+                                >{{
+                                    translations[currentLanguage].suiv
+                                }}</UButton
                             >
                         </div>
                     </div>
@@ -88,16 +90,61 @@
                                             : 'i-lucide-brush-cleaning'
                                     "
                                 >
-                                    {{ meta.Status ? translations[currentLanguage].fullLabel : translations[currentLanguage].emptyLabel }}
+                                    {{
+                                        meta.Status
+                                            ? translations[currentLanguage]
+                                                  .fullLabel
+                                            : translations[currentLanguage]
+                                                  .emptyLabel
+                                    }}
                                 </UBadge>
                                 <UBadge
-                                    v-if="intelligentMode && meta.Status_DeepIA !== null"
+                                    v-if="
+                                        intelligentMode &&
+                                        meta.Status_DeepIA !== null
+                                    "
                                     variant="solid"
                                     size="md"
                                     class="font-bold rounded-full bg-gradient-to-r from-purple-500 to-purple-300 text-white flex items-center gap-1"
                                 >
-                                    <UIcon name="i-lucide-sparkles" class="w-4 h-4" />
-                                    IA : {{ meta.Status_DeepIA ? translations[currentLanguage].fullLabel : translations[currentLanguage].emptyLabel }}
+                                    <UIcon
+                                        name="i-lucide-sparkles"
+                                        class="w-4 h-4"
+                                    />
+                                    {{
+                                        translations[currentLanguage].modelDeep
+                                    }}:
+                                    {{
+                                        meta.Status_DeepIA
+                                            ? translations[currentLanguage]
+                                                  .fullLabel
+                                            : translations[currentLanguage]
+                                                  .emptyLabel
+                                    }}
+                                </UBadge>
+                                <UBadge
+                                    v-if="
+                                        !intelligentMode &&
+                                        meta.Status_CondIA !== null
+                                    "
+                                    variant="solid"
+                                    size="md"
+                                    class="font-bold rounded-full bg-gradient-to-r from-gray-400 to-gray-300 text-white flex items-center gap-1"
+                                >
+                                    <UIcon
+                                        name="i-lucide-sliders-horizontal"
+                                        class="w-4 h-4"
+                                    />
+                                    {{
+                                        translations[currentLanguage].modelCond
+                                    }}:
+                                    {{
+                                        meta.Status_CondIA
+                                            ? translations[currentLanguage]
+                                                  .fullLabel
+                                            : translations[currentLanguage]
+                                                  .emptyLabel
+                                    }}
                                 </UBadge>
                             </div>
                         </div>
@@ -110,21 +157,50 @@
                         </h2>
                         <div class="grid grid-cols-2 gap-2">
                             <div>
-                                <strong>{{ translations[currentLanguage].date }} :</strong> {{ meta.Date_taken }}
+                                <strong
+                                    >{{
+                                        translations[currentLanguage].date
+                                    }}
+                                    :</strong
+                                >
+                                {{ meta.Date_taken }}
                             </div>
                             <div>
-                                <strong>{{ translations[currentLanguage].size }} :</strong> {{ meta.Size }} ko
+                                <strong
+                                    >{{
+                                        translations[currentLanguage].size
+                                    }}
+                                    :</strong
+                                >
+                                {{ meta.Size }} ko
                             </div>
                             <div>
-                                <strong>{{ translations[currentLanguage].dim }} :</strong> {{ meta.Width }} ×
+                                <strong
+                                    >{{
+                                        translations[currentLanguage].dim
+                                    }}
+                                    :</strong
+                                >
+                                {{ meta.Width }} ×
                                 {{ meta.Height }}
                             </div>
                             <div>
-                                <strong>{{ translations[currentLanguage].contrast }} :</strong>
+                                <strong
+                                    >{{
+                                        translations[currentLanguage].contrast
+                                    }}
+                                    :</strong
+                                >
                                 {{ meta.Contrast_level }}
                             </div>
                             <div>
-                                <strong>{{ translations[currentLanguage].edges }} :</strong> {{ meta.Edges }}
+                                <strong
+                                    >{{
+                                        translations[currentLanguage].edges
+                                    }}
+                                    :</strong
+                                >
+                                {{ meta.Edges }}
                             </div>
                         </div>
                     </div>
@@ -138,14 +214,16 @@
                             @click="openForm"
                             color="primary"
                             variant="soft"
-                            >{{ translations[currentLanguage].annoter }}</UButton
+                            >{{
+                                translations[currentLanguage].annoter
+                            }}</UButton
                         >
 
                         <div v-if="showForm" class="space-y-4 mt-4">
                             <div>
-                                <label class="block text-sm font-medium mb-1"
-                                    >{{ translations[currentLanguage].date }}</label
-                                >
+                                <label class="block text-sm font-medium mb-1">{{
+                                    translations[currentLanguage].date
+                                }}</label>
                                 <UInput
                                     v-model="formData.Date_taken"
                                     type="date"
@@ -156,7 +234,9 @@
                                 <div>
                                     <label
                                         class="block text-sm font-medium mb-1"
-                                        >{{ translations[currentLanguage].lat }}</label
+                                        >{{
+                                            translations[currentLanguage].lat
+                                        }}</label
                                     >
                                     <UInput
                                         v-model="formData.Latitude"
@@ -168,7 +248,9 @@
                                 <div>
                                     <label
                                         class="block text-sm font-medium mb-1"
-                                        >{{ translations[currentLanguage].lon }}</label
+                                        >{{
+                                            translations[currentLanguage].lon
+                                        }}</label
                                     >
                                     <UInput
                                         v-model="formData.Longitude"
@@ -179,9 +261,9 @@
                             </div>
 
                             <div>
-                                <label class="block text-sm font-medium mb-1"
-                                    >{{ translations[currentLanguage].statut }}</label
-                                >
+                                <label class="block text-sm font-medium mb-1">{{
+                                    translations[currentLanguage].statut
+                                }}</label>
                                 <USelect
                                     v-model="formData.Status"
                                     :items="statutOptions"
@@ -194,7 +276,9 @@
                                     @click="submitAnnotation"
                                     color="primary"
                                     variant="solid"
-                                    >{{ translations[currentLanguage].val }}</UButton
+                                    >{{
+                                        translations[currentLanguage].val
+                                    }}</UButton
                                 >
                             </div>
                         </div>
@@ -215,7 +299,8 @@
                                     ],
                                     datasets: [
                                         {
-                                            label: translations[currentLanguage].moyrgb,
+                                            label: translations[currentLanguage]
+                                                .moyrgb,
                                             data: [
                                                 meta.Avg_R,
                                                 meta.Avg_G,
@@ -309,7 +394,6 @@ const isSpecificImage = ref(false);
 
 const intelligentMode = ref(false);
 
-
 async function fetchImage() {
     try {
         const response = await fetch(
@@ -318,55 +402,64 @@ async function fetchImage() {
         const data = await response.json();
         totalPages.value = Math.ceil(data.total / limit);
 
-    if (data.images.length > 0) {
-      const imageId = data.images[0].Id_Image;
-      await fetchImageById(imageId);
-    } else {
-      meta.value = null;
+        if (data.images.length > 0) {
+            const imageId = data.images[0].Id_Image;
+            await fetchImageById(imageId);
+        } else {
+            meta.value = null;
+        }
+    } catch (error) {
+        console.error("Erreur de chargement des images :", error);
     }
-  } catch (error) {
-    console.error("Erreur de chargement des images :", error);
-  }
 }
 
 async function fetchImageById(id) {
-  try {
-    isSpecificImage.value = true;
+    try {
+        isSpecificImage.value = true;
 
-    if (intelligentMode.value) {
-      // Prédire les images manquantes avant de charger les métadonnées
-      await axios.post('http://localhost:8000/img/predict_missing_crops/');
+        if (intelligentMode.value) {
+            // Prédire les images manquantes avant de charger les métadonnées
+            await axios.post(
+                "http://localhost:8000/img/predict_missing_crops/"
+            );
+        }
+
+        const metaResponse = await fetch(
+            `http://localhost:8000/img/metadatas/${id}/`
+        );
+        meta.value = await metaResponse.json();
+
+        showForm.value = false;
+        formData.value = {
+            Date_taken: "",
+            Latitude: "",
+            Longitude: "",
+            Status: "false",
+        };
+    } catch (error) {
+        console.error("Erreur de chargement de l'image par ID :", error);
     }
-
-    const metaResponse = await fetch(`http://localhost:8000/img/metadatas/${id}/`);
-    meta.value = await metaResponse.json();
-
-    showForm.value = false;
-    formData.value = { Date_taken: "", Latitude: "", Longitude: "", Status: "false" };
-  } catch (error) {
-    console.error("Erreur de chargement de l'image par ID :", error);
-  }
 }
 
 async function loadIntelligentMode() {
-  try {
-    const res = await axios.get('http://localhost:8000/api/config/');
-    intelligentMode.value = res.data.intelligent_mode;
-  } catch (err) {
-    console.error('Erreur loadIntelligentMode:', err);
-  }
+    try {
+        const res = await axios.get("http://localhost:8000/api/config/");
+        intelligentMode.value = res.data.intelligent_mode;
+    } catch (err) {
+        console.error("Erreur loadIntelligentMode:", err);
+    }
 }
 
 onMounted(() => {
-  loadIntelligentMode();
-  const idFromStorage = localStorage.getItem("currentId");
-  if (idFromStorage) {
-    fetchImageById(idFromStorage);
-    localStorage.removeItem("currentId");
-  } else {
-    fetchImage();
-  }
-  window.addEventListener("keydown", handleKey);
+    loadIntelligentMode();
+    const idFromStorage = localStorage.getItem("currentId");
+    if (idFromStorage) {
+        fetchImageById(idFromStorage);
+        localStorage.removeItem("currentId");
+    } else {
+        fetchImage();
+    }
+    window.addEventListener("keydown", handleKey);
 });
 
 onBeforeUnmount(() => {
@@ -377,23 +470,23 @@ watch(currentPage, fetchImage);
 
 function suivante() {
     if (isSpecificImage.value) {
-    isSpecificImage.value = false; // Désactiver l'état spécifique
-    currentPage.value++; // Passer à la page suivante
-    fetchImage(); // Charger les images via la pagination
-  } else if (currentPage.value < totalPages.value) {
-    currentPage.value++;
-    fetchImage();
-  }
+        isSpecificImage.value = false; // Désactiver l'état spécifique
+        currentPage.value++; // Passer à la page suivante
+        fetchImage(); // Charger les images via la pagination
+    } else if (currentPage.value < totalPages.value) {
+        currentPage.value++;
+        fetchImage();
+    }
 }
 function precedente() {
     if (isSpecificImage.value) {
-    isSpecificImage.value = false; // Désactiver l'état spécifique
-    currentPage.value--; // Passer à la page précédente
-    fetchImage(); // Charger les images via la pagination
-  } else if (currentPage.value > 1) {
-    currentPage.value--;
-    fetchImage();
-  }
+        isSpecificImage.value = false; // Désactiver l'état spécifique
+        currentPage.value--; // Passer à la page précédente
+        fetchImage(); // Charger les images via la pagination
+    } else if (currentPage.value > 1) {
+        currentPage.value--;
+        fetchImage();
+    }
 }
 function handleKey(event) {
     if (event.key === "ArrowLeft") precedente();
@@ -490,8 +583,14 @@ const formData = ref({
     Status: "false",
 });
 const statutOptions = computed(() => [
-    { label: translations[currentLanguage.value]?.fullLabel ?? "Pleine", value: "true" },
-    { label: translations[currentLanguage.value]?.emptyLabel ?? "Vide", value: "false" },
+    {
+        label: translations[currentLanguage.value]?.fullLabel ?? "Pleine",
+        value: "true",
+    },
+    {
+        label: translations[currentLanguage.value]?.emptyLabel ?? "Vide",
+        value: "false",
+    },
 ]);
 
 function openForm() {
@@ -505,24 +604,27 @@ function openForm() {
 }
 
 async function submitAnnotation() {
-  try {
-    const response = await fetch(`http://localhost:8000/img/${meta.value.Id_Image}/modify/`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        Date_taken: formData.value.Date_taken,
-        Latitude: parseFloat(formData.value.Latitude),
-        Longitude: parseFloat(formData.value.Longitude),
-        Status: formData.value.Status === "true",
-      }),
-    });
-    if (!response.ok) throw new Error("Erreur lors de l'envoi");
-    showForm.value = false;
-    await fetchImageById(meta.value.Id_Image);
-    alert("Annotation sauvegardée !");
-  } catch (err) {
-    console.error(err);
-    alert("Erreur lors de l'envoi.");
-  }
+    try {
+        const response = await fetch(
+            `http://localhost:8000/img/${meta.value.Id_Image}/modify/`,
+            {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    Date_taken: formData.value.Date_taken,
+                    Latitude: parseFloat(formData.value.Latitude),
+                    Longitude: parseFloat(formData.value.Longitude),
+                    Status: formData.value.Status === "true",
+                }),
+            }
+        );
+        if (!response.ok) throw new Error("Erreur lors de l'envoi");
+        showForm.value = false;
+        await fetchImageById(meta.value.Id_Image);
+        alert("Annotation sauvegardée !");
+    } catch (err) {
+        console.error(err);
+        alert("Erreur lors de l'envoi.");
+    }
 }
 </script>
