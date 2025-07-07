@@ -20,7 +20,7 @@ const translations = {
         label: "Langue",
         headerup: "Uploader",
         headernav: "Navigation",
-        headerconstraints: "Contraintes",
+        headerconstraints: "Analyse IA",
         //footer
         footerText: "2025 TrashMap. Tous droits réservés.",
         //Index
@@ -100,6 +100,8 @@ const translations = {
         err4: "Lieu introuvable",
         err5: "Veuillez remplir tous les champs.",
         err6: "Upload réussi",
+        modelDeep: "Modèle Avancée",
+        modelCond: "Modèle Basique",
         //Navigation
         navtitle: "Navigation des images",
         navtips:
@@ -129,8 +131,8 @@ const translations = {
         constraintsTitle: "Configuration des contraintes",
         constraintsDescription:
             "Paramétrez les règles de classification et activez le mode intelligent.",
-        modeint: "Mode intelligent activé",
-        modeman: "Mode manuel activé",
+        modeint: "Mode avancée activé",
+        modeman: "Mode basique activé",
         constraintsFormDesctiption:
             "Pour désactiver une règle, attribuez lui un score de zéro.",
         save: "Enregistrer",
@@ -142,7 +144,7 @@ const translations = {
         label: "Language",
         headerup: "Upload",
         headernav: "Navigation",
-        headerconstraints: "Constraints",
+        headerconstraints: "AI Analysis",
         uploadButton: "Upload an image",
         //Footer
         footerText: "2025 TrashMap. All rights reserved.",
@@ -222,6 +224,8 @@ const translations = {
         err4: "Location not found",
         err5: "Please fill in all fields.",
         err6: "Upload successful",
+        modelDeep: "Advanced Model",
+        modelCond: "Basic Model",
         //Navigation
         navtitle: "Image Navigation",
         navtips:
@@ -252,7 +256,7 @@ const translations = {
         constraintsDescription:
             "Set classification rules and enable intelligent mode.",
         modeint: "Intelligent mode enabled",
-        modeman: "Manual mode enabled",
+        modeman: "Basic mode enabled",
         save: "Save",
         relanceIA: "Relaunch AI prediction on all images",
         relanceCond: "Relaunch prediction on all images",
@@ -263,7 +267,7 @@ const translations = {
         label: "اللغة",
         headerup: "تحميل",
         headernav: "التنقل",
-        headerconstraints: "القيود",
+        headerconstraints: "تحليل الذكاء الاصطناعي",
         //Footer
         footerText: "2025 TrashMap. جميع الحقوق محفوظة.",
         //Index
@@ -339,6 +343,8 @@ const translations = {
         err4: "الموقع غير موجود",
         err5: "يرجى ملء جميع الحقول.",
         err6: "تم التحميل بنجاح",
+        modelDeep: "النموذج المتقدم",
+        modelCond: "النموذج الأساسي",
         //Navigation
         navtitle: "تصفح الصور",
         navtips: "استخدم الأسهم أو اختصارات لوحة المفاتيح للتنقل بين الصور.",
@@ -367,7 +373,7 @@ const translations = {
         constraintsTitle: "إعداد القيود",
         constraintsDescription: "اضبط قواعد التصنيف وفعّل الوضع الذكي.",
         modeint: "تم تفعيل الوضع الذكي",
-        modeman: "تم تفعيل الوضع اليدوي",
+        modeman: "تم تمكين الوضع الأساسي",
         save: "حفظ",
         relanceIA: "إعادة تشغيل تنبؤات الذكاء الاصطناعي على جميع الصور",
         relanceCond: "إعادة تشغيل التنبؤ على جميع الصور",
