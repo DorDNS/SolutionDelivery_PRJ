@@ -133,7 +133,7 @@ const translations = {
             "Paramétrez les règles de classification et activez le mode intelligent.",
         modeint: "Mode avancé activé",
         modeman: "Mode basique activé",
-        relanceIA: "Relaunch AI prediction on all images",
+        relanceIA: "Relancer la prédiction IA sur toutes les images",
         constraintsFormDesctiption:
             "Pour désactiver une règle, attribuez lui un score de zéro.",
         save: "Enregistrer",
