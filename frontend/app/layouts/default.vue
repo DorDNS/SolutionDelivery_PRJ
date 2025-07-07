@@ -100,7 +100,7 @@ const translations = {
         err4: "Lieu introuvable",
         err5: "Veuillez remplir tous les champs.",
         err6: "Upload réussi",
-        modelDeep: "Modèle Avancée",
+        modelDeep: "Modèle Avancé",
         modelCond: "Modèle Basique",
         //Navigation
         navtitle: "Navigation des images",
@@ -131,7 +131,7 @@ const translations = {
         constraintsTitle: "Configuration des contraintes",
         constraintsDescription:
             "Paramétrez les règles de classification et activez le mode intelligent.",
-        modeint: "Mode avancée activé",
+        modeint: "Mode avancé activé",
         modeman: "Mode basique activé",
         relanceIA: "Relaunch AI prediction on all images",
         constraintsFormDesctiption:
