@@ -31,7 +31,6 @@ urlpatterns = [
     path("img/list/", v.list_images_paginated),
     path('img/locations/', v.locations_img),     # GET: Return ids and locations of images for map
     path('img/upload/', v.upload_img),           # POST: Upload an image
-    path('img/predict/', v.predict_img),         # POST: Classify image(s)
     path('img/<int:id>/modify/', v.modify_img),  # POST/PUT: Annotate/modify image
     path('img/metadatas/<int:id>/', v.img_detail),          # GET: Get all info of this image
     path('img/img/<int:id>', v.get_img),                ## GET: Get the image
@@ -39,15 +38,12 @@ urlpatterns = [
     path('api/image/<str:filename>/', v.img_by_filename),  # GET : infos via nom de fichier
     
 
-
-    # Map-related
-    path('map/predict/', v.predict_map),            # POST/GET: Predict zones in map
-
     #Constraints
     path('api/constraints/', v.get_constraints, name='get_constraints'),
     path('api/constraints/update/', v.update_constraints, name='update_constraints'),
+    path('api/constraints/reset/', v.reset_constraints, name='update_constraints'),
 
-    path('api/config/',          v.get_app_config),
+    path('api/config/', v.get_app_config),
     path('api/config/update/',   v.update_app_config),
 
     path('img/predict_crops_all/', v.predict_crops_all),

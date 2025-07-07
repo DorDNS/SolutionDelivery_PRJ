@@ -135,6 +135,7 @@ const translations = {
             "Pour désactiver une règle, attribuez lui un score de zéro.",
         save: "Enregistrer",
         relanceCond: "Relancer la prédiction sur toutes les images",
+        reinitiateRuleCond: "Réinitialiser les règles par défaut",
     },
     en: {
         //Header
@@ -255,6 +256,7 @@ const translations = {
         save: "Save",
         relanceIA: "Relaunch AI prediction on all images",
         relanceCond: "Relaunch prediction on all images",
+        reinitiateRuleCond: "Reset rules to default",
     },
     ar: {
         //Header
@@ -369,6 +371,7 @@ const translations = {
         save: "حفظ",
         relanceIA: "إعادة تشغيل تنبؤات الذكاء الاصطناعي على جميع الصور",
         relanceCond: "إعادة تشغيل التنبؤ على جميع الصور",
+        reinitiateRuleCond: "إعادة تعيين القواعد إلى الوضع الافتراضي",
     },
 };
 

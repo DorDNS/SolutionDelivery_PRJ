@@ -105,7 +105,6 @@
                             v-model="rule.operator"
                             :options="operators"
                             label="Opérateur"
-                            :aria-hidden="false"
                         />
 
                         <!-- Threshold -->
@@ -136,11 +135,20 @@
                         </UButton>
                     </div>
                 </div>
-                <span>
-                    {{
-                        translations[currentLanguage].constraintsFormDesctiption
-                    }}
-                </span>
+
+                <div class="justify-between items-center mb-2">
+                    <UButton @click="reinitiateRuleCond()">
+                        {{ translations[currentLanguage].reinitiateRuleCond }}
+                    </UButton>
+                    <div>
+                        <span>
+                            {{
+                                translations[currentLanguage]
+                                    .constraintsFormDesctiption
+                            }}
+                        </span>
+                    </div>
+                </div>
             </div>
 
             <div v-if="message" class="mt-4 text-green-600 text-center">
@@ -192,7 +200,6 @@ async function getConstraints() {
 
 async function submitConstraint(constraint) {
     try {
-        console.log(constraint);
         await axios.post(
             "http://localhost:8000/api/constraints/update/",
             constraint
@@ -201,6 +208,18 @@ async function submitConstraint(constraint) {
     } catch (err) {
         console.error("Erreur submitConstraints:", err);
         message.value = translations[currentLanguage].savedError;
+    }
+}
+
+async function reinitiateRuleCond() {
+    try {
+        await axios.post("http://localhost:8000/api/constraints/reset/");
+        alert(
+            "✅ Les prédictions conditionnelles ont été reinitialisées avec succès."
+        );
+    } catch (err) {
+        console.error("❌ Erreur lors de la relance conditionnelle :", err);
+        alert("❌ Une erreur est survenue lors de la relance conditionnelle.");
     }
 }
 

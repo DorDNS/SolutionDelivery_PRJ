@@ -341,10 +341,6 @@ def process_features_async(id_image, full_path):
     except Exception as e:
         print(f"Erreur traitement async pour image {id_image} : {e}")
 
-
-def predict_img(request):
-    return HttpResponse(models.predict())
-
 @csrf_exempt
 def modify_img(request, id):
     if request.method not in ['POST', 'PUT']:
@@ -387,10 +383,6 @@ def modify_img(request, id):
         return JsonResponse({"message": "Aucune mise à jour pour l'image"})
 
     return JsonResponse({"message": f"Image {id} mise à jour avec succès."})
-
-
-def predict_map(request):
-    return HttpResponse("Prédiction de carte à faire")
 
 
 def img_detail(request, id):
@@ -916,3 +908,38 @@ def predict_cond_all(request):
         # savuvegarder dans la database pour chaque image avec l'id.
 
         return HttpResponse("ok")
+    
+from django.views.decorators.http import require_POST
+
+@csrf_exempt
+@require_POST
+def reset_constraints(request):
+    try:
+        db_path = os.path.join(s.BASE_DIR, 'db.sqlite3')
+        with sqlite3.connect(db_path) as conn:
+            cursor = conn.cursor()
+
+            # Supprimer toutes les lignes
+            cursor.execute("DELETE FROM ClassificationConstraints")
+
+            # Réinsérer les valeurs par défaut
+            default_constraints = [
+                ('Size', '>', 500, 0.26),
+                ('Avg_B', '>', 85, 0.115),
+                ('Contrast_level', '>', 50, 0.5),
+                ('Edges', '>', 65000, 0.29),
+                ('Max_Blue_Index', '>', 200, 0.12)
+            ]
+
+            cursor.executemany(
+                "INSERT INTO ClassificationConstraints (feature, operator, threshold, SCORE) VALUES (?, ?, ?, ?)",
+                default_constraints
+            )
+
+            conn.commit()
+
+        return JsonResponse({'status': 'success', 'message': 'Contraintes réinitialisées avec succès.'})
+
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
