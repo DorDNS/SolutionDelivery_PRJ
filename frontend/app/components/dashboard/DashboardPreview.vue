@@ -25,10 +25,10 @@
       </template>
 
       <div class="flex flex-wrap gap-4 mb-4">
-        <UCheckbox v-model="showDepots" :label="translations[currentLanguage].checkboxdepots" />
-        <UCheckbox v-model="showChantiers" :label="translations[currentLanguage].checkboxchantiers" />
+        <UCheckbox v-model="showDepots" :label="translations[currentLanguage].checkboxdepots" color="info" />
+        <UCheckbox v-model="showChantiers" :label="translations[currentLanguage].checkboxchantiers" color="warning"/>
         <UCheckbox v-model="showMarches" :label="translations[currentLanguage].checkboxmarche" />
-        <UCheckbox v-model="showZones" :label="translations[currentLanguage].checkboxzones" />
+        <UCheckbox v-model="showZones" :label="translations[currentLanguage].checkboxzones" color="error" />
       </div>
 
       <CarteMarchesChantiers
