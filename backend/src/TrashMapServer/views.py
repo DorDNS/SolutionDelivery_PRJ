@@ -676,20 +676,24 @@ def update_constraints(request):
 
     try:
         data = json.loads(request.body.decode('utf-8'))
-        id = request.POST.get('id')
-        feature = request.POST.get('feature')
-        operator = request.POST.get('operator')
-        threshold = request.POST.get('threshold')
-        score = request.POST.get('score')
+        id = data.get('id')
+        feature = data.get('feature')
+        operator = data.get('operator')
+        threshold = data.get('threshold')
+        score = data.get('score')
 
+        if (id==None or data==None or feature==None or operator==None or threshold==None or score==None):
+            return JsonResponse({"error": "Invalid JSON body"}, status=400)
     except json.JSONDecodeError:
         return JsonResponse({"error": "Invalid JSON body"}, status=400)
 
     try:
+        query = "UPDATE ClassificationConstraints SET feature=?, operator=?, threshold=?, SCORE=? WHERE id=?"
         with sqlite3.connect(os.path.join(s.BASE_DIR, 'db.sqlite3')) as conn:
             cursor = conn.cursor()
-            cursor.execute(("UPDATE ClassificationConstraints SET feature=?, operator=?, threshold=?, SCORE=? WHERE id=?"), 
+            res = cursor.execute(query,
                            (feature, operator, threshold, score, id))
+            print(data.get('id'))
             conn.commit()
 
         return JsonResponse({"message": "Contraintes enregistrées avec succès."})

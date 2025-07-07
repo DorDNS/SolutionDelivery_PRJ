@@ -58,12 +58,12 @@
             </div>
 
             <!-- Formulaire de contraintes -->
-            <div v-if="!intelligentMode" class="space-y-4">
+            <div v-if="!intelligentMode" class="space-y-4 text-center">
                 <UButton
                     color="primary"
                     variant="solid"
                     size="md"
-                    icon="i-lucide-sparkles"
+                    codicon:debug-rerun
                     @click="confirmRelanceCond"
                 >
                     {{
