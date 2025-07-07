@@ -50,10 +50,7 @@
                     icon="i-lucide-sparkles"
                     @click="confirmRelance"
                 >
-                    {{
-                        translations[currentLanguage]?.relanceIA ??
-                        "Relancer prédiction IA sur toutes les images"
-                    }}
+                    {{ translations[currentLanguage]?.relanceIA }}
                 </UButton>
             </div>
 
@@ -65,11 +62,11 @@
                     size="md"
                     codicon:debug-rerun
                     @click="confirmRelanceCond"
-                >
-                    {{
-                        translations[currentLanguage]?.relanceCond ??
-                        "Relancer la prédiction sur toutes les images"
-                    }}
+                    ><UIcon
+                        name="i-lucide-sliders-horizontal"
+                        class="w-4 h-4"
+                    />
+                    {{ translations[currentLanguage]?.relanceCond }}
                 </UButton>
                 <div
                     v-for="(rule, index) in constraints"
