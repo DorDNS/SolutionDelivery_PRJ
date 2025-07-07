@@ -74,7 +74,7 @@
                     <div class="flex justify-between items-center mb-2">
                         <p>
                             SI {{ rule.feature }} {{ rule.operator }}
-                            {{ rule.threshold }} → la poubelle est pleine. Score
+                            {{ rule.threshold }} → la poubelle est pleine. Poids
                             :
                             <span class="font-bold text-blue-700">{{
                                 rule.score
@@ -97,9 +97,9 @@
                     >
                         <!-- Operator -->
                         <USelect
-                            v-model="rule.operator"
-                            :options="operators"
-                            label="Opérateur"
+                          v-model="rule.operator"
+                          :items="operatorOptions"
+                          label="Opérateur"
                         />
 
                         <!-- Threshold -->
@@ -157,8 +157,14 @@
 import { ref, inject, onMounted, watch } from "vue";
 import axios from "axios";
 
-const constraints = ref({});
-const operators = [">", "<", ">=", "<=", "=="];
+const constraints = ref([]);                            
+const operatorOptions = ref([
+  { label: ">",  value: ">"  },
+  { label: "<",  value: "<"  },
+  { label: ">=", value: ">=" },
+  { label: "<=", value: "<=" },
+  { label: "==", value: "==" },
+]);
 const intelligentMode = ref(true);
 const isInitializing = ref(true);
 const message = ref("");
