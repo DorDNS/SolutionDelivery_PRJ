@@ -885,17 +885,33 @@ def predict_cond_all(request):
             "Avg_R", "Avg_G", "Avg_B", "Contrast_level", "RGB_Histogram", "Luminance_Histogram",
             "Edges", "Status", "Status_CondIA", "Status_DeepIA"
         ])
-
         image_data[["Max_Red_Index", "Max_Green_Index", "Max_Blue_Index"]] = image_data["RGB_Histogram"].apply(mdl.extract_max_indices)
         image_data["sum_rgb"] = image_data[["Avg_R", "Avg_G", "Avg_B"]].astype(float).sum(axis=1)
         image_data.drop(columns=["File_name", "File_path", "Date_taken", "RGB_Histogram", "Luminance_Histogram", "Height", "Width"], inplace=True)
         image_data = image_data.astype(float)
 
         cursor.execute("SELECT * FROM ClassificationConstraints")
-        rules = cursor.fetchall()
+        rule_rows = cursor.fetchall()
+        rules = []
+        for row in rule_rows:
+            rules.append({
+                "id": row[0],
+                "feature": row[1],
+                "operator": row[2],
+                "threshold": float(row[3]),
+                "score": float(row[4])
+            })
+        for index, row in image_data.iterrows():
+            prediction = mdl.predict_status(row, rules)
+            image_id = int(row["Id_Image"])
 
-        for data in image_data:
-            data["Predicted_Status"] = mdl.predict_status(data, rules) # le resultat bien sauvé dans le df ?
+            cursor.execute("""
+                UPDATE Image
+                SET Status_CondIA = ?
+                WHERE Id_Image = ?
+            """, (prediction, image_id))
+
+        conn.commit()
         
         # savuvegarder dans la database pour chaque image avec l'id.
 

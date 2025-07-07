@@ -25,7 +25,7 @@ def apply_rule(row, rule):
     else:
         return False
 
-def predict_status(data, rules, threshold_score=1):
+def predict_status(data, rules, threshold_score=0.2):
     # return True == status full
     #data de type dict
     score = 0
@@ -33,4 +33,4 @@ def predict_status(data, rules, threshold_score=1):
         if apply_rule(data, rule):
             score += rule["score"]
     predicted_status = 1 if score >= threshold_score else 0
-    return predict_status
+    return predicted_status
