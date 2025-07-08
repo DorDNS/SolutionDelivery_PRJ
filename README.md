@@ -74,14 +74,54 @@ Avant de commencer, vérifiez que vous avez :
 
 Une fois que vous avez cloné ce dépôt GitHub sur votre machine, voici ce qu’il faut faire :
 
-**1. Ouvrir un terminal et se placer dans le dossier `frontend` :**
+**1. Ouvrir deux terminals pour gérer le backend et le frontend**
+
+**2. Dans votre premier terminal placez vous dans le dossier `backend`:**
+
+```bash
+cd [nom-du-projet-cloné]
+cd backend
+```
+
+**2. Et créez puis activez votre environnement python `.env`:**
+
+Pour le créer :
+```bash
+python3 -m venv .env
+```
+
+> Puis si vous êtes sous Windows : 
+```bash
+.env/Scripts/activate
+```
+
+> Sous MacOS :
+```bash
+source .env/bin/activate
+```
+
+**3. Toujours dans le dossier `backend` téléchargez les dépendances:**
+
+```bash
+pip install -r setup.txt
+```
+> Il est préférable d'opérer sous Python 3.11
+
+**4. Enfin dans le dossier `src` lancez le serveur:**
+
+```bash
+cd src
+python3 manage.py runserver
+```
+
+**5. Dans le deuxième terminal se placer dans le dossier `frontend` :**
 
 ```bash
 cd [nom-du-projet-cloné]
 cd frontend
 ```
 
-**2. Installer les dépendances du projet :**
+**6. Installer les dépendances du projet :**
 
 ```bash
 npm install
@@ -89,7 +129,7 @@ npm install
 
 > Cela va créer automatiquement le dossier `node_modules/` (qui est ignoré par Git).
 
-**3. (Facultatif) Copier le fichier `.env.example` si présent :**
+**7. (Facultatif) Copier le fichier `.env.example` si présent :**
 
 ```bash
 cp .env.example .env
@@ -97,7 +137,7 @@ cp .env.example .env
 
 > Sinon, vous pouvez créer un fichier `.env` vide ou le configurer selon les besoins ultérieurs (actuellement pas requis pour ce projet).
 
-**4. Lancer le serveur de développement Nuxt :**
+**8. Lancer le serveur de développement Nuxt :**
 
 ```bash
 npm run dev
