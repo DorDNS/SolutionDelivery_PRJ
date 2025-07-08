@@ -74,7 +74,7 @@ Avant de commencer, vérifiez que vous avez :
 
 Une fois que vous avez cloné ce dépôt GitHub sur votre machine, voici ce qu’il faut faire :
 
-**1. Ouvrir deux terminals pour gérer le backend et le frontend**
+**1. Ouvrez deux terminals pour gérer le backend et le frontend.**
 
 **2. Dans votre premier terminal placez vous dans le dossier `backend`:**
 
@@ -87,7 +87,7 @@ cd backend
 
 Pour le créer :
 ```bash
-python3 -m venv .env
+python -m venv .env
 ```
 
 > Puis si vous êtes sous Windows : 
@@ -111,7 +111,7 @@ pip install -r setup.txt
 
 ```bash
 cd src
-python3 manage.py runserver
+python manage.py runserver
 ```
 
 **5. Dans le deuxième terminal se placer dans le dossier `frontend` :**
@@ -173,9 +173,9 @@ Elle devrait s'appeler `default`.
 **3. Créer la variable pour faire fonctionner le module météo :**
 * Créer un fichier `.env` dans le dossier `frontend` (à la racine)
 * Copier-coller ceci dans ce fichier : `VITE_OPENWEATHER_API_KEY=`
-* Après le = tu copies-colles ta clé API
+* Après le = copiez-collez votre clé API
 
-**Normalement ça marche maintenant !**
+**L'activation de votre clé prendra un certain temps donc ne vous inquiétez pas si la météo ne s'affiche pas immédiatement, rafraichissez régulièrement la page après 20min**
 
 ## 🧠 Que contient le projet ?
 
@@ -184,6 +184,12 @@ Elle devrait s'appeler `default`.
 * `frontend/app/layouts/default.vue` : le layout principal avec structure page complète
 * `frontend/public/images/` : image de fond (`hero-fond.png`)
 * `frontend/nuxt.config.ts` : configuration globale de Nuxt
+* `backend/src/media` : les images stockées
+* `backend/src/TrashMapServer` : le backend principale (structure des routes/urls + scripts python logiques)
+* `backend/src/dbqlite3` : la base de données (visualisable en installant l'extension Database Client sur votre IDE)
+* `backend/src/email.json` : les emails des abonnés à la newsletter
+* `backend/src/manage.py` : la logique de server de Django
+* `backend/src/update_all_features.py` : logiques de traitement des données pour l'IA intelligente
 
 
 ## 📝 Licence
