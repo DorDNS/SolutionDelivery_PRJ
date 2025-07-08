@@ -17,6 +17,14 @@ import requests
 from TrashMapServer import deep_model
 from TrashMapServer import utils
 import pandas as pd
+from django.core.mail import send_mail
+from django.utils.timezone import now
+from .utils import generate_full_report
+from django.conf import settings
+import traceback
+from .utils import is_zone_red_from_db, generate_zone_report_from_row
+
+EMAILS_FILE = os.path.join(s.BASE_DIR, "emails.json")
 
 def dashboard(request):
     db_path = os.path.join(s.BASE_DIR, 'db.sqlite3')
@@ -225,6 +233,37 @@ def upload_img(request):
                     conn.commit()
 
                 prediction_result = status_ia
+    try:
+        with sqlite3.connect(db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT L.Latitude, L.Longitude, L.City, L.Id_Image
+                FROM Location L
+                JOIN Image I ON L.Id_Image = I.Id_Image
+                WHERE L.Id_Image = ?
+            """, (id_image,))
+            loc = cursor.fetchone()
+
+        if loc:
+            lat, lon, city, id_img = loc
+            if is_zone_red_from_db(lat, lon, id_img):
+                report = generate_zone_report_from_row(lat, lon, city, id_img)
+                try:
+                    with open(EMAILS_FILE, "r") as f:
+                        recipients = json.load(f)
+                except:
+                    recipients = []
+
+                if recipients:
+                    send_mail(
+                        subject="🚨 Nouvelle zone critique détectée - TrashMap",
+                        message=report,
+                        from_email=s.EMAIL_HOST_USER,
+                        recipient_list=recipients,
+                        fail_silently=False
+                    )
+    except Exception as e:
+        print(f"[ALERTE MAIL] Erreur : {e}")
 
     return JsonResponse({
         "message": "Image uploaded",
@@ -1000,3 +1039,79 @@ def reset_constraints(request):
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
+DB_PATH = os.path.join(settings.BASE_DIR, "db.sqlite3")  # adapte si nécessaire
+
+@csrf_exempt
+def subscribe_email(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "Méthode non autorisée"}, status=405)
+
+    try:
+        body = json.loads(request.body)
+        email = body.get("email")
+        print("---- Données reçues ----")
+        print(body)
+
+        if not email or "@" not in email:
+            return JsonResponse({"error": "Email invalide"}, status=400)
+
+        # Crée le fichier s’il n'existe pas
+        if not os.path.exists(EMAILS_FILE):
+            with open(EMAILS_FILE, "w") as f:
+                json.dump([], f)
+
+        with open(EMAILS_FILE, "r") as f:
+            emails = json.load(f)
+
+        if email not in emails:
+            emails.append(email)
+            with open(EMAILS_FILE, "w") as f:
+                json.dump(emails, f)
+
+            # Récupération directe des zones critiques via sqlite3
+            try:
+                conn = sqlite3.connect(DB_PATH)
+                cursor = conn.cursor()
+                query = """
+                    SELECT L.Id_Location, I.Id_Image, L.City, L.Latitude, L.Longitude
+                    FROM Location L
+                    JOIN Image I ON L.Id_Image = I.Id_Image
+                    WHERE I.Status = 1
+                """
+                cursor.execute(query)
+                rows = cursor.fetchall()
+                conn.close()
+
+                if rows:
+                    message_lines = ["Zones critiques détectées :"]
+                    for row in rows:
+                        id_location, id_image, city, lat, lon = row
+                        message_lines.append(
+                            f"- Zone #{id_location} (image {id_image}) à {city} → Coordonnées : ({lat}, {lon})"
+                        )
+                    message = "\n".join(message_lines)
+                else:
+                    message = "Aucune zone critique détectée actuellement."
+
+                # Envoi du mail
+                send_mail(
+                    subject="Rapport initial des zones TrashMap",
+                    message=message,
+                    from_email=settings.EMAIL_HOST_USER,
+                    recipient_list=[email],
+                    fail_silently=False,
+                )
+
+            except Exception as e:
+                print(f"ERREUR lors de l'envoi du rapport initial : {e}")
+                traceback.print_exc()
+
+            return JsonResponse({"message": "Inscription réussie"})
+
+        else:
+            return JsonResponse({"message": "Email déjà inscrit"})
+
+    except Exception as e:
+        print("ERREUR INTERNE :", e)
+        traceback.print_exc()
+        return JsonResponse({"error": "Erreur serveur"}, status=500)
