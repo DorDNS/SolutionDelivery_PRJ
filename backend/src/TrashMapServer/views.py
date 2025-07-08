@@ -255,7 +255,7 @@ def upload_img(request):
 
                 if recipients:
                     send_mail(
-                        subject="🚨 Nouvelle zone critique détectée - TrashMap",
+                        subject="Nouvelle zone critique détectée - TrashMap",
                         message=report,
                         from_email=s.EMAIL_HOST_USER,
                         recipient_list=recipients,
