@@ -26,7 +26,7 @@
             <!-- Conditionnel -->
             <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 w-60 text-center shadow-sm">
                 <h3 class="text-blue-700 font-semibold text-lg">
-                Conditionnel
+                {{translations[currentLanguage]?.condition}}
                 </h3>
                 <p class="text-3xl font-bold text-blue-900 mt-2">68%</p>
                 <p class="text-sm text-blue-600 mt-1">Accuracy</p>
@@ -95,15 +95,21 @@
                 >
                     <div class="flex justify-between items-center mb-2">
                         <p>
-                            SI {{ rule.feature }} {{ rule.operator }}
-                            {{ rule.threshold }} → la poubelle est pleine. Poids
-                            :
-                            <span class="font-bold text-blue-700">{{
-                                rule.score
-                            }}</span>
+                            <template v-if="currentLanguage === 'ar'">
+                            {{ translations[currentLanguage]?.then }}
+                            <span class="font-bold text-blue-700">{{ rule.score }}</span>
+                            ← {{ rule.feature }} {{ rule.operator }}
+                            {{ rule.threshold }} {{ translations[currentLanguage]?.If }}
+                            </template>
+
+                            <template v-else>
+                            {{ translations[currentLanguage]?.If }} {{ rule.feature }} {{ rule.operator }}
+                            {{ rule.threshold }} → {{ translations[currentLanguage]?.then }}
+                            <span class="font-bold text-blue-700">{{ rule.score }}</span>
+                            </template>
                         </p>
                         <UButton
-                            :label="openForm === index ? 'Fermer' : 'Modifier'"
+                            :label="(openForm === index) ? translations[currentLanguage]?.close : translations[currentLanguage]?.mod"
                             color="gray"
                             variant="ghost"
                             size="sm"
