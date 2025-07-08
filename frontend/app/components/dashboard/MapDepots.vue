@@ -16,7 +16,7 @@ const props = defineProps({
 const map = ref(null);
 const markers = ref([]);
 
-const { data } = await useFetch("http://127.0.0.1:8000/img/locations/");
+const { data } = await useFetch("http://127.0.0.1:8000/img/locations/1970-01-01");
 
 onMounted(async () => {
   const L = await import("leaflet");

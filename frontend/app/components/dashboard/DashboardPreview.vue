@@ -8,7 +8,6 @@
         </h3>
       </template>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <USelect v-model="selectedEtat" :items="etats" placeholder="Filtrer par état" />
         <USelect v-model="selectedPeriod" :items="periodes" placeholder="Filtrer par période" />
       </div>
     </UCard>
@@ -112,7 +111,7 @@
 <script setup>
 import { useWebSocket } from '~/composables/useWebSocket'
 import RealTimeIndicators from '~/components/RealTimeIndicators.vue'
-import { ref, computed, inject } from "vue";
+import { ref, computed, inject, provide } from "vue";
 import { Bar, Pie, Doughnut } from "vue-chartjs";
 import {
   Chart as ChartJS,
@@ -143,13 +142,6 @@ const { data: realtimeIndicators } = useWebSocket()
 const currentLanguage = inject('currentLanguage')
 const translations = inject('translations')
 
-// Filtres
-const etats = computed(() => [
-  { label: translations[currentLanguage.value]?.allStates ?? "Tous", value: "all" },
-  { label: translations[currentLanguage.value]?.emptyState ?? "Vide", value: "vide" },
-  { label: translations[currentLanguage.value]?.overflowState ?? "Débordée", value: "debordee" },
-]);
-
 const periodes = computed(() => [
   { label: translations[currentLanguage.value]?.allPeriods ?? "Toutes périodes", value: "all" },
   { label: translations[currentLanguage.value]?.last7Days ?? "7 derniers jours", value: "7days" },
@@ -157,14 +149,57 @@ const periodes = computed(() => [
   { label: translations[currentLanguage.value]?.thisYear ?? "Cette année", value: "year" },
 ]);
 
-const selectedEtat = ref(etats.value[0].value);
 const selectedPeriod = ref(periodes.value[0].value);
+const date = ref("1970-01-01");
+
+watch(selectedPeriod, (newPeriod) => {
+  const today = new Date();
+  switch (newPeriod) {
+    case "7days":
+      date.value = new Date(today.setDate(today.getDate() - 7)).toISOString().split("T")[0];
+      break;
+    case "30days":
+      date.value = new Date(today.setDate(today.getDate() - 30)).toISOString().split("T")[0];
+      break;
+    case "year":
+      date.value = new Date(today.getFullYear(), 0, 1).toISOString().split("T")[0];
+      break;
+    default:
+      date.value = "1970-01-01"; // Valeur par défaut pour "all"
+  }
+});
+
 
 // API dashboard
-const { data, pending, error } = await useFetch("http://127.0.0.1:8000/dashboard/");
+const { data, pending, error } = await useFetch(`http://127.0.0.1:8000/dashboard/${date.value}`);
 
 // API histograms globaux
-const { data: histoData, pending: histoPending, error: histoError } = await useFetch("http://127.0.0.1:8000/img/global_histograms/");
+const { data: histoData, pending: histoPending, error: histoError } = await useFetch(`http://127.0.0.1:8000/img/global_histograms/${date.value}`);
+
+watch(date, async (newDate) => {
+  try {
+    const response = await $fetch(`http://127.0.0.1:8000/img/global_histograms/${newDate}`);
+    histoData.value = response;
+  } catch (error) {
+    console.error("Erreur lors de la récupération des données :", error);
+    histoError.value = error;
+  } finally {
+    histoPending.value = false; 
+  }
+});
+
+watch(date, async (newDate) => {
+  try {
+    const response = await $fetch(`http://127.0.0.1:8000/dashboard/${newDate}`);
+    data.value = response;
+  } catch (error) {
+    console.error("Erreur lors de la récupération des données :", error);
+    error.value = error;
+  } finally {
+    pending.value = false; 
+  }
+});
+
 
 // Graphes dashboard
 const barImages = computed(() => ({
@@ -241,24 +276,24 @@ const barTonsDominants = computed(() => ({
     {
       label: translations[currentLanguage.value]?.Red ?? "Rouge",
       data: [
-        histoData.value?.Dominant_Colors_Label?.Vide?.Rouge ?? 0,
         histoData.value?.Dominant_Colors_Label?.Pleine?.Rouge ?? 0,
+        histoData.value?.Dominant_Colors_Label?.Vide?.Rouge ?? 0,
       ],
       backgroundColor: "#FF4C4C",
     },
     {
       label: translations[currentLanguage.value]?.Green ?? "Vert",
       data: [
-        histoData.value?.Dominant_Colors_Label?.Vide?.Vert ?? 0,
         histoData.value?.Dominant_Colors_Label?.Pleine?.Vert ?? 0,
+        histoData.value?.Dominant_Colors_Label?.Vide?.Vert ?? 0,
       ],
       backgroundColor: "#4CAF50",
     },
     {
       label: translations[currentLanguage.value]?.Blue ?? "Bleu",
       data: [
-        histoData.value?.Dominant_Colors_Label?.Vide?.Bleu ?? 0,
         histoData.value?.Dominant_Colors_Label?.Pleine?.Bleu ?? 0,
+        histoData.value?.Dominant_Colors_Label?.Vide?.Bleu ?? 0,
       ],
       backgroundColor: "#2196F3",
     },
@@ -294,24 +329,24 @@ const barContrastesLabel = computed(() => ({
     {
       label: translations[currentLanguage.value]?.low ?? "Faible",
       data: [
-        histoData.value?.Contrast_Level_Label?.Vide?.Faible ?? 0,
         histoData.value?.Contrast_Level_Label?.Pleine?.Faible ?? 0,
+        histoData.value?.Contrast_Level_Label?.Vide?.Faible ?? 0,
       ],
       backgroundColor: "#FF7F27",
     },
     {
       label: translations[currentLanguage.value]?.medium ?? "Moyen",
       data: [
-        histoData.value?.Contrast_Level_Label?.Vide?.Moyen ?? 0,
         histoData.value?.Contrast_Level_Label?.Pleine?.Moyen ?? 0,
+        histoData.value?.Contrast_Level_Label?.Vide?.Moyen ?? 0,
       ],
       backgroundColor: "#006FFF",
     },
     {
       label: translations[currentLanguage.value]?.high ?? "Élevé",
       data: [
-        histoData.value?.Contrast_Level_Label?.Vide?.Élevé ?? 0,
         histoData.value?.Contrast_Level_Label?.Pleine?.Élevé ?? 0,
+        histoData.value?.Contrast_Level_Label?.Vide?.Élevé ?? 0,
       ],
       backgroundColor: "#000000",
     },
@@ -432,4 +467,6 @@ const pieOptions = {
 
 console.log("Dashboard data", data.value);
 console.log("Histogram data", histoData.value);
+
+provide('date', date);
 </script>

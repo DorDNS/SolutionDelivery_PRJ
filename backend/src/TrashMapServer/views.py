@@ -25,7 +25,7 @@ from .utils import is_zone_red_from_db, generate_zone_report_from_row
 
 EMAILS_FILE = os.path.join(s.BASE_DIR, "emails.json")
 
-def dashboard(request):
+def dashboard(request, date="1970-01-01"):
     db_path = os.path.join(s.BASE_DIR, 'db.sqlite3')
     with sqlite3.connect(db_path) as conn:
         cursor = conn.cursor()
@@ -37,8 +37,8 @@ def dashboard(request):
                     COUNT(CASE WHEN Status = 1 THEN 1 END),
                     COUNT(CASE WHEN Status IS NULL THEN 1 END),
                     AVG(Avg_R), AVG(Avg_G), AVG(Avg_B)
-                FROM Image
-            """)
+                FROM Image WHERE Date_taken > ?
+            """, (date or '1970-01-01',))
             count, empty_count, full_count, no_labeled_count, Avg_R, Avg_G, Avg_B = cursor.fetchone()
 
             cursor.execute("SELECT (Height * Width) AS Size, Contrast_level FROM Image")
@@ -60,16 +60,16 @@ def dashboard(request):
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=500)
 
-def locations_img(request):
+def locations_img(request, date="1970-01-01"):
     db_path = os.path.join(s.BASE_DIR, 'db.sqlite3')
     with sqlite3.connect(db_path) as conn:
         cursor = conn.cursor()
         try:
             cursor.execute("""
                 SELECT Location.Id_Location, Location.latitude, Location.Longitude, Location.city, Location.id_image, Image.Status
-                FROM Location
-                JOIN Image ON Location.id_image = Image.Id_Image
-            """)
+                FROM Location 
+                JOIN Image ON Location.id_image = Image.Id_Image WHERE Image.Date_taken > ?
+            """, (date or '1970-01-01',))
             results = cursor.fetchall()
             data = [
                 {
@@ -542,14 +542,14 @@ def list_images_paginated(request):
 
 
 
-def global_histograms(request):
+def global_histograms(request, date="1970-01-01"):
     try:
         with sqlite3.connect(os.path.join(s.BASE_DIR, 'db.sqlite3')) as conn:
             cursor = conn.cursor()
             cursor.execute("""
                 SELECT Width, Height, RGB_Histogram, Luminance_Histogram, Contrast_level, Edges, Status
-                FROM Image
-            """)
+                FROM Image WHERE Date_taken > ?
+            """, (date or '1970-01-01',))
             rows = cursor.fetchall()
 
         # Init structures

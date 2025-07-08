@@ -15,6 +15,8 @@ const { showMarches, showChantiers, showDepots, showZones } = defineProps({
     showZones: { type: Boolean, default: false },
 });
 
+const date = inject("date");
+
 // Constantes Leaflet
 const url = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
 const attribution = "&copy; OpenStreetMap contributors";
@@ -91,7 +93,7 @@ const fetchChantiers = async () => {
 
 const fetchDepots = async () => {
     try {
-        const response = await axios.get("http://127.0.0.1:8000/img/locations/");
+        const response = await axios.get(`http://127.0.0.1:8000/img/locations/${date.value}`);
         console.log("Réponse API depots :", response.data);
 
         depots.value = response.data.map(d => {
@@ -118,6 +120,11 @@ const fetchDepots = async () => {
         console.error("Erreur récupération dépôts :", error);
     }
 };
+
+
+watch(date, async () => {
+    await fetchDepots();
+});
 
 function generateRiskZones() {
     console.log("Depots avant filter :", depots.value);

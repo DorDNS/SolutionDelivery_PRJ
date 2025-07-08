@@ -25,16 +25,16 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     # DASHBOARD-related routes
-    path('dashboard/', v.dashboard),
+    path('dashboard/<str:date>/', v.dashboard),
     
     # IMG-related routes
     path("img/list/", v.list_images_paginated),
-    path('img/locations/', v.locations_img),     # GET: Return ids and locations of images for map
+    path('img/locations/<str:date>/', v.locations_img),     # GET: Return ids and locations of images for map
     path('img/upload/', v.upload_img),           # POST: Upload an image
     path('img/<int:id>/modify/', v.modify_img),  # POST/PUT: Annotate/modify image
     path('img/metadatas/<int:id>/', v.img_detail),          # GET: Get all info of this image
     path('img/img/<int:id>', v.get_img),                ## GET: Get the image
-    path('img/global_histograms/', v.global_histograms),
+    path('img/global_histograms/<str:date>/', v.global_histograms),
     path('api/image/<str:filename>/', v.img_by_filename),  # GET : infos via nom de fichier
     
 
