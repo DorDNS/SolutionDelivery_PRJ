@@ -28,7 +28,7 @@
                 <h3 class="text-blue-700 font-semibold text-lg">
                 Conditionnel
                 </h3>
-                <p class="text-3xl font-bold text-blue-900 mt-2">68%</p>
+                <p class="text-3xl font-bold text-blue-900 mt-2">69%</p>
                 <p class="text-sm text-blue-600 mt-1">Accuracy</p>
             </div>
 
@@ -37,7 +37,7 @@
                 <h3 class="text-green-700 font-semibold text-lg">
                 Deep Learning
                 </h3>
-                <p class="text-3xl font-bold text-green-900 mt-2">77%</p>
+                <p class="text-3xl font-bold text-green-900 mt-2">79%</p>
                 <p class="text-sm text-green-600 mt-1">Accuracy</p>
             </div>
             </div>
