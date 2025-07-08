@@ -241,8 +241,8 @@ async function reinitiateRuleCond() {
             "✅ Les prédictions conditionnelles ont été reinitialisées avec succès."
         );
     } catch (err) {
-        console.error("❌ Erreur lors de la relance conditionnelle :", err);
-        alert("❌ Une erreur est survenue lors de la relance conditionnelle.");
+        console.error("Erreur lors de la relance conditionnelle :", err);
+        alert("Une erreur est survenue lors de la relance conditionnelle.");
     }
 }
 
@@ -254,9 +254,9 @@ watch(intelligentMode, async (newVal) => {
             intelligent_mode: newVal,
         });
 
-        // 🔥 Si mode intelligent activé, prédire toutes les images manquantes
+        // Si mode intelligent activé, prédire toutes les images manquantes
         if (newVal) {
-            await loadMissingPredictionsCount(); // 🔥 recharge le nombre avant
+            await loadMissingPredictionsCount(); // recharge le nombre avant
 
             if (missingPredictionsCount.value > 0) {
                 const res = await axios.post(
@@ -264,7 +264,7 @@ watch(intelligentMode, async (newVal) => {
                 );
                 console.log("Prédictions IA manquantes lancées :", res.data);
                 alert(
-                    "✅ Prédictions IA lancées pour toutes les images sans prédiction."
+                    "Prédictions IA lancées pour toutes les images sans prédiction."
                 );
             } else {
                 console.log(
@@ -274,7 +274,7 @@ watch(intelligentMode, async (newVal) => {
         }
     } catch (err) {
         console.error("Erreur saveMode:", err);
-        alert("❌ Erreur lors de l'activation du mode intelligent.");
+        alert("Erreur lors de l'activation du mode intelligent.");
     }
 });
 function getInputType(value) {
@@ -305,10 +305,10 @@ async function relancerPredictionIA() {
         const res = await axios.post(
             "http://localhost:8000/img/predict_crops_all/"
         );
-        alert("✅ Prédictions IA relancées avec succès.");
+        alert("Prédictions IA relancées avec succès.");
     } catch (err) {
         console.error("Erreur relancerPredictionIA:", err);
-        alert("❌ Erreur lors de la relance des prédictions IA.");
+        alert("Erreur lors de la relance des prédictions IA.");
     }
 }
 
@@ -317,17 +317,17 @@ async function relancerPredictionCond() {
         const res = await axios.post(
             "http://localhost:8000/img/predict_cond_all/"
         );
-        alert("✅ Prédictions IA relancées avec succès.");
+        alert("Prédictions IA relancées avec succès.");
     } catch (err) {
         console.error("Erreur relancerPredictionIA:", err);
-        alert("❌ Erreur lors de la relance des prédictions IA.");
+        alert("Erreur lors de la relance des prédictions IA.");
     }
 }
 
 function confirmRelanceCond() {
     if (
         confirm(
-            "⚠️ Cette action va relancer la prédiction connditionelles sur toutes les images.\nContinuer ?"
+            "Cette action va relancer la prédiction connditionelles sur toutes les images.\nContinuer ?"
         )
     ) {
         relancerPredictionCond();
@@ -337,7 +337,7 @@ function confirmRelanceCond() {
 function confirmRelance() {
     if (
         confirm(
-            "⚠️ Cette action va relancer la prédiction IA sur toutes les images.\nContinuer ?"
+            "Cette action va relancer la prédiction IA sur toutes les images.\nContinuer ?"
         )
     ) {
         relancerPredictionIA();
