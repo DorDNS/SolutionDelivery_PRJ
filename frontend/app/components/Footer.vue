@@ -4,7 +4,7 @@
   </footer>
 </template>
 
-<script setup lang="ts">
+<script setup>
 import {inject } from 'vue'
 
 const currentLanguage = inject('currentLanguage')

@@ -21,6 +21,28 @@
                 </div>
             </div>
 
+            <!-- Bloc accuracy des modèles -->
+            <div class="mt-6 flex flex-col sm:flex-row justify-center items-center gap-6">
+            <!-- Conditionnel -->
+            <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 w-60 text-center shadow-sm">
+                <h3 class="text-blue-700 font-semibold text-lg">
+                {{translations[currentLanguage]?.condition}}
+                </h3>
+                <p class="text-3xl font-bold text-blue-900 mt-2">68%</p>
+                <p class="text-sm text-blue-600 mt-1">Accuracy</p>
+            </div>
+
+            <!-- Deep Learning -->
+            <div class="bg-green-50 border border-green-200 rounded-xl p-4 w-60 text-center shadow-sm">
+                <h3 class="text-green-700 font-semibold text-lg">
+                Deep Learning
+                </h3>
+                <p class="text-3xl font-bold text-green-900 mt-2">77%</p>
+                <p class="text-sm text-green-600 mt-1">Accuracy</p>
+            </div>
+            </div>
+
+
             <!-- Switch mode intelligent -->
             <div class="flex items-center justify-center gap-1 mb-6">
                 <USwitch
@@ -73,15 +95,21 @@
                 >
                     <div class="flex justify-between items-center mb-2">
                         <p>
-                            SI {{ rule.feature }} {{ rule.operator }}
-                            {{ rule.threshold }} → la poubelle est pleine. Poids
-                            :
-                            <span class="font-bold text-blue-700">{{
-                                rule.score
-                            }}</span>
+                            <template v-if="currentLanguage === 'ar'">
+                            {{ translations[currentLanguage]?.then }}
+                            <span class="font-bold text-blue-700">{{ rule.score }}</span>
+                            ← {{ rule.feature }} {{ rule.operator }}
+                            {{ rule.threshold }} {{ translations[currentLanguage]?.If }}
+                            </template>
+
+                            <template v-else>
+                            {{ translations[currentLanguage]?.If }} {{ rule.feature }} {{ rule.operator }}
+                            {{ rule.threshold }} → {{ translations[currentLanguage]?.then }}
+                            <span class="font-bold text-blue-700">{{ rule.score }}</span>
+                            </template>
                         </p>
                         <UButton
-                            :label="openForm === index ? 'Fermer' : 'Modifier'"
+                            :label="(openForm === index) ? translations[currentLanguage]?.close : translations[currentLanguage]?.mod"
                             color="gray"
                             variant="ghost"
                             size="sm"
@@ -232,9 +260,9 @@ watch(intelligentMode, async (newVal) => {
             intelligent_mode: newVal,
         });
 
-        // 🔥 Si mode intelligent activé, prédire toutes les images manquantes
+        // Si mode intelligent activé, prédire toutes les images manquantes
         if (newVal) {
-            await loadMissingPredictionsCount(); // 🔥 recharge le nombre avant
+            await loadMissingPredictionsCount(); // recharge le nombre avant
 
             if (missingPredictionsCount.value > 0) {
                 const res = await axios.post(

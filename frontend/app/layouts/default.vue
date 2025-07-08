@@ -139,6 +139,11 @@ const translations = {
         save: "Enregistrer",
         relanceCond: "Relancer la prédiction sur toutes les images",
         reinitiateRuleCond: "Réinitialiser les règles par défaut",
+        condition : "Conditionnel",
+        If: "Si",
+        then: "La poubelle est plaine. Poids : ",
+        mod: "Modifier",
+        close: "Fermer",
     },
     en: {
         //Header
@@ -260,8 +265,14 @@ const translations = {
         modeman: "Basic mode enabled",
         save: "Save",
         relanceIA: "Relaunch AI prediction on all images",
+        constraintsFormDesctiption: "To disable a rule, set its score to zero.",
         relanceCond: "Relaunch prediction on all images",
         reinitiateRuleCond: "Reset rules to default",
+        condition: "Conditional",
+        If: "If",
+        then: "the trash bin is full. Weight: ",
+        mod: "Modify",
+        close: "Close",
     },
     ar: {
         //Header
@@ -377,8 +388,14 @@ const translations = {
         modeman: "تم تمكين الوضع الأساسي",
         save: "حفظ",
         relanceIA: "إعادة تشغيل تنبؤات الذكاء الاصطناعي على جميع الصور",
+        constraintsFormDesctiption: "لإلغاء تفعيل قاعدة، قم بتعيين نتيجتها إلى صفر.",
         relanceCond: "إعادة تشغيل التنبؤ على جميع الصور",
         reinitiateRuleCond: "إعادة تعيين القواعد إلى الوضع الافتراضي",
+        condition: "شرطي",
+        If: "إذا",
+        then: "الحاوية ممتلئة. الوزن: ",
+        mod: "تعديل",
+        close: "إغلاق",
     },
 };
 
