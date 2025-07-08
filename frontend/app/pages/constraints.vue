@@ -260,9 +260,9 @@ watch(intelligentMode, async (newVal) => {
             intelligent_mode: newVal,
         });
 
-        // 🔥 Si mode intelligent activé, prédire toutes les images manquantes
+        // Si mode intelligent activé, prédire toutes les images manquantes
         if (newVal) {
-            await loadMissingPredictionsCount(); // 🔥 recharge le nombre avant
+            await loadMissingPredictionsCount(); // recharge le nombre avant
 
             if (missingPredictionsCount.value > 0) {
                 const res = await axios.post(
