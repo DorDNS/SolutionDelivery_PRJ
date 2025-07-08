@@ -19,7 +19,6 @@ from TrashMapServer import utils
 import pandas as pd
 from django.core.mail import send_mail
 from django.utils.timezone import now
-from .utils import generate_full_report
 from django.conf import settings
 import traceback
 from .utils import is_zone_red_from_db, generate_zone_report_from_row
