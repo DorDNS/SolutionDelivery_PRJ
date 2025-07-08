@@ -74,7 +74,7 @@ Avant de commencer, vérifiez que vous avez :
 
 Une fois que vous avez cloné ce dépôt GitHub sur votre machine, voici ce qu’il faut faire :
 
-**1. Ouvrez deux terminals pour gérer le backend et le frontend :**
+**1. Ouvrez deux terminals pour gérer le backend et le frontend.**
 
 **2. Dans votre premier terminal placez vous dans le dossier `backend`:**
 
@@ -173,9 +173,9 @@ Elle devrait s'appeler `default`.
 **3. Créer la variable pour faire fonctionner le module météo :**
 * Créer un fichier `.env` dans le dossier `frontend` (à la racine)
 * Copier-coller ceci dans ce fichier : `VITE_OPENWEATHER_API_KEY=`
-* Après le = tu copies-colles ta clé API
+* Après le = copiez-collez votre clé API
 
-**Normalement ça marche maintenant !**
+**L'activation de votre clé prendra un certain temps donc ne vous inquiétez pas si la météo ne s'affiche pas immédiatement, rafraichissez régulièrement la page après 20min**
 
 ## 🧠 Que contient le projet ?
 
