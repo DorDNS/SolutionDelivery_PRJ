@@ -56,6 +56,9 @@ urlpatterns = [
     path('img/predict_only/cond/', v.predict_only_cond),
 
     path('img/count_missing_predictions/', v.count_images_without_prediction),
+    
+    path("subscribe/", v.subscribe_email, name="subscribe_email"),
+
 
 ]
 
