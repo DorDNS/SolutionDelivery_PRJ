@@ -23,10 +23,10 @@ const translations = {
         headerconstraints: "Analyse IA",
         //footer
         footerText: "2025 TrashMap. Tous droits réservés.",
-        footerMessages: {
-            subscribeSuccess: "Inscription réussie ! Un rapport vous a été envoyé.",
-            subscribeError: "Erreur lors de l’inscription.",
-        },
+        enter: "Entrez votre email",
+        sub:"S'abonner",
+        subscribeSuccess: "Inscription réussie ! Un rapport vous a été envoyé.",
+        subscribeError: "Erreur lors de l’inscription.",
         //Index
         slogan: "Aidez votre ville à rester propre. Uploadez des images de poubelles et contribuez à une meilleure gestion des déchets urbains grâce à l’IA.",
         uploadButton: "Uploader une image",
@@ -158,10 +158,10 @@ const translations = {
         uploadButton: "Upload an image",
         //Footer
         footerText: "2025 TrashMap. All rights reserved.",
-        footerMessages: {
-            subscribeSuccess: "Subscription successful! A report has been sent to you.",
-            subscribeError: "Error during subscription.",
-        },
+        enter: "Enter your email",
+        sub: "Subscribe",
+        subscribeSuccess: "Subscription successful! A report has been sent to you.",
+        subscribeError: "Error during subscription.",
         //Index
         slogan: "Help your city stay clean. Upload images of trash and contribute to better urban waste management with AI.",
         dashboardprev: "Dashboard Overview",
@@ -290,10 +290,10 @@ const translations = {
         headerconstraints: "تحليل الذكاء الاصطناعي",
         //Footer
         footerText: "2025 TrashMap. جميع الحقوق محفوظة.",
-        footerMessages: {
-            subscribeSuccess: "تم الاشتراك بنجاح! تم إرسال تقرير إليك.",
-            subscribeError: "حدث خطأ أثناء الاشتراك.",
-        },
+        enter: "أدخل بريدك الإلكتروني",
+        sub: "الاشتراك",
+        subscribeSuccess: "تم الاشتراك بنجاح! تم إرسال تقرير إليك.",
+        subscribeError: "خطأ أثناء الاشتراك.",
         //Index
         slogan: "ساعد مدينتك على البقاء نظيفة. قم بتحميل صور الحاويات وساهم في تحسين إدارة النفايات باستخدام الذكاء الاصطناعي.",
         uploadButton: "تحميل صورة",

@@ -5,7 +5,7 @@
       <input
         v-model="email"
         type="email"
-        placeholder="Entrez votre email"
+        :placeholder="translations[currentLanguage].enter"
         required
         class="text-black px-2 py-1 rounded bg-white"
       />
@@ -13,7 +13,7 @@
         type="submit"
         class="bg-[#1b263b] hover:bg-[#0d1b2a] text-white px-3 py-1 rounded"
       >
-        S’abonner
+        {{ translations[currentLanguage].sub }}
       </button>
     </form>
 
@@ -34,10 +34,10 @@ const message = ref('')
 const subscribeEmail = async () => {
   try {
     await axios.post('http://localhost:8000/subscribe/', { email: email.value })
-    message.value = 'Inscription réussie ! Un rapport vous a été envoyé.'
+    message.value = translations[currentLanguage.value]?.subscribeSuccess ?? "Inscription réussie"
     email.value = ''
   } catch (error) {
-    message.value = 'Erreur lors de l’inscription.'
+    message.value = translations[currentLanguage.value]?.subscribeError ?? "Erreur lors de l'inscription"
     console.error(error)
   }
 }
