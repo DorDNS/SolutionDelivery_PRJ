@@ -74,7 +74,7 @@ Avant de commencer, vérifiez que vous avez :
 
 Une fois que vous avez cloné ce dépôt GitHub sur votre machine, voici ce qu’il faut faire :
 
-**1. Ouvrir deux terminals pour gérer le backend et le frontend**
+**1. Ouvrez deux terminals pour gérer le backend et le frontend :**
 
 **2. Dans votre premier terminal placez vous dans le dossier `backend`:**
 
