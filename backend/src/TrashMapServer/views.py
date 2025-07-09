@@ -165,7 +165,7 @@ def upload_img(request):
     latitude = request.POST.get('Latitude')
     longitude = request.POST.get('Longitude')
     city = request.POST.get('City')
-    prediction_ia = request.POST.get('Prediction_IA')
+    prediction_ia = request.POST.get('Prediction_IA') 
 
     db_path = os.path.join(s.BASE_DIR, 'db.sqlite3')
     with sqlite3.connect(db_path) as conn:
@@ -193,7 +193,7 @@ def upload_img(request):
         except Exception as e:
             return JsonResponse({"error": str(e)}, status=500)
 
-    #Traitement synchrone complet : crop + features
+    # Traitement synchrone complet : crop + features
     process_features_sync(id_image, full_path)
 
     prediction_result = None
@@ -211,7 +211,7 @@ def upload_img(request):
         prediction_result = status_ia
 
     else:
-        # SI mode intelligent activé, prédire immédiatement et maj Status_DeepIA
+        # Si mode intelligent activé, prédire immédiatement et maj Status_DeepIA
         intelligent_mode = False
         config_db = os.path.join(s.BASE_DIR, 'db.sqlite3')
         with sqlite3.connect(config_db) as conn:
@@ -755,7 +755,6 @@ def update_app_config(request):
     db = os.path.join(s.BASE_DIR, 'db.sqlite3')
     with sqlite3.connect(db) as conn:
         cur = conn.cursor()
-        # UPSERT : insert si absent, update si présent
         cur.execute("""
             INSERT INTO AppConfig (key, value)
             VALUES ('intelligent_mode', ?)
@@ -885,8 +884,8 @@ def predict_only_cond(request):
         image_pil = PILImage.open(io.BytesIO(image_bytes)).convert("RGB")
         image_pil.save(temp_path, format="WEBP", quality=80)
 
-        # 2. Extraire les features () fonction à adapter selon ton projet)
-        features = utils.extract_features_from_path(temp_path)  # à adapter
+        # 2. Extraire les features
+        features = utils.extract_features_from_path(temp_path) 
 
         # 3. Charger les règles conditionnelles depuis la BDD
         rules = []

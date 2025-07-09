@@ -28,7 +28,7 @@
                 <h3 class="text-blue-700 font-semibold text-lg">
                 {{translations[currentLanguage]?.condition}}
                 </h3>
-                <p class="text-3xl font-bold text-blue-900 mt-2">68%</p>
+                <p class="text-3xl font-bold text-blue-900 mt-2">69%</p>
                 <p class="text-sm text-blue-600 mt-1">Accuracy</p>
             </div>
 
@@ -37,7 +37,7 @@
                 <h3 class="text-green-700 font-semibold text-lg">
                 Deep Learning
                 </h3>
-                <p class="text-3xl font-bold text-green-900 mt-2">77%</p>
+                <p class="text-3xl font-bold text-green-900 mt-2">79%</p>
                 <p class="text-sm text-green-600 mt-1">Accuracy</p>
             </div>
             </div>
@@ -247,8 +247,8 @@ async function reinitiateRuleCond() {
             "✅ Les prédictions conditionnelles ont été reinitialisées avec succès."
         );
     } catch (err) {
-        console.error("❌ Erreur lors de la relance conditionnelle :", err);
-        alert("❌ Une erreur est survenue lors de la relance conditionnelle.");
+        console.error("Erreur lors de la relance conditionnelle :", err);
+        alert("Une erreur est survenue lors de la relance conditionnelle.");
     }
 }
 
@@ -270,7 +270,7 @@ watch(intelligentMode, async (newVal) => {
                 );
                 console.log("Prédictions IA manquantes lancées :", res.data);
                 alert(
-                    "✅ Prédictions IA lancées pour toutes les images sans prédiction."
+                    "Prédictions IA lancées pour toutes les images sans prédiction."
                 );
             } else {
                 console.log(
@@ -280,7 +280,7 @@ watch(intelligentMode, async (newVal) => {
         }
     } catch (err) {
         console.error("Erreur saveMode:", err);
-        alert("❌ Erreur lors de l'activation du mode intelligent.");
+        alert("Erreur lors de l'activation du mode intelligent.");
     }
 });
 function getInputType(value) {
@@ -311,10 +311,10 @@ async function relancerPredictionIA() {
         const res = await axios.post(
             "http://localhost:8000/img/predict_crops_all/"
         );
-        alert("✅ Prédictions IA relancées avec succès.");
+        alert("Prédictions IA relancées avec succès.");
     } catch (err) {
         console.error("Erreur relancerPredictionIA:", err);
-        alert("❌ Erreur lors de la relance des prédictions IA.");
+        alert("Erreur lors de la relance des prédictions IA.");
     }
 }
 
@@ -323,17 +323,17 @@ async function relancerPredictionCond() {
         const res = await axios.post(
             "http://localhost:8000/img/predict_cond_all/"
         );
-        alert("✅ Prédictions IA relancées avec succès.");
+        alert("Prédictions IA relancées avec succès.");
     } catch (err) {
         console.error("Erreur relancerPredictionIA:", err);
-        alert("❌ Erreur lors de la relance des prédictions IA.");
+        alert("Erreur lors de la relance des prédictions IA.");
     }
 }
 
 function confirmRelanceCond() {
     if (
         confirm(
-            "⚠️ Cette action va relancer la prédiction connditionelles sur toutes les images.\nContinuer ?"
+            "Cette action va relancer la prédiction connditionelles sur toutes les images.\nContinuer ?"
         )
     ) {
         relancerPredictionCond();
@@ -343,7 +343,7 @@ function confirmRelanceCond() {
 function confirmRelance() {
     if (
         confirm(
-            "⚠️ Cette action va relancer la prédiction IA sur toutes les images.\nContinuer ?"
+            "Cette action va relancer la prédiction IA sur toutes les images.\nContinuer ?"
         )
     ) {
         relancerPredictionIA();

@@ -220,7 +220,7 @@ const fileName = ref("");
 const intelligentMode = ref(false);
 const predictionIAValue = ref(null);
 
-//localisation via Leaflet
+// localisation via Leaflet
 const lat = ref(48.8566); // Paris par défaut
 const lon = ref(2.3522);
 let L; // Leaflet instance
@@ -230,7 +230,7 @@ const translations = inject("translations");
 const currentLanguage = inject("currentLanguage");
 
 async function initializeMap() {
-    await nextTick(); // attend que le DOM soit rendu
+    await nextTick(); //attend que le DOM soit rendu
 
     if (!document.getElementById("mapid")) {
         console.error("Div #mapid introuvable pour Leaflet");
@@ -343,7 +343,7 @@ async function processFile(file) {
     annotationSaved.value = false;
     predictionDone.value = false;
     selectedFile.value = file;
-    predictionIAValue.value = null;
+    predictionIAValue.value = null; 
 
     if (!file) return;
 
@@ -392,7 +392,7 @@ async function processFile(file) {
                         ) {
                             annotation.value =
                                 data.prediction === 1 ? "pleine" : "vide";
-                            predictionIAValue.value = data.prediction;
+                            predictionIAValue.value = data.prediction; // stocke la prédiction IA
                         }
                     } catch (err) {
                         console.error("Erreur prédiction IA :", err);
@@ -425,7 +425,7 @@ async function processFile(file) {
                         ) {
                             annotation.value =
                                 data.prediction === 1 ? "pleine" : "vide";
-                            predictionIAValue.value = data.prediction; 
+                            predictionIAValue.value = data.prediction; // stocke la prédiction IA
                         }
                     } catch (err) {
                         console.error("Erreur prédiction IA :", err);
@@ -451,7 +451,7 @@ async function saveAnnotation() {
     annotationSaved.value = true;
 
     try {
-        //Reverse geocoding pour récupérer la ville
+        // Reverse geocoding pour récupérer la ville
         let city = "Unknown";
         try {
             const url = `http://localhost:8000/api/reverse_geocode_proxy/?lat=${lat.value}&lon=${lon.value}`;
@@ -481,7 +481,7 @@ async function saveAnnotation() {
         formData.append("City", city);
 
         if (intelligentMode.value && predictionIAValue.value !== null) {
-            formData.append("Prediction_IA", predictionIAValue.value);
+            formData.append("Prediction_IA", predictionIAValue.value); // utilise la prédiction IA originale
         }
 
         const response = await fetch("http://localhost:8000/img/upload/", {
