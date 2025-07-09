@@ -1,5 +1,7 @@
 <template>
   <div class="space-y-10">
+    <!-- Indicateurs en temps réel -->
+    <RealTimeIndicators :indicators="realtimeIndicators || {}" />
     <!-- Filtres -->
     <UCard>
       <template #header>
@@ -11,10 +13,6 @@
         <USelect v-model="selectedPeriod" :items="periodes" placeholder="Filtrer par période" />
       </div>
     </UCard>
-
-    <!-- Indicateurs en temps réel -->
-    <RealTimeIndicators :indicators="realtimeIndicators || {}" />
-
     <!-- Carte -->
     <UCard class="mt-12">
       <template #header>
