@@ -1,22 +1,12 @@
-# 🧠 Plateforme intelligente de suivi des poubelles – Wild Dump Prevention (WDP)
+# ♻️ TrashMap - Votre allié votre les dépôts sauvages !
 
 ## 📌 Contexte
 
-Face à l’absence de données précises sur les déchets abandonnés et l’inefficacité des méthodes actuelles de prévention, le projet **WDP** (Wild Dump Prevention) propose une **solution numérique innovante** pour :
+Face à l’absence de données précises sur les déchets abandonnés et l’inefficacité des méthodes actuelles de prévention, TrashMap propose une **solution numérique innovante** pour :
 
 - Détecter automatiquement l’état des poubelles publiques (pleine, vide) à partir d’images,
 - Identifier les zones à risque de débordement,
 - Aider les collectivités à améliorer leur gestion des déchets et prévenir les dépôts sauvages.
-
-Ce projet s’inscrit dans une logique **AI for Good** et de **Green IT**, visant un impact environnemental et sociétal positif.
-
-## 🎯 Objectifs
-
-- Développement d’une **plateforme web** pour la détection automatique d’ordures via des images.
-- Mise en place d’un système de **classification sans IA** basé sur des règles conditionnelles.
-- Visualisation des données via un **tableau de bord interactif**.
-- Suivi de l’état des poubelles sur le territoire (cartographie dynamique).
-- Intégration de bonnes pratiques en **éco-conception** et **gestion des risques**.
 
 ## 🧩 Fonctionnalités principales
 
@@ -39,13 +29,9 @@ Ce projet s’inscrit dans une logique **AI for Good** et de **Green IT**, visan
 - Graphiques via Chart.js et Matplotlib,
 - Cartographie dynamique des zones à risque.
 
-### ♻️ 5. Éco-conception (RGESN)
-- Intégration des recommandations du Référentiel Général d'Écoconception,
-- Réduction des impacts : poids des images, nombre de requêtes, hébergement durable.
-
-### ⚠️ 6. Évaluation des risques
-- Analyse des risques liés à la qualité des images, l’annotation manuelle, la variabilité technique des utilisateurs, etc.
-- Mesures d’atténuation prévues (prévisualisation, contrôle qualité, documentation).
+### ♻️ 5. Éco-conception
+- Réduction des impacts : poids des images, nombre de requêtes...
+- Impact social et sanitaire
 
 ## 👥 Équipe
 
@@ -129,21 +115,13 @@ npm install
 
 > Cela va créer automatiquement le dossier `node_modules/` (qui est ignoré par Git).
 
-**7. (Facultatif) Copier le fichier `.env.example` si présent :**
-
-```bash
-cp .env.example .env
-```
-
-> Sinon, vous pouvez créer un fichier `.env` vide ou le configurer selon les besoins ultérieurs (actuellement pas requis pour ce projet).
-
-**8. Lancer le serveur de développement Nuxt :**
+**7. Lancer le serveur de développement Nuxt :**
 
 ```bash
 npm run dev
 ```
 
-**5. Accéder au site dans le navigateur :**
+**8. Accéder au site dans le navigateur :**
 
 Ouvrez votre navigateur à l'adresse suivante :
 
@@ -177,20 +155,58 @@ Elle devrait s'appeler `default`.
 
 **L'activation de votre clé prendra un certain temps donc ne vous inquiétez pas si la météo ne s'affiche pas immédiatement, rafraichissez régulièrement la page après 20min**
 
-## 🧠 Que contient le projet ?
+## 🧱 Que contient le projet ?
 
-* `frontend/app/pages/` : les pages Vue/Nuxt (`index.vue`, `upload.vue`)
-* `frontend/app/components/` : les composants comme `Header` et `Footer`
-* `frontend/app/layouts/default.vue` : le layout principal avec structure page complète
-* `frontend/public/images/` : image de fond (`hero-fond.png`)
-* `frontend/nuxt.config.ts` : configuration globale de Nuxt
-* `backend/src/media` : les images stockées
-* `backend/src/TrashMapServer` : le backend principale (structure des routes/urls + scripts python logiques)
-* `backend/src/dbqlite3` : la base de données (visualisable en installant l'extension Database Client sur votre IDE)
-* `backend/src/email.json` : les emails des abonnés à la newsletter
-* `backend/src/manage.py` : la logique de server de Django
-* `backend/src/update_all_features.py` : logiques de traitement des données pour l'IA intelligente
+### 1. **Front-end (Interface utilisateur)**
 
+Développé avec **Nuxt.js (Vue 3)**, le front-end assure une navigation fluide, réactive et accessible pour tous les utilisateurs : citoyens, agents, collectivités.
+
+#### Principales vues/pages :
+
+* **Page d’accueil** : upload d’images, présentation du projet
+* **Navigation d’images** : affichage image par image, métadonnées, statut d’annotation
+* **Dashboard** : statistiques dynamiques, graphiques (Chart.js), filtres, résumé global
+* **Carte interactive** : géolocalisation des poubelles, marchés, chantiers, zones sensibles
+* **Système de notifications** : affichage d’alertes, envoi automatique par email
+
+### 2. **Back-end (API et logique métier)**
+
+Développé en **Node.js (Express)**, avec traitement asynchrone des données.
+
+#### Rôles principaux :
+
+* **Réception et gestion des images** : upload, renommage, stockage
+* **Extraction automatique de caractéristiques** : via scripts Python exécutés côté serveur (dimensions, couleur moyenne, contraste, contours…)
+* **Classification automatique** :
+
+  * Modèle conditionnel basé sur des règles simples
+  * Modèle IA (réseau de neurones convolutif entraîné)
+* **Gestion des règles personnalisées** : interface admin pour modifier les seuils
+* **Envoi d’emails d’alerte automatisés**
+
+### 3. **Scripts Python (Feature Extraction & IA)**
+
+Scripts modulaires utilisés pour :
+
+* Extraire des **caractéristiques visuelles simples**
+* Lancer la **classification conditionnelle**
+* Prédire l’état des poubelles via le **CNN entraîné**
+* Gérer les règles personnalisées de seuil
+
+### 4. **Base de données**
+
+Base relationnelle **PostgreSQL**, structurée pour stocker :
+
+* Les images (chemin d’accès)
+* Les métadonnées (date, dimensions, caractéristiques)
+* Les annotations (manuelles et automatiques)
+* Les règles configurées par l’utilisateur
+* Les événements (notifications envoyées, statut des poubelles)
+
+### 5. **Stockage des fichiers**
+
+* Stockage local sur le serveur pour les images
+* Nommage automatique et dossiers organisés par date
 
 ## 📝 Licence
 
